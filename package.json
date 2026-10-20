@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "format": "biome format",
     "lint": "biome lint",
-    "check": "biome check"
+    "check": "biome check",
+    "api": "json-server --watch db/db.json --port 3001"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
@@ -32,6 +33,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.1",
+    "json-server": "^1.0.0-beta.15",
     "typescript": "^6.0.2",
     "vite": "^8.0.0"
   },
