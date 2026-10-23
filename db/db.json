@@ -1,1 +1,12 @@
-{ "users": [{ "id": 1, "name": "João Oliveira", "email": "joao@example.com", "password": "123456", "onBoardingDone": true }] }
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "João Oliveira",
+      "email": "joao@example.com",
+      "password": "$2a$12$b1Hro2p7ZmVqSqj0MLhPpOkAdfBgsgf1zzvNnWKxLhunos/32N7gW",
+      "onBoardingDone": true
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
