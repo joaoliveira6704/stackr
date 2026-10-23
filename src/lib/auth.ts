@@ -4,6 +4,7 @@
  * NOTE (school demo): plaintext passwords and a localStorage session.
  * Never use this in production.
  */
+import bcrypt from 'bcryptjs';
 
 export interface User {
 	id: string;
@@ -50,10 +51,14 @@ export async function signIn(
 	email: string,
 	password: string,
 ): Promise<SessionUser> {
-	const users = await fetchUsersByEmail(email);
-	const user = users.find((candidate) => candidate.password === password);
+  const users = await fetchUsersByEmail(email);
+  const user = users.find(candidate => candidate.email === email)
 	if (!user) {
 		throw new Error("Invalid email or password.");
+  }
+  const match = await bcrypt.compare(password, user.password)
+  if (!match) {
+    throw new Error("Invalid email or password.");
 	}
 	return createSession(user);
 }
@@ -65,8 +70,10 @@ export async function signUp(input: {
 }): Promise<SessionUser> {
 	const existing = await fetchUsersByEmail(input.email);
 	if (existing.length > 0) {
-		throw new Error("An account with this email already exists.");
+		throw new Error("Error creating account");
 	}
+	const saltRounds = 10;
+		const hashedPassword: string = await bcrypt.hash(input.password, saltRounds);
 
 	let res: Response;
 	try {
@@ -76,7 +83,7 @@ export async function signUp(input: {
 			body: JSON.stringify({
 				name: input.name,
 				email: input.email,
-				password: input.password,
+				password: hashedPassword,
 			}),
 		});
 	} catch {
