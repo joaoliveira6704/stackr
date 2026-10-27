@@ -1,9 +1,10 @@
 /**
  * Mock auth against json-server (db/db.json), run via `bun run api`.
  *
- * NOTE (school demo): plaintext passwords and a localStorage session.
- * Never use this in production.
+ * NOTE (school demo): passwords are hashed in the browser and the session
+ * lives in localStorage. Never use this in production.
  */
+import bcrypt from "bcryptjs";
 
 export interface User {
 	id: string;
@@ -18,18 +19,29 @@ export interface SessionUser {
 	email: string;
 }
 
+export interface SignUpInput {
+	name: string;
+	email: string;
+	password: string;
+}
+
 const API_BASE = "/api";
 const SESSION_KEY = "stackr.session";
+const SALT_ROUNDS = 10;
+const INVALID_CREDENTIALS = "Invalid email or password.";
 
-async function fetchUsersByEmail(email: string): Promise<User[]> {
-	let res: Response;
+async function requestApi(path: string, init?: RequestInit): Promise<Response> {
 	try {
-		res = await fetch(`${API_BASE}/users?email=${encodeURIComponent(email)}`);
+		return await fetch(`${API_BASE}${path}`, init);
 	} catch {
 		throw new Error(
 			"Could not reach the API. Make sure json-server is running (bun run api).",
 		);
 	}
+}
+
+async function fetchUsersByEmail(email: string): Promise<User[]> {
+	const res = await requestApi(`/users?email=${encodeURIComponent(email)}`);
 	if (!res.ok) {
 		throw new Error("API request failed.");
 	}
@@ -51,39 +63,33 @@ export async function signIn(
 	password: string,
 ): Promise<SessionUser> {
 	const users = await fetchUsersByEmail(email);
-	const user = users.find((candidate) => candidate.password === password);
+	const user = users.find((candidate) => candidate.email === email);
 	if (!user) {
-		throw new Error("Invalid email or password.");
+		throw new Error(INVALID_CREDENTIALS);
+	}
+	const passwordMatches = await bcrypt.compare(password, user.password);
+	if (!passwordMatches) {
+		throw new Error(INVALID_CREDENTIALS);
 	}
 	return createSession(user);
 }
 
-export async function signUp(input: {
-	name: string;
-	email: string;
-	password: string;
-}): Promise<SessionUser> {
+export async function signUp(input: SignUpInput): Promise<SessionUser> {
 	const existing = await fetchUsersByEmail(input.email);
 	if (existing.length > 0) {
-		throw new Error("An account with this email already exists.");
+		throw new Error("Error creating account");
 	}
+	const hashedPassword = await bcrypt.hash(input.password, SALT_ROUNDS);
 
-	let res: Response;
-	try {
-		res = await fetch(`${API_BASE}/users`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				name: input.name,
-				email: input.email,
-				password: input.password,
-			}),
-		});
-	} catch {
-		throw new Error(
-			"Could not reach the API. Make sure json-server is running (bun run api).",
-		);
-	}
+	const res = await requestApi("/users", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({
+			name: input.name,
+			email: input.email,
+			password: hashedPassword,
+		}),
+	});
 	if (!res.ok) {
 		throw new Error("Could not create the account.");
 	}

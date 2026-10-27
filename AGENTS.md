@@ -16,6 +16,6 @@ Follow the patterns and folder structure already in the project before you inven
 
 ## Tests
 
-Every new feature comes with unit tests. Write them in the same change as the feature, not later. Test the behaviour the user cares about, and cover the normal case, the edge cases and the error cases. For money, always test rounding, zero, negative amounts and large values.
+Every new feature comes with unit tests, written using vitest. Write them in the same change as the feature, not later. Test the behaviour the user cares about, and cover the normal case, the edge cases and the error cases. For money, always test rounding, zero, negative amounts and large values.
 
 Keep each test small and focused on one thing. Name tests so a failure reads like a sentence that explains what broke. Tests must not depend on each other or on real network calls, so use simple fakes for outside services and for db.json data. Run the full test suite before you say the work is done, and fix any test your change breaks. When you fix a bug, add a test that would have caught it.
