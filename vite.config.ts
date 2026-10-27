@@ -1,12 +1,8 @@
 import tailwindcss from "@tailwindcss/vite";
-import { devtools } from "@tanstack/devtools-vite";
+import vue from "@vitejs/plugin-vue";
+import { defineConfig } from "vitest/config";
 
-import { tanstackRouter } from "@tanstack/router-plugin/vite";
-
-import viteReact from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
-
-const config = defineConfig({
+export default defineConfig({
 	resolve: { tsconfigPaths: true },
 	server: {
 		// json-server (bun run api) runs on 3001; the app always talks to /api/*
@@ -17,12 +13,9 @@ const config = defineConfig({
 			},
 		},
 	},
-	plugins: [
-		devtools(),
-		tailwindcss(),
-		tanstackRouter({ target: "react", autoCodeSplitting: true }),
-		viteReact(),
-	],
+	plugins: [tailwindcss(), vue()],
+	test: {
+		environment: "jsdom",
+		setupFiles: ["src/test/setup.ts"],
+	},
 });
-
-export default config;
