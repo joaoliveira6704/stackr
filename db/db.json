@@ -6,6 +6,18 @@
       "email": "joao@example.com",
       "password": "$2a$12$b1Hro2p7ZmVqSqj0MLhPpOkAdfBgsgf1zzvNnWKxLhunos/32N7gW",
       "onBoardingDone": true
+    },
+    {
+      "name": "Emanuel Gomes",
+      "email": "emanuel@example.com",
+      "password": "$2b$10$BmIn.MHu6SEe9YiAo1D/oeOTQdMJsjn/dHc.7/Z3QtgtDM67hctSO",
+      "id": "vSeDWkrk8q4"
+    },
+    {
+      "name": "Miguel Neto",
+      "email": "miguel@example.com",
+      "password": "$2b$10$k/Pv4mN3ctGQ.54h0AscPunQAogD6H5gkpMyKe7GXxbv/nbwk/UZ2",
+      "id": "zT4gZflxwYI"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
