@@ -5,9 +5,12 @@ import {
 	type RouterHistory,
 } from "vue-router";
 import { getSession } from "./lib/auth";
+import { ONBOARDING_PATH } from "./lib/onboarding";
 import DashboardView from "./views/DashboardView.vue";
 import HomeView from "./views/HomeView.vue";
 import LoginView from "./views/LoginView.vue";
+import NotFoundView from "./views/NotFoundView.vue";
+import OnboardingView from "./views/OnboardingView.vue";
 import SignupView from "./views/SignupView.vue";
 
 declare module "vue-router" {
@@ -21,15 +24,26 @@ const routes = [
 	{ path: "/login", component: LoginView },
 	{ path: "/signup", component: SignupView },
 	{
+		path: ONBOARDING_PATH,
+		component: OnboardingView,
+		meta: { requiresAuth: true },
+	},
+	{
 		path: "/dashboard",
 		component: DashboardView,
 		meta: { requiresAuth: true },
 	},
+	{ path: "/:pathMatch(.*)*", component: NotFoundView },
 ];
 
 export function requireSession(to: RouteLocationNormalized) {
-	if (to.meta.requiresAuth && !getSession()) {
+	if (!to.meta.requiresAuth) return true;
+	const session = getSession();
+	if (!session) {
 		return { path: "/login", query: { redirect: to.fullPath } };
+	}
+	if (!session.onboardingDone && to.path !== ONBOARDING_PATH) {
+		return { path: ONBOARDING_PATH };
 	}
 	return true;
 }

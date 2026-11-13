@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+import AuthLayout from "../components/AuthLayout.vue";
 import TextField from "../components/TextField.vue";
-import { errorMessage } from "../lib/errors";
+import { type ErrorCode, errorCode } from "../lib/errors";
 import { safeRedirect } from "../lib/redirect";
 import { useAuth } from "../lib/use-auth";
 
 const { signIn } = useAuth();
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const email = ref("");
 const password = ref("");
-const error = ref<string | null>(null);
+const error = ref<ErrorCode | null>(null);
 const pending = ref(false);
 
 async function handleSubmit() {
@@ -21,7 +24,7 @@ async function handleSubmit() {
 		await signIn(email.value, password.value);
 		await router.push(safeRedirect(route.query.redirect));
 	} catch (cause) {
-		error.value = errorMessage(cause);
+		error.value = errorCode(cause);
 	} finally {
 		pending.value = false;
 	}
@@ -29,34 +32,42 @@ async function handleSubmit() {
 </script>
 
 <template>
-	<div class="mx-auto max-w-sm">
-		<h1 class="text-2xl font-bold">Login</h1>
-		<form class="mt-6 flex flex-col gap-4" @submit.prevent="handleSubmit">
+	<AuthLayout
+		:title="t('login.title')"
+		:subtitle="t('login.subtitle')"
+		:panel-title="t('login.panelTitle')"
+		:panel-detail="t('login.panelDetail')"
+		panel-image="/social-proof.png"
+		:panel-image-alt="t('login.panelImageAlt')"
+	>
+		<form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
 			<TextField
 				v-model="email"
-				label="Email"
+				:label="t('common.email')"
 				type="email"
 				autocomplete="email"
 			/>
 			<TextField
 				v-model="password"
-				label="Password"
+				:label="t('common.password')"
 				type="password"
 				autocomplete="current-password"
 			/>
-			<p v-if="error" class="text-sm text-red-600">{{ error }}</p>
-			<button
-				type="submit"
-				:disabled="pending"
-				class="rounded bg-neutral-900 px-4 py-2 text-white hover:bg-neutral-700 disabled:opacity-50"
-			>
-				{{ pending ? "Logging in..." : "Login" }}
+			<p v-if="error" role="alert" class="text-sm font-semibold text-tangerine-strong">
+				{{ t(`errors.${error}`) }}
+			</p>
+			<button type="submit" :disabled="pending" class="btn-primary mt-2 w-full">
+				{{ pending ? t("login.pending") : t("login.submit") }}
 			</button>
 		</form>
-		<p class="mt-4 text-sm text-neutral-500">
-			Don't have an account?
-			<RouterLink to="/signup" class="underline">Sign Up</RouterLink>
+		<p class="mt-6 text-sm text-ink-muted">
+			{{ t("login.noAccount") }}
+			<RouterLink to="/signup" class="font-semibold text-ink underline">
+				{{ t("nav.signup") }}
+			</RouterLink>
 		</p>
-		<p class="mt-2 text-xs text-neutral-400">Demo: joao@example.com / 123456</p>
-	</div>
+		<p class="mt-3 rounded-2xl bg-surface-muted px-4 py-3 text-xs text-ink-muted">
+			{{ t("login.demo") }}
+		</p>
+	</AuthLayout>
 </template>

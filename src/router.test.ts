@@ -1,16 +1,10 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { createMemoryHistory } from "vue-router";
 import { createAppRouter } from "./router";
+import { demoUser, newcomer, storeSessionFor } from "./test/fake-api";
 
 function signInAsDemoUser() {
-	localStorage.setItem(
-		"stackr.session",
-		JSON.stringify({
-			id: "1",
-			name: "João Oliveira",
-			email: "joao@example.com",
-		}),
-	);
+	storeSessionFor(demoUser);
 }
 
 afterEach(() => {
@@ -42,5 +36,48 @@ describe("router", () => {
 		await router.push("/signup");
 
 		expect(router.currentRoute.value.path).toBe("/signup");
+	});
+
+	it("sends a signed in user who has not onboarded to the onboarding first", async () => {
+		storeSessionFor(newcomer);
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/dashboard");
+
+		expect(router.currentRoute.value.path).toBe("/onboarding");
+	});
+
+	it("lets a user who has not onboarded open the onboarding", async () => {
+		storeSessionFor(newcomer);
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/onboarding");
+
+		expect(router.currentRoute.value.path).toBe("/onboarding");
+	});
+
+	it("sends a signed out visitor from the onboarding to login", async () => {
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/onboarding");
+
+		expect(router.currentRoute.value.path).toBe("/login");
+	});
+
+	it("keeps public pages open to a user who has not onboarded", async () => {
+		storeSessionFor(newcomer);
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/");
+
+		expect(router.currentRoute.value.path).toBe("/");
+	});
+
+	it("shows the not found page for an unknown address", async () => {
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/this-does-not-exist");
+
+		expect(router.currentRoute.value.matched[0]?.path).toBe("/:pathMatch(.*)*");
 	});
 });

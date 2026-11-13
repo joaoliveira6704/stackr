@@ -43,7 +43,7 @@ describe("XP", () => {
 
 		progress.addXp(200);
 
-		expect(progress.level.name).toBe("Apprentice");
+		expect(progress.level.id).toBe("apprentice");
 	});
 
 	it("clears the weekly count on a new week but keeps the total", () => {
