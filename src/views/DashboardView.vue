@@ -1,45 +1,68 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+import type { IconName } from "../components/icons";
+import LevelCard from "../components/LevelCard.vue";
+import StatCard from "../components/StatCard.vue";
+import type { Tone } from "../components/tones";
 import { useAuth } from "../lib/use-auth";
+import { useProgressStore } from "../stores/progress";
 
-const { user, signOut } = useAuth();
-const router = useRouter();
+const { user } = useAuth();
+const progress = useProgressStore();
+const { t, n } = useI18n();
 
-function handleSignOut() {
-	signOut();
-	void router.push("/");
+const firstName = computed(() => user.value?.name.split(" ")[0] ?? "");
+
+interface Stat {
+	key: "xp" | "stacks" | "streak" | "lessons";
+	icon: IconName;
+	tone: Tone;
+	value: number;
 }
+
+const stats = computed<Stat[]>(() => [
+	{ key: "xp", icon: "sparkle", tone: "grape", value: progress.xp },
+	{ key: "stacks", icon: "stacks", tone: "sun", value: progress.stacks },
+	{ key: "streak", icon: "flame", tone: "tangerine", value: progress.streak },
+	{
+		key: "lessons",
+		icon: "book",
+		tone: "brand",
+		value: progress.completedLessons.length,
+	},
+]);
 </script>
 
 <template>
-	<div class="flex flex-col gap-6">
+	<div class="flex flex-col gap-8">
 		<div>
-			<h1 class="text-3xl font-bold">Dashboard</h1>
+			<h1 class="text-title sm:text-display">
+				{{ t("dashboard.greeting", { name: firstName }) }}
+			</h1>
+			<p class="mt-2 text-lead text-ink-muted">{{ t("dashboard.subtitle") }}</p>
 		</div>
 
-		<div class="rounded border border-neutral-200 p-4">
-			<h2 class="font-semibold">Current Session</h2>
-			<dl class="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-				<dt class="text-neutral-500">Name</dt>
-				<dd>{{ user?.name ?? "—" }}</dd>
-				<dt class="text-neutral-500">Email</dt>
-				<dd>{{ user?.email ?? "—" }}</dd>
-				<dt class="text-neutral-500">ID</dt>
-				<dd>{{ user?.id ?? "—" }}</dd>
-			</dl>
-		</div>
+		<section class="card">
+			<h2 class="mb-4 text-sm font-semibold text-ink-muted">
+				{{ t("dashboard.currentLevel") }}
+			</h2>
+			<LevelCard :xp="progress.xp" />
+		</section>
 
-		<div class="flex items-center gap-4">
-			<button
-				type="button"
-				class="rounded border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100"
-				@click="handleSignOut"
-			>
-				Logout
-			</button>
-			<RouterLink to="/" class="text-sm underline text-neutral-500">
-				Back
-			</RouterLink>
-		</div>
+		<section class="flex flex-col gap-4">
+			<h2 class="text-heading">{{ t("dashboard.statsTitle") }}</h2>
+			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+				<StatCard
+					v-for="stat in stats"
+					:key="stat.key"
+					:icon="stat.icon"
+					:tone="stat.tone"
+					:label="t(`stats.${stat.key}`)"
+					:detail="t(`stats.${stat.key}Detail`)"
+					:value="n(stat.value)"
+				/>
+			</div>
+		</section>
 	</div>
 </template>

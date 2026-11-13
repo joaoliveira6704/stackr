@@ -5,9 +5,11 @@ import {
 	demoUser,
 	fakeUsersApi,
 	jsonResponse,
+	newcomer,
+	storeSessionFor,
 	unreachableApi,
 } from "../test/fake-api";
-import { getSession, signIn, signOut, signUp } from "./auth";
+import { getSession, saveOnboarding, signIn, signOut, signUp } from "./auth";
 
 const SESSION_KEY = "stackr.session";
 
@@ -26,6 +28,8 @@ describe("signIn", () => {
 			id: "1",
 			name: demoUser.name,
 			email: demoUser.email,
+			onboardingDone: true,
+			track: "foundation",
 		});
 		expect(getSession()).toEqual(session);
 	});
@@ -34,7 +38,7 @@ describe("signIn", () => {
 		fakeUsersApi();
 
 		await expect(signIn("nobody@example.com", DEMO_PASSWORD)).rejects.toThrow(
-			"Invalid email or password.",
+			"invalidCredentials",
 		);
 		expect(getSession()).toBeNull();
 	});
@@ -43,7 +47,7 @@ describe("signIn", () => {
 		fakeUsersApi();
 
 		await expect(signIn(demoUser.email, "wrong")).rejects.toThrow(
-			"Invalid email or password.",
+			"invalidCredentials",
 		);
 	});
 
@@ -51,7 +55,7 @@ describe("signIn", () => {
 		unreachableApi();
 
 		await expect(signIn(demoUser.email, DEMO_PASSWORD)).rejects.toThrow(
-			"Could not reach the API",
+			"apiUnreachable",
 		);
 	});
 
@@ -62,7 +66,7 @@ describe("signIn", () => {
 		);
 
 		await expect(signIn(demoUser.email, DEMO_PASSWORD)).rejects.toThrow(
-			"API request failed.",
+			"apiFailed",
 		);
 	});
 });
@@ -83,6 +87,8 @@ describe("signUp", () => {
 			id: "2",
 			name: newUser.name,
 			email: newUser.email,
+			onboardingDone: false,
+			track: null,
 		});
 		expect(getSession()).toEqual(session);
 	});
@@ -102,7 +108,7 @@ describe("signUp", () => {
 		const fetchMock = fakeUsersApi();
 
 		await expect(signUp({ ...newUser, email: demoUser.email })).rejects.toThrow(
-			"Error creating account",
+			"emailTaken",
 		);
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 	});
@@ -115,9 +121,7 @@ describe("signUp", () => {
 			),
 		);
 
-		await expect(signUp(newUser)).rejects.toThrow(
-			"Could not create the account.",
-		);
+		await expect(signUp(newUser)).rejects.toThrow("accountNotCreated");
 		expect(getSession()).toBeNull();
 	});
 });
@@ -134,11 +138,72 @@ describe("getSession", () => {
 		expect(localStorage.getItem(SESSION_KEY)).toBeNull();
 	});
 
+	it("treats a session saved before onboarding existed as not onboarded", () => {
+		localStorage.setItem(
+			SESSION_KEY,
+			JSON.stringify({ id: "1", name: "Ana", email: "ana@example.com" }),
+		);
+
+		expect(getSession()).toMatchObject({ onboardingDone: false, track: null });
+	});
+
+	it("drops a track value it does not know", () => {
+		localStorage.setItem(
+			SESSION_KEY,
+			JSON.stringify({
+				id: "1",
+				name: "Ana",
+				email: "ana@example.com",
+				onboardingDone: true,
+				track: "casino",
+			}),
+		);
+
+		expect(getSession()?.track).toBeNull();
+	});
+
 	it("clears a session that is missing fields", () => {
 		localStorage.setItem(SESSION_KEY, JSON.stringify({ id: "1" }));
 
 		expect(getSession()).toBeNull();
 		expect(localStorage.getItem(SESSION_KEY)).toBeNull();
+	});
+});
+
+describe("saveOnboarding", () => {
+	it("saves the track on the user and marks onboarding as done", async () => {
+		const fetchMock = fakeUsersApi();
+		storeSessionFor(newcomer);
+
+		const session = await saveOnboarding("arena");
+
+		const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(url).toBe(`/api/users/${newcomer.id}`);
+		expect(init.method).toBe("PATCH");
+		expect(JSON.parse(String(init.body))).toEqual({
+			onboardingDone: true,
+			track: "arena",
+		});
+		expect(session).toMatchObject({ onboardingDone: true, track: "arena" });
+		expect(getSession()).toEqual(session);
+	});
+
+	it("refuses to save when nobody is signed in", async () => {
+		const fetchMock = fakeUsersApi();
+
+		await expect(saveOnboarding("arena")).rejects.toThrow("notSignedIn");
+		expect(fetchMock).not.toHaveBeenCalled();
+	});
+
+	it("keeps the old session when the API rejects the update", async () => {
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => jsonResponse({}, 500)),
+		);
+		storeSessionFor(newcomer);
+
+		await expect(saveOnboarding("arena")).rejects.toThrow("onboardingNotSaved");
+		expect(getSession()?.onboardingDone).toBe(false);
 	});
 });
 

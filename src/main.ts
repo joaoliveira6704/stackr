@@ -1,7 +1,12 @@
 import { createPinia } from "pinia";
 import { createApp } from "vue";
 import App from "./App.vue";
+import { createAppI18n } from "./i18n";
 import { createAppRouter } from "./router";
 import "./styles.css";
 
-createApp(App).use(createPinia()).use(createAppRouter()).mount("#app");
+createApp(App)
+	.use(createPinia())
+	.use(createAppI18n())
+	.use(createAppRouter())
+	.mount("#app");

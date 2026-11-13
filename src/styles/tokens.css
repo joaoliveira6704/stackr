@@ -1,0 +1,78 @@
+/*
+ * Design tokens. Every value here becomes a normal Tailwind class, so
+ * --color-brand gives bg-brand and text-brand, --text-title gives text-title,
+ * --radius-card gives rounded-card and so on. Colours that change with the
+ * theme point at the variables in themes.css.
+ */
+@theme {
+	--font-sans: "Proxima Nova", ui-sans-serif, system-ui, sans-serif;
+
+	/* Palette. The -strong shades are for text and icons on a tinted surface. */
+	--color-brand: #4ddf7b;
+	--color-grape: #8b6cff;
+	--color-tangerine: #ff7a45;
+	--color-sun: #ffc23d;
+	--color-brand-strong: var(--brand-strong);
+	--color-grape-strong: var(--grape-strong);
+	--color-tangerine-strong: var(--tangerine-strong);
+	--color-sun-strong: var(--sun-strong);
+	--color-on-brand: #04170b;
+
+	/* Theme colours. */
+	--color-surface: var(--surface);
+	--color-surface-muted: var(--surface-muted);
+	--color-ink: var(--ink);
+	--color-ink-muted: var(--ink-muted);
+	--color-ink-faint: var(--ink-faint);
+	--color-line: var(--line);
+	--color-line-strong: var(--line-strong);
+	--color-glass: var(--glass);
+	--color-glass-strong: var(--glass-strong);
+	--color-glass-border: var(--glass-border);
+
+	/* Type scale. Each step sets size, line height, tracking and weight. */
+	--text-display: 3.75rem;
+	--text-display--line-height: 1.02;
+	--text-display--letter-spacing: -0.035em;
+	--text-display--font-weight: 800;
+	--text-title: 2.25rem;
+	--text-title--line-height: 1.1;
+	--text-title--letter-spacing: -0.03em;
+	--text-title--font-weight: 800;
+	--text-heading: 1.5rem;
+	--text-heading--line-height: 1.2;
+	--text-heading--letter-spacing: -0.02em;
+	--text-heading--font-weight: 800;
+	--text-subheading: 1.125rem;
+	--text-subheading--line-height: 1.4;
+	--text-subheading--font-weight: 700;
+	--text-lead: 1.125rem;
+	--text-lead--line-height: 1.6;
+	--text-label: 0.875rem;
+	--text-label--line-height: 1.4;
+
+	/* Shapes. */
+	--radius-tile: 1rem;
+	--radius-field: 1rem;
+	--radius-card: 1.75rem;
+	--radius-panel: 2.5rem;
+
+	/* Depth. Only these shadows are allowed. */
+	--shadow-glass: var(--glass-shadow);
+	--shadow-glow: 0 8px 24px -10px rgb(77 223 123 / 0.7);
+	--blur-glass: 24px;
+
+	/* Motion. */
+	--animate-reveal: reveal 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+	@keyframes reveal {
+		from {
+			opacity: 0;
+			transform: translateY(16px) scale(0.98);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+}

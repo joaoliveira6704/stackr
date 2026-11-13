@@ -1,17 +1,17 @@
-
+/*
+ * Stackr design system. Read docs/design-system.md before adding styles.
+ *
+ * fonts.css       Proxima Nova from public/fonts
+ * tokens.css      colours, type scale, radius, shadows (become Tailwind classes)
+ * themes.css      light and dark values for the theme colours
+ * base.css        page defaults
+ * components.css  glass, card, panel, btn, chip, tone, icon-tile, field, choice
+ */
 @import "tailwindcss";
+@import "./styles/fonts.css";
+@import "./styles/tokens.css";
+@import "./styles/themes.css";
+@import "./styles/base.css";
+@import "./styles/components.css";
 
-* {
-  box-sizing: border-box;
-}
-
-html,
-body,
-#app {
-  min-height: 100%;
-}
-
-body {
-  margin: 0;
-}
-
+@custom-variant dark (&:where(.dark, .dark *));

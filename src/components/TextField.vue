@@ -9,14 +9,14 @@ const value = defineModel<string>({ required: true });
 </script>
 
 <template>
-	<label class="flex flex-col gap-1 text-sm">
+	<label class="flex flex-col gap-1.5 text-label font-semibold text-ink">
 		{{ label }}
 		<input
 			v-model="value"
 			:type="type ?? 'text'"
 			:autocomplete="autocomplete"
 			required
-			class="rounded border border-neutral-300 px-3 py-2"
+			class="field font-normal"
 		/>
 	</label>
 </template>

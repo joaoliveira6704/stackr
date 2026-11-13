@@ -1,8 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { assertWholeAmount, levelForXp } from "../lib/rewards";
-
-export type Track = "foundation" | "strategist" | "arena";
+import type { Track } from "../lib/tracks";
 
 function addOnce(list: string[], id: string): void {
 	if (!list.includes(id)) list.push(id);
@@ -25,6 +24,10 @@ export const useProgressStore = defineStore("progress", () => {
 
 	// Derived from XP instead of stored, so the level can never drift out of sync.
 	const level = computed(() => levelForXp(xp.value));
+
+	function setTrack(chosen: Track): void {
+		track.value = chosen;
+	}
 
 	function completeOnboarding(): void {
 		onboardingDone.value = true;
@@ -98,6 +101,7 @@ export const useProgressStore = defineStore("progress", () => {
 		lastActivity,
 		badges,
 		unlockedContent,
+		setTrack,
 		completeOnboarding,
 		addXp,
 		resetWeek,
