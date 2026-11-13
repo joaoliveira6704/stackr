@@ -10,6 +10,12 @@ The app runs on Vue 3, Vue Router, Vite and Tailwind, with json-server reading `
 
 Stackr is a small gamified finance school for young people. A short onboarding quiz sends each user to one of three tracks: Foundation for people starting from zero, Strategist for people who want to invest for the long term, and Arena for risk lovers who need to learn to control risk. Each track has four modules, each module has three short lessons, a five question quiz after each lesson and a practical case at the end. A quiz score of 80% or more unlocks the next lesson. Below that, the user goes back to the lesson, sees the parts linked to their wrong answers highlighted, and tries again. Every activity earns XP, which drives five levels, and Stacks, a virtual currency the user spends on extra content.
 
+## Status
+
+Phase 0 and phase 1 are done. Phase 2 is under way: the first module of each track is in `db.json` with three lessons and their quizzes, and the lessons map, lesson and quiz screens, the 80% rule, the review with highlighted sections and saved progress all work. The practical cases, the remaining three modules per track and the final challenges are still to come.
+
+A few decisions were made on the way. Rewards are paid when a quiz is passed, not when a lesson is read, and only the first time, so nobody can farm XP. A quiz only opens after its lesson is read to the end, and failing closes it until the lesson is read again. Progress is saved on each user's record in `db.json` instead of a separate collection, because json-server cannot look records up by a text id that looks like a number.
+
 ## Phase 0: shared foundations
 
 Before any screen, we need the pieces every feature will lean on.

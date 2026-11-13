@@ -10,6 +10,7 @@ export const pt = {
 		lightMode: "Mudar para modo claro",
 		darkModeSwitch: "Modo escuro",
 		profile: "Perfil",
+		learn: "Aprender",
 		preferences: "Preferências",
 		mainNavigation: "Navegação principal",
 		otherLanguage: "English",
@@ -33,7 +34,6 @@ export const pt = {
 		password: "Palavra-passe",
 		back: "Voltar",
 		next: "Seguinte",
-		comingSoon: "Em breve",
 		cancel: "Cancelar",
 	},
 	logoutConfirm: {
@@ -52,6 +52,9 @@ export const pt = {
 			"Não foi possível guardar o teu trilho. Tenta outra vez.",
 		notSignedIn: "A tua sessão terminou. Entra outra vez.",
 		passwordsDoNotMatch: "As palavras-passe não coincidem.",
+		contentNotFound: "Não encontrámos este conteúdo.",
+		progressNotSaved:
+			"Não foi possível guardar o teu progresso. Vamos tentar outra vez na próxima alteração.",
 		unknown: "Algo correu mal.",
 	},
 	levels: {
@@ -197,8 +200,65 @@ export const pt = {
 		noTrack: "Ainda por definir",
 		changeTrack: "Refazer o questionário",
 		nextStep: "Próximo passo",
-		nextStepTitle: "A tua primeira aula está a chegar",
-		nextStepDetail: "Estamos a preparar as aulas do teu trilho.",
+		nextStepTitle: "Continua o teu trilho",
+		nextStepDetail: "As tuas aulas estão à tua espera.",
+		goToLessons: "Ir para as aulas",
+	},
+	learn: {
+		title: "Aprender",
+		subtitle:
+			"O teu trilho, módulo a módulo. Cada aula termina com um quiz de cinco perguntas.",
+		module: "Módulo {number}",
+		lessonsDone: "{done} de {total} aulas concluídas",
+		minutes: "{minutes} min",
+		status: {
+			locked: "Bloqueada",
+			available: "Disponível",
+			review: "Para rever",
+			done: "Concluída",
+		},
+		lockedHint: "Conclui a aula anterior para a desbloquear.",
+		loading: "A carregar as aulas...",
+		retry: "Tentar outra vez",
+	},
+	lesson: {
+		back: "Voltar às aulas",
+		reviewTitle: "Vamos rever esta aula",
+		reviewMessage:
+			"As partes ligadas às perguntas que erraste estão em destaque. Lê-as com calma e tenta o quiz outra vez.",
+		reviewTag: "Rever",
+		example: "Exemplo",
+		startQuiz: "Fazer o quiz",
+		locked: "Esta aula ainda está bloqueada.",
+		loading: "A carregar a aula...",
+	},
+	quiz: {
+		progress: "Pergunta {current} de {total}",
+		passMark: "Precisas de 80% para passar",
+		check: "Verificar",
+		next: "Seguinte",
+		finish: "Ver resultado",
+		correct: "Certo!",
+		wrong: "Não é bem assim.",
+		passTitle: "Aula concluída!",
+		passMessage:
+			"Acertaste {correct} de {total}. A aula seguinte já está desbloqueada.",
+		failTitle: "Quase lá",
+		failMessage:
+			"Acertaste {correct} de {total}. Precisas de 80% para avançar. Revê as partes em destaque e tenta outra vez.",
+		score: "Resultado",
+		xpEarned: "+{amount} XP",
+		stacksEarned: "+{amount} Stacks",
+		alreadyDone:
+			"Já tinhas concluído esta aula, por isso desta vez não há recompensa.",
+		review: "Rever a aula",
+		nextLesson: "Próxima aula",
+		backToLearn: "Voltar às aulas",
+		loading: "A carregar o quiz...",
+		readFirstTitle: "Primeiro, a aula",
+		readFirstMessage:
+			"O quiz só abre depois de leres a aula teórica até ao fim. Se falhares, voltas a ler antes de tentar outra vez.",
+		goToLesson: "Ir para a aula",
 	},
 	onboarding: {
 		intro: {

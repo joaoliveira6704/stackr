@@ -5,6 +5,7 @@
  * lives in localStorage. Never use this in production.
  */
 import bcrypt from "bcryptjs";
+import { JSON_HEADERS, requestApi } from "./api";
 import { AppError } from "./errors";
 import { isTrack, type Track } from "./tracks";
 
@@ -31,19 +32,8 @@ export interface SignUpInput {
 	password: string;
 }
 
-const API_BASE = "/api";
 const SESSION_KEY = "stackr.session";
 const SALT_ROUNDS = 10;
-const JSON_HEADERS = { "Content-Type": "application/json" };
-
-async function requestApi(path: string, init?: RequestInit): Promise<Response> {
-	try {
-		return await fetch(`${API_BASE}${path}`, init);
-	} catch {
-		throw new AppError("apiUnreachable");
-	}
-}
-
 async function fetchUsersByEmail(email: string): Promise<User[]> {
 	const res = await requestApi(`/users?email=${encodeURIComponent(email)}`);
 	if (!res.ok) {

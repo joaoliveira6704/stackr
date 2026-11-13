@@ -25,5 +25,2225 @@
       "track": "strategist"
     }
   ],
+  "tracks": [
+    {
+      "id": "foundation",
+      "modules": [
+        {
+          "id": "foundation-budget",
+          "title": {
+            "pt-PT": "O teu orçamento",
+            "en": "Your budget"
+          },
+          "summary": {
+            "pt-PT": "Saber para onde vai o dinheiro, dividi-lo com a regra 50/30/20 e montar um fundo de emergência.",
+            "en": "Know where your money goes, split it with the 50/30/20 rule and build an emergency fund."
+          },
+          "lessonIds": [
+            "foundation-budget-1",
+            "foundation-budget-2",
+            "foundation-budget-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "strategist",
+      "modules": [
+        {
+          "id": "strategist-growth",
+          "title": {
+            "pt-PT": "Inflação e juros compostos",
+            "en": "Inflation and compound interest"
+          },
+          "summary": {
+            "pt-PT": "Porque o dinheiro parado perde valor e como o tempo faz o dinheiro crescer.",
+            "en": "Why money sitting still loses value and how time makes money grow."
+          },
+          "lessonIds": [
+            "strategist-growth-1",
+            "strategist-growth-2",
+            "strategist-growth-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "arena",
+      "modules": [
+        {
+          "id": "arena-risk",
+          "title": {
+            "pt-PT": "Risco sob controlo",
+            "en": "Risk under control"
+          },
+          "summary": {
+            "pt-PT": "Volatilidade, risco e retorno, e os sinais de que uma oportunidade é uma burla.",
+            "en": "Volatility, risk and return, and the signs that an opportunity is a scam."
+          },
+          "lessonIds": [
+            "arena-risk-1",
+            "arena-risk-2",
+            "arena-risk-3"
+          ]
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "foundation-budget-1",
+      "title": {
+        "pt-PT": "Para onde vai o teu dinheiro",
+        "en": "Where your money goes"
+      },
+      "summary": {
+        "pt-PT": "Rendimentos, despesas fixas e variáveis, e porque vale a pena registar um mês.",
+        "en": "Income, fixed and variable costs, and why tracking one month is worth it."
+      },
+      "minutes": 2,
+      "sections": [
+        {
+          "id": "income-expenses",
+          "title": {
+            "pt-PT": "Entra e sai",
+            "en": "Money in and money out"
+          },
+          "body": {
+            "pt-PT": "Um orçamento começa com duas listas: o que entra, como o salário ou a mesada, e o que sai, como a renda, a comida e as subscrições. Se sai mais do que entra, a diferença vem de algum lado, normalmente de dívidas.",
+            "en": "A budget starts with two lists: what comes in, like your salary or allowance, and what goes out, like rent, food and subscriptions. If more goes out than comes in, the gap comes from somewhere, usually debt."
+          },
+          "example": {
+            "pt-PT": "Recebes 900 € por mês e gastas 950 €. Esses 50 € a mais acabam no cartão de crédito todos os meses.",
+            "en": "You earn 900 € a month and spend 950 €. Those extra 50 € end up on the credit card every month."
+          }
+        },
+        {
+          "id": "fixed-variable",
+          "title": {
+            "pt-PT": "Fixas e variáveis",
+            "en": "Fixed and variable"
+          },
+          "body": {
+            "pt-PT": "As despesas fixas são iguais todos os meses, como a renda ou o passe. As variáveis mudam, como os jantares fora ou as compras online. É nas variáveis que tens mais margem para cortar.",
+            "en": "Fixed costs are the same every month, like rent or a transport pass. Variable costs change, like eating out or online shopping. Variable costs are where you have the most room to cut."
+          }
+        },
+        {
+          "id": "track-a-month",
+          "title": {
+            "pt-PT": "Regista um mês",
+            "en": "Track one month"
+          },
+          "body": {
+            "pt-PT": "Durante um mês, aponta cada despesa, mesmo o café. No fim, agrupa por categorias. A maioria das pessoas descobre pelo menos uma categoria onde gasta muito mais do que pensava.",
+            "en": "For one month, write down every expense, even coffee. At the end, group them by category. Most people find at least one category where they spend far more than they thought."
+          },
+          "example": {
+            "pt-PT": "Três cafés por dia a 0,80 € parecem pouco, mas são cerca de 72 € por mês.",
+            "en": "Three coffees a day at 0.80 € look small, but they add up to about 72 € a month."
+          }
+        }
+      ],
+      "trackId": "foundation",
+      "moduleId": "foundation-budget"
+    },
+    {
+      "id": "foundation-budget-2",
+      "title": {
+        "pt-PT": "A regra 50/30/20",
+        "en": "The 50/30/20 rule"
+      },
+      "summary": {
+        "pt-PT": "Uma forma simples de dividir o que ganhas entre necessidades, desejos e poupança.",
+        "en": "A simple way to split what you earn between needs, wants and savings."
+      },
+      "minutes": 2,
+      "sections": [
+        {
+          "id": "needs",
+          "title": {
+            "pt-PT": "50% para necessidades",
+            "en": "50% for needs"
+          },
+          "body": {
+            "pt-PT": "Metade do que recebes vai para o que não podes evitar: casa, comida, transportes, contas da casa e pagamentos mínimos de dívidas.",
+            "en": "Half of what you earn goes to what you cannot avoid: housing, food, transport, bills and minimum debt payments."
+          }
+        },
+        {
+          "id": "wants",
+          "title": {
+            "pt-PT": "30% para desejos",
+            "en": "30% for wants"
+          },
+          "body": {
+            "pt-PT": "Até 30% pode ir para o que torna a vida mais agradável: jantares fora, viagens, roupa nova, subscrições. Não é desperdício, é dinheiro planeado para gastar sem culpa.",
+            "en": "Up to 30% can go to what makes life nicer: eating out, trips, new clothes, subscriptions. It is not waste, it is money planned to spend without guilt."
+          }
+        },
+        {
+          "id": "savings",
+          "title": {
+            "pt-PT": "20% para poupança",
+            "en": "20% for savings"
+          },
+          "body": {
+            "pt-PT": "Pelo menos 20% vai para o futuro: primeiro o fundo de emergência, depois objetivos maiores e investimento. Separa esta parte logo quando recebes, antes de gastar.",
+            "en": "At least 20% goes to your future: first the emergency fund, then bigger goals and investing. Set this part aside as soon as you get paid, before you spend."
+          },
+          "example": {
+            "pt-PT": "Com 1000 € líquidos: 500 € para necessidades, 300 € para desejos e 200 € para poupança.",
+            "en": "With 1000 € take home: 500 € for needs, 300 € for wants and 200 € for savings."
+          }
+        }
+      ],
+      "trackId": "foundation",
+      "moduleId": "foundation-budget"
+    },
+    {
+      "id": "foundation-budget-3",
+      "title": {
+        "pt-PT": "O fundo de emergência",
+        "en": "The emergency fund"
+      },
+      "summary": {
+        "pt-PT": "Uma almofada para imprevistos, quanto guardar e onde a ter.",
+        "en": "A cushion for the unexpected, how much to keep and where to keep it."
+      },
+      "minutes": 2,
+      "sections": [
+        {
+          "id": "what-it-is",
+          "title": {
+            "pt-PT": "Para que serve",
+            "en": "What it is for"
+          },
+          "body": {
+            "pt-PT": "O fundo de emergência é dinheiro guardado só para imprevistos, como uma avaria no carro, uma despesa de saúde ou perder o emprego. Evita que um mau mês te leve a pedir crédito.",
+            "en": "An emergency fund is money kept only for the unexpected, like a car repair, a health bill or losing your job. It stops one bad month from pushing you into borrowing."
+          }
+        },
+        {
+          "id": "how-much",
+          "title": {
+            "pt-PT": "Quanto guardar",
+            "en": "How much to keep"
+          },
+          "body": {
+            "pt-PT": "O habitual é juntar entre três e seis meses das tuas despesas essenciais. Começa por um objetivo pequeno, como 500 €, e vai aumentando.",
+            "en": "The usual target is three to six months of your essential costs. Start with a small goal, like 500 €, and build from there."
+          },
+          "example": {
+            "pt-PT": "Se as tuas necessidades custam 700 € por mês, um fundo de três meses são 2100 €.",
+            "en": "If your needs cost 700 € a month, a three month fund is 2100 €."
+          }
+        },
+        {
+          "id": "where-to-keep",
+          "title": {
+            "pt-PT": "Onde guardar e quando investir",
+            "en": "Where to keep it and when to invest"
+          },
+          "body": {
+            "pt-PT": "Guarda-o num sítio seguro e fácil de levantar, como uma conta poupança. Não o invistas em ações, porque podem estar em baixo precisamente quando precisas. Só depois de o teres faz sentido começar a investir.",
+            "en": "Keep it somewhere safe and easy to withdraw, like a savings account. Do not invest it in shares, because they may be down exactly when you need the money. Only once you have it does investing make sense."
+          }
+        }
+      ],
+      "trackId": "foundation",
+      "moduleId": "foundation-budget"
+    },
+    {
+      "id": "strategist-growth-1",
+      "title": {
+        "pt-PT": "O que é a inflação",
+        "en": "What inflation is"
+      },
+      "summary": {
+        "pt-PT": "Preços a subir, rendimento real e o custo de deixar tudo na conta à ordem.",
+        "en": "Rising prices, real return and the cost of leaving everything in a current account."
+      },
+      "minutes": 2,
+      "sections": [
+        {
+          "id": "rising-prices",
+          "title": {
+            "pt-PT": "Os preços sobem",
+            "en": "Prices go up"
+          },
+          "body": {
+            "pt-PT": "Inflação é a subida geral dos preços ao longo do tempo. Com 3% de inflação, o que hoje custa 100 € custa cerca de 103 € daqui a um ano. O teu dinheiro compra menos.",
+            "en": "Inflation is the general rise in prices over time. With 3% inflation, what costs 100 € today costs about 103 € a year from now. Your money buys less."
+          }
+        },
+        {
+          "id": "real-return",
+          "title": {
+            "pt-PT": "Rendimento real",
+            "en": "Real return"
+          },
+          "body": {
+            "pt-PT": "O rendimento real é o que ganhas depois de descontar a inflação. Se uma conta rende 1% e a inflação é 3%, o rendimento real é cerca de menos 2%: tens mais euros, mas compras menos com eles.",
+            "en": "Real return is what you earn after taking inflation out. If an account pays 1% and inflation is 3%, the real return is about minus 2%: you have more euros, but they buy less."
+          }
+        },
+        {
+          "id": "idle-money",
+          "title": {
+            "pt-PT": "Dinheiro parado",
+            "en": "Idle money"
+          },
+          "body": {
+            "pt-PT": "Ter o fundo de emergência numa conta segura faz sentido. Mas deixar anos de poupança parados na conta à ordem é perder poder de compra devagar, todos os anos.",
+            "en": "Keeping your emergency fund in a safe account makes sense. But leaving years of savings in a current account means slowly losing buying power every year."
+          },
+          "example": {
+            "pt-PT": "10 000 € parados durante 10 anos com 3% de inflação compram o mesmo que cerca de 7400 € hoje.",
+            "en": "10 000 € left for 10 years with 3% inflation buys what about 7400 € buys today."
+          }
+        }
+      ],
+      "trackId": "strategist",
+      "moduleId": "strategist-growth"
+    },
+    {
+      "id": "strategist-growth-2",
+      "title": {
+        "pt-PT": "Juros compostos",
+        "en": "Compound interest"
+      },
+      "summary": {
+        "pt-PT": "Juros sobre juros, o papel do tempo e a regra do 72.",
+        "en": "Interest on interest, the role of time and the rule of 72."
+      },
+      "minutes": 3,
+      "sections": [
+        {
+          "id": "simple-vs-compound",
+          "title": {
+            "pt-PT": "Simples e compostos",
+            "en": "Simple and compound"
+          },
+          "body": {
+            "pt-PT": "Com juros simples ganhas sempre sobre o valor inicial. Com juros compostos, os juros juntam-se ao valor e no ano seguinte também rendem. Ganhas juros sobre juros.",
+            "en": "With simple interest you always earn on the starting amount. With compound interest, the interest is added to the amount and earns too the next year. You earn interest on interest."
+          },
+          "example": {
+            "pt-PT": "1000 € a 5% ao ano: com juros simples tens 1500 € ao fim de 10 anos, com juros compostos cerca de 1629 €.",
+            "en": "1000 € at 5% a year: with simple interest you have 1500 € after 10 years, with compound interest about 1629 €."
+          }
+        },
+        {
+          "id": "time",
+          "title": {
+            "pt-PT": "O tempo é o ingrediente principal",
+            "en": "Time is the main ingredient"
+          },
+          "body": {
+            "pt-PT": "Os juros compostos crescem devagar no início e cada vez mais depressa depois. Por isso, anos a mais pesam mais do que euros a mais.",
+            "en": "Compound interest grows slowly at first and faster and faster later. That is why extra years matter more than extra euros."
+          }
+        },
+        {
+          "id": "rule-of-72",
+          "title": {
+            "pt-PT": "A regra do 72",
+            "en": "The rule of 72"
+          },
+          "body": {
+            "pt-PT": "Para saber em quantos anos o dinheiro duplica, divide 72 pela taxa anual. A 6% ao ano, duplica em cerca de 12 anos.",
+            "en": "To find how many years it takes money to double, divide 72 by the yearly rate. At 6% a year, it doubles in about 12 years."
+          }
+        }
+      ],
+      "trackId": "strategist",
+      "moduleId": "strategist-growth"
+    },
+    {
+      "id": "strategist-growth-3",
+      "title": {
+        "pt-PT": "Começar cedo e com regularidade",
+        "en": "Start early and stay regular"
+      },
+      "summary": {
+        "pt-PT": "Investir todos os meses, ter atenção aos custos e não tentar adivinhar o mercado.",
+        "en": "Investing every month, watching the costs and not trying to time the market."
+      },
+      "minutes": 2,
+      "sections": [
+        {
+          "id": "regular",
+          "title": {
+            "pt-PT": "Um pouco todos os meses",
+            "en": "A little every month"
+          },
+          "body": {
+            "pt-PT": "Investir um valor fixo todos os meses cria o hábito e espalha as compras por preços altos e baixos. Não precisas de muito para começar, precisas de começar.",
+            "en": "Investing a fixed amount every month builds the habit and spreads your buys over high and low prices. You do not need much to start, you need to start."
+          },
+          "example": {
+            "pt-PT": "50 € por mês durante 30 anos a 6% ao ano dão cerca de 50 000 €, com apenas 18 000 € postos do teu bolso.",
+            "en": "50 € a month for 30 years at 6% a year grows to about 50 000 €, with only 18 000 € coming from your pocket."
+          }
+        },
+        {
+          "id": "costs",
+          "title": {
+            "pt-PT": "Os custos contam",
+            "en": "Costs matter"
+          },
+          "body": {
+            "pt-PT": "Comissões e taxas de gestão também se acumulam ao longo dos anos. Uma diferença de 1% ao ano em custos pode comer uma grande fatia do resultado final.",
+            "en": "Fees and management charges also add up over the years. A 1% a year difference in costs can eat a big slice of the final result."
+          }
+        },
+        {
+          "id": "timing",
+          "title": {
+            "pt-PT": "Tempo no mercado, não timing",
+            "en": "Time in the market, not timing"
+          },
+          "body": {
+            "pt-PT": "Tentar comprar no ponto mais baixo e vender no mais alto quase nunca resulta. Ficar investido muito tempo costuma bater quem entra e sai à procura do momento perfeito.",
+            "en": "Trying to buy at the very bottom and sell at the very top almost never works. Staying invested for a long time usually beats jumping in and out looking for the perfect moment."
+          }
+        }
+      ],
+      "trackId": "strategist",
+      "moduleId": "strategist-growth"
+    },
+    {
+      "id": "arena-risk-1",
+      "title": {
+        "pt-PT": "Volatilidade não é perda",
+        "en": "Volatility is not loss"
+      },
+      "summary": {
+        "pt-PT": "Preços que sobem e descem, perdas no papel e o horizonte de tempo.",
+        "en": "Prices going up and down, paper losses and your time horizon."
+      },
+      "minutes": 2,
+      "sections": [
+        {
+          "id": "swings",
+          "title": {
+            "pt-PT": "Os preços oscilam",
+            "en": "Prices swing"
+          },
+          "body": {
+            "pt-PT": "Volatilidade é o quanto um preço sobe e desce. Ações e criptomoedas podem mexer 5% ou mais num só dia. Isso não quer dizer que o investimento seja mau, só que é instável.",
+            "en": "Volatility is how much a price moves up and down. Shares and crypto can move 5% or more in a single day. That does not mean the investment is bad, only that it is unstable."
+          }
+        },
+        {
+          "id": "paper-vs-real",
+          "title": {
+            "pt-PT": "Perda no papel e perda real",
+            "en": "Paper loss and real loss"
+          },
+          "body": {
+            "pt-PT": "Se o teu investimento cai 20%, só perdes de facto quando vendes. Até lá é uma perda no papel, que pode recuperar. Vender em pânico transforma uma descida temporária numa perda definitiva.",
+            "en": "If your investment drops 20%, you only really lose when you sell. Until then it is a paper loss, which can recover. Panic selling turns a temporary drop into a permanent loss."
+          },
+          "example": {
+            "pt-PT": "Compraste por 1000 €, vale agora 800 €. Se venderes, perdes 200 € de vez. Se esperares, pode voltar a subir.",
+            "en": "You bought for 1000 €, it is now worth 800 €. If you sell, you lose 200 € for good. If you wait, it may go back up."
+          }
+        },
+        {
+          "id": "horizon",
+          "title": {
+            "pt-PT": "O teu horizonte de tempo",
+            "en": "Your time horizon"
+          },
+          "body": {
+            "pt-PT": "Dinheiro que vais precisar em breve não deve estar em investimentos voláteis. Quanto mais tempo podes esperar, mais aguentas as descidas sem seres obrigado a vender.",
+            "en": "Money you will need soon should not sit in volatile investments. The longer you can wait, the more drops you can ride out without being forced to sell."
+          }
+        }
+      ],
+      "trackId": "arena",
+      "moduleId": "arena-risk"
+    },
+    {
+      "id": "arena-risk-2",
+      "title": {
+        "pt-PT": "Risco e retorno",
+        "en": "Risk and return"
+      },
+      "summary": {
+        "pt-PT": "Mais retorno vem com mais risco, diversificar e o que podes perder.",
+        "en": "Higher return comes with higher risk, spreading out and what you can afford to lose."
+      },
+      "minutes": 2,
+      "sections": [
+        {
+          "id": "tradeoff",
+          "title": {
+            "pt-PT": "Não há almoços grátis",
+            "en": "There is no free lunch"
+          },
+          "body": {
+            "pt-PT": "Quanto maior o retorno prometido, maior o risco. Uma conta poupança rende pouco mas quase não tem risco. Uma criptomoeda pode multiplicar ou ir a zero.",
+            "en": "The higher the promised return, the higher the risk. A savings account pays little but carries almost no risk. A crypto coin can multiply or go to zero."
+          }
+        },
+        {
+          "id": "diversify",
+          "title": {
+            "pt-PT": "Não ponhas tudo no mesmo cesto",
+            "en": "Do not put all your eggs in one basket"
+          },
+          "body": {
+            "pt-PT": "Diversificar é espalhar o dinheiro por vários investimentos. Se um corre mal, os outros amortecem a queda. Um ETF já junta centenas de empresas num só produto.",
+            "en": "Diversifying means spreading money across several investments. If one goes badly, the others soften the fall. An ETF already holds hundreds of companies in one product."
+          }
+        },
+        {
+          "id": "afford-to-lose",
+          "title": {
+            "pt-PT": "Só o que podes perder",
+            "en": "Only what you can afford to lose"
+          },
+          "body": {
+            "pt-PT": "Em apostas de alto risco, investe apenas dinheiro que, se desaparecer, não muda a tua vida. Nunca uses o fundo de emergência, dinheiro emprestado ou o dinheiro da renda.",
+            "en": "For high risk bets, only use money that would not change your life if it vanished. Never use your emergency fund, borrowed money or your rent money."
+          }
+        }
+      ],
+      "trackId": "arena",
+      "moduleId": "arena-risk"
+    },
+    {
+      "id": "arena-risk-3",
+      "title": {
+        "pt-PT": "Sinais de burla",
+        "en": "Signs of a scam"
+      },
+      "summary": {
+        "pt-PT": "Lucros garantidos, pressa e plataformas sem registo.",
+        "en": "Guaranteed profits, pressure and unregistered platforms."
+      },
+      "minutes": 2,
+      "sections": [
+        {
+          "id": "guaranteed",
+          "title": {
+            "pt-PT": "Lucros garantidos",
+            "en": "Guaranteed profits"
+          },
+          "body": {
+            "pt-PT": "Ninguém pode garantir lucros altos sem risco. Promessas como \"ganha 10% por semana\" ou \"duplica em 30 dias\" são o sinal mais comum de uma burla.",
+            "en": "Nobody can guarantee high profits without risk. Promises like \"earn 10% a week\" or \"double it in 30 days\" are the most common sign of a scam."
+          }
+        },
+        {
+          "id": "pressure",
+          "title": {
+            "pt-PT": "Pressa e segredo",
+            "en": "Pressure and secrecy"
+          },
+          "body": {
+            "pt-PT": "Os burlões criam urgência: \"só hoje\", \"últimas vagas\", \"não contes a ninguém\". Também pedem para recrutares amigos em troca de bónus. Uma oportunidade real aguenta que penses com calma.",
+            "en": "Scammers create urgency: \"today only\", \"last spots\", \"do not tell anyone\". They also ask you to recruit friends for a bonus. A real opportunity can wait while you think it over."
+          }
+        },
+        {
+          "id": "check-regulator",
+          "title": {
+            "pt-PT": "Confirma antes de investir",
+            "en": "Check before you invest"
+          },
+          "body": {
+            "pt-PT": "Antes de pôr dinheiro numa plataforma, confirma se está registada na CMVM ou no Banco de Portugal. Desconfia de contactos inesperados nas redes sociais e nunca partilhes códigos de acesso.",
+            "en": "Before putting money on a platform, check that it is registered with the CMVM or the Banco de Portugal. Be wary of unexpected contacts on social media and never share access codes."
+          },
+          "example": {
+            "pt-PT": "Uma conta no Instagram promete 300% num mês com uma moeda nova e pede para enviares dinheiro por MB WAY. São três sinais de burla de uma vez.",
+            "en": "An Instagram account promises 300% in a month with a new coin and asks you to send money by MB WAY. That is three scam signs at once."
+          }
+        }
+      ],
+      "trackId": "arena",
+      "moduleId": "arena-risk"
+    }
+  ],
+  "quizzes": [
+    {
+      "id": "foundation-budget-1-quiz",
+      "lessonId": "foundation-budget-1",
+      "questions": [
+        {
+          "id": "q1",
+          "sectionId": "income-expenses",
+          "prompt": {
+            "pt-PT": "Ganhas 900 € e gastas 950 € por mês. O que está a acontecer?",
+            "en": "You earn 900 € and spend 950 € a month. What is happening?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Estás a poupar 50 €",
+                "en": "You are saving 50 €"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Estás a gastar 50 € a mais do que ganhas",
+                "en": "You are spending 50 € more than you earn"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "O orçamento está equilibrado",
+                "en": "The budget is balanced"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "Quando sai mais do que entra, a diferença tem de vir de poupanças ou de dívida.",
+            "en": "When more goes out than comes in, the gap has to come from savings or debt."
+          }
+        },
+        {
+          "id": "q2",
+          "sectionId": "fixed-variable",
+          "prompt": {
+            "pt-PT": "Qual destas é uma despesa fixa?",
+            "en": "Which of these is a fixed cost?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Jantares fora",
+                "en": "Eating out"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "A renda da casa",
+                "en": "Rent"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Compras online",
+                "en": "Online shopping"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "A renda é igual todos os meses, por isso é fixa.",
+            "en": "Rent is the same every month, so it is fixed."
+          }
+        },
+        {
+          "id": "q3",
+          "sectionId": "fixed-variable",
+          "prompt": {
+            "pt-PT": "Onde costuma ser mais fácil cortar despesas?",
+            "en": "Where is it usually easiest to cut spending?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Nas despesas variáveis",
+                "en": "In variable costs"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Nas despesas fixas",
+                "en": "In fixed costs"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Em nenhuma",
+                "en": "In neither"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "As despesas variáveis dependem das tuas escolhas do dia a dia.",
+            "en": "Variable costs depend on your day to day choices."
+          }
+        },
+        {
+          "id": "q4",
+          "sectionId": "track-a-month",
+          "prompt": {
+            "pt-PT": "Porque vale a pena registar todas as despesas durante um mês?",
+            "en": "Why is it worth tracking every expense for a month?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Para pagar menos impostos",
+                "en": "To pay less tax"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Para ver onde o dinheiro vai mesmo",
+                "en": "To see where the money really goes"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Porque o banco obriga",
+                "en": "Because the bank requires it"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "Só depois de ver os números reais é que sabes o que mudar.",
+            "en": "Only after seeing the real numbers do you know what to change."
+          }
+        },
+        {
+          "id": "q5",
+          "sectionId": "track-a-month",
+          "prompt": {
+            "pt-PT": "Três cafés por dia a 0,80 € dão aproximadamente quanto por mês?",
+            "en": "Three coffees a day at 0.80 € add up to roughly how much a month?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Cerca de 7 €",
+                "en": "About 7 €"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Cerca de 24 €",
+                "en": "About 24 €"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Cerca de 72 €",
+                "en": "About 72 €"
+              }
+            }
+          ],
+          "correctOptionId": "c",
+          "explanation": {
+            "pt-PT": "3 × 0,80 € × 30 dias dá 72 €. Pequenas despesas repetidas somam depressa.",
+            "en": "3 × 0.80 € × 30 days is 72 €. Small repeated costs add up fast."
+          }
+        }
+      ]
+    },
+    {
+      "id": "foundation-budget-2-quiz",
+      "lessonId": "foundation-budget-2",
+      "questions": [
+        {
+          "id": "q1",
+          "sectionId": "needs",
+          "prompt": {
+            "pt-PT": "Na regra 50/30/20, que parte vai para necessidades?",
+            "en": "In the 50/30/20 rule, how much goes to needs?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "20%",
+                "en": "20%"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "30%",
+                "en": "30%"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "50%",
+                "en": "50%"
+              }
+            }
+          ],
+          "correctOptionId": "c",
+          "explanation": {
+            "pt-PT": "Metade do rendimento cobre o essencial.",
+            "en": "Half of your income covers the essentials."
+          }
+        },
+        {
+          "id": "q2",
+          "sectionId": "needs",
+          "prompt": {
+            "pt-PT": "Qual destes é uma necessidade?",
+            "en": "Which of these is a need?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "A conta da luz",
+                "en": "The electricity bill"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Um concerto",
+                "en": "A concert ticket"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Uma subscrição de streaming",
+                "en": "A streaming subscription"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Sem luz não vives com normalidade, por isso é uma necessidade.",
+            "en": "You cannot live normally without electricity, so it is a need."
+          }
+        },
+        {
+          "id": "q3",
+          "sectionId": "wants",
+          "prompt": {
+            "pt-PT": "Um jantar fora com amigos entra em que parte?",
+            "en": "A dinner out with friends belongs in which part?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Necessidades",
+                "en": "Needs"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Desejos",
+                "en": "Wants"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Poupança",
+                "en": "Savings"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "É agradável mas não essencial, por isso é um desejo.",
+            "en": "It is nice but not essential, so it is a want."
+          }
+        },
+        {
+          "id": "q4",
+          "sectionId": "savings",
+          "prompt": {
+            "pt-PT": "Com 1000 € líquidos, quanto deves poupar segundo a regra?",
+            "en": "With 1000 € take home, how much should you save under the rule?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "100 €",
+                "en": "100 €"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "200 €",
+                "en": "200 €"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "300 €",
+                "en": "300 €"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "20% de 1000 € são 200 €.",
+            "en": "20% of 1000 € is 200 €."
+          }
+        },
+        {
+          "id": "q5",
+          "sectionId": "savings",
+          "prompt": {
+            "pt-PT": "Qual é a melhor altura para separar a poupança?",
+            "en": "When is the best time to set your savings aside?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Logo quando recebes",
+                "en": "As soon as you get paid"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "No fim do mês, com o que sobrar",
+                "en": "At the end of the month, with what is left"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Só quando tiveres um aumento",
+                "en": "Only when you get a raise"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Se esperares pelo fim do mês, raramente sobra alguma coisa.",
+            "en": "If you wait for the end of the month, there is rarely anything left."
+          }
+        }
+      ]
+    },
+    {
+      "id": "foundation-budget-3-quiz",
+      "lessonId": "foundation-budget-3",
+      "questions": [
+        {
+          "id": "q1",
+          "sectionId": "what-it-is",
+          "prompt": {
+            "pt-PT": "Para que serve o fundo de emergência?",
+            "en": "What is an emergency fund for?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Para férias",
+                "en": "For holidays"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Para imprevistos",
+                "en": "For the unexpected"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Para investir em ações",
+                "en": "For investing in shares"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "É uma almofada só para despesas que não estavam previstas.",
+            "en": "It is a cushion only for costs you did not plan for."
+          }
+        },
+        {
+          "id": "q2",
+          "sectionId": "how-much",
+          "prompt": {
+            "pt-PT": "Quanto se recomenda ter no fundo de emergência?",
+            "en": "How much is usually recommended for an emergency fund?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Um salário",
+                "en": "One paycheck"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Três a seis meses de despesas essenciais",
+                "en": "Three to six months of essential costs"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Dois anos de salário",
+                "en": "Two years of salary"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "Três a seis meses chegam para a maioria dos imprevistos.",
+            "en": "Three to six months covers most surprises."
+          }
+        },
+        {
+          "id": "q3",
+          "sectionId": "how-much",
+          "prompt": {
+            "pt-PT": "As tuas necessidades custam 700 € por mês. Quanto é um fundo de três meses?",
+            "en": "Your needs cost 700 € a month. How much is a three month fund?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "700 €",
+                "en": "700 €"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "1400 €",
+                "en": "1400 €"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "2100 €",
+                "en": "2100 €"
+              }
+            }
+          ],
+          "correctOptionId": "c",
+          "explanation": {
+            "pt-PT": "3 × 700 € = 2100 €.",
+            "en": "3 × 700 € = 2100 €."
+          }
+        },
+        {
+          "id": "q4",
+          "sectionId": "where-to-keep",
+          "prompt": {
+            "pt-PT": "Onde é melhor guardar o fundo de emergência?",
+            "en": "Where is the best place to keep an emergency fund?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Numa conta poupança fácil de levantar",
+                "en": "In a savings account you can withdraw from easily"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Em criptomoedas",
+                "en": "In crypto"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Em ações de uma só empresa",
+                "en": "In shares of one company"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Tem de estar seguro e disponível no dia em que precisares.",
+            "en": "It has to be safe and available on the day you need it."
+          }
+        },
+        {
+          "id": "q5",
+          "sectionId": "where-to-keep",
+          "prompt": {
+            "pt-PT": "O que deve vir primeiro?",
+            "en": "What should come first?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Investir e depois criar o fundo",
+                "en": "Investing, then building the fund"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Criar o fundo e depois investir",
+                "en": "Building the fund, then investing"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Tanto faz a ordem",
+                "en": "The order does not matter"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "Sem fundo, um imprevisto pode obrigar-te a vender investimentos na pior altura.",
+            "en": "Without a fund, a surprise can force you to sell investments at the worst time."
+          }
+        }
+      ]
+    },
+    {
+      "id": "strategist-growth-1-quiz",
+      "lessonId": "strategist-growth-1",
+      "questions": [
+        {
+          "id": "q1",
+          "sectionId": "rising-prices",
+          "prompt": {
+            "pt-PT": "O que é a inflação?",
+            "en": "What is inflation?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "A subida geral dos preços",
+                "en": "The general rise in prices"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "O juro de uma conta poupança",
+                "en": "The interest on a savings account"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Uma taxa do banco",
+                "en": "A bank fee"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Com inflação, o mesmo dinheiro compra menos coisas.",
+            "en": "With inflation, the same money buys fewer things."
+          }
+        },
+        {
+          "id": "q2",
+          "sectionId": "rising-prices",
+          "prompt": {
+            "pt-PT": "Com 3% de inflação, quanto custa daqui a um ano algo que hoje custa 100 €?",
+            "en": "With 3% inflation, how much will something that costs 100 € today cost in a year?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "97 €",
+                "en": "97 €"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "100 €",
+                "en": "100 €"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Cerca de 103 €",
+                "en": "About 103 €"
+              }
+            }
+          ],
+          "correctOptionId": "c",
+          "explanation": {
+            "pt-PT": "100 € mais 3% são 103 €.",
+            "en": "100 € plus 3% is 103 €."
+          }
+        },
+        {
+          "id": "q3",
+          "sectionId": "real-return",
+          "prompt": {
+            "pt-PT": "Uma conta rende 1% e a inflação é 3%. Qual é o rendimento real aproximado?",
+            "en": "An account pays 1% and inflation is 3%. What is the real return, roughly?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Mais 4%",
+                "en": "Plus 4%"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Menos 2%",
+                "en": "Minus 2%"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Mais 1%",
+                "en": "Plus 1%"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "1% menos 3% de inflação dá cerca de menos 2% de poder de compra.",
+            "en": "1% minus 3% inflation is about minus 2% in buying power."
+          }
+        },
+        {
+          "id": "q4",
+          "sectionId": "real-return",
+          "prompt": {
+            "pt-PT": "Se o rendimento real é negativo, o que acontece ao teu dinheiro?",
+            "en": "If the real return is negative, what happens to your money?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Compra cada vez menos",
+                "en": "It buys less and less"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Fica exatamente igual",
+                "en": "It stays exactly the same"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Desaparece da conta",
+                "en": "It disappears from the account"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "O número na conta pode até subir, mas o poder de compra desce.",
+            "en": "The number in the account may even go up, but its buying power goes down."
+          }
+        },
+        {
+          "id": "q5",
+          "sectionId": "idle-money",
+          "prompt": {
+            "pt-PT": "Que dinheiro faz sentido manter numa conta segura e sem risco?",
+            "en": "Which money makes sense to keep in a safe, risk free account?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "O fundo de emergência",
+                "en": "The emergency fund"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Todas as poupanças para sempre",
+                "en": "All savings forever"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Nenhum",
+                "en": "None of it"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "O fundo de emergência precisa de estar disponível. O resto pode trabalhar a longo prazo.",
+            "en": "The emergency fund has to be available. The rest can work for the long term."
+          }
+        }
+      ]
+    },
+    {
+      "id": "strategist-growth-2-quiz",
+      "lessonId": "strategist-growth-2",
+      "questions": [
+        {
+          "id": "q1",
+          "sectionId": "simple-vs-compound",
+          "prompt": {
+            "pt-PT": "O que distingue os juros compostos?",
+            "en": "What makes compound interest different?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Rendem sobre os juros já ganhos",
+                "en": "They earn on interest already earned"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Têm sempre uma taxa maior",
+                "en": "They always have a higher rate"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Só existem em criptomoedas",
+                "en": "They only exist in crypto"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Os juros juntam-se ao valor e passam também a render.",
+            "en": "Interest is added to the amount and starts earning too."
+          }
+        },
+        {
+          "id": "q2",
+          "sectionId": "simple-vs-compound",
+          "prompt": {
+            "pt-PT": "1000 € a 5% durante 10 anos. Com juros compostos, ficas com aproximadamente:",
+            "en": "1000 € at 5% for 10 years. With compound interest you end up with roughly:"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "1050 €",
+                "en": "1050 €"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "1500 €",
+                "en": "1500 €"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "1629 €",
+                "en": "1629 €"
+              }
+            }
+          ],
+          "correctOptionId": "c",
+          "explanation": {
+            "pt-PT": "Os juros sobre juros acrescentam cerca de 129 € face aos juros simples.",
+            "en": "Interest on interest adds about 129 € compared with simple interest."
+          }
+        },
+        {
+          "id": "q3",
+          "sectionId": "time",
+          "prompt": {
+            "pt-PT": "O que tem mais peso nos juros compostos a longo prazo?",
+            "en": "What matters most for compound interest in the long run?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "O tempo investido",
+                "en": "Time invested"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "O dia da semana em que investes",
+                "en": "The weekday you invest on"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "O nome do banco",
+                "en": "The bank's name"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Quanto mais anos, mais vezes os juros rendem sobre si próprios.",
+            "en": "The more years, the more times interest earns on itself."
+          }
+        },
+        {
+          "id": "q4",
+          "sectionId": "rule-of-72",
+          "prompt": {
+            "pt-PT": "A 6% ao ano, em quantos anos o dinheiro duplica, mais ou menos?",
+            "en": "At 6% a year, in about how many years does money double?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "6 anos",
+                "en": "6 years"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "12 anos",
+                "en": "12 years"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "72 anos",
+                "en": "72 years"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "72 a dividir por 6 dá 12.",
+            "en": "72 divided by 6 is 12."
+          }
+        },
+        {
+          "id": "q5",
+          "sectionId": "rule-of-72",
+          "prompt": {
+            "pt-PT": "A 9% ao ano, a regra do 72 diz que o dinheiro duplica em cerca de:",
+            "en": "At 9% a year, the rule of 72 says money doubles in about:"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "8 anos",
+                "en": "8 years"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "9 anos",
+                "en": "9 years"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "18 anos",
+                "en": "18 years"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "72 a dividir por 9 dá 8.",
+            "en": "72 divided by 9 is 8."
+          }
+        }
+      ]
+    },
+    {
+      "id": "strategist-growth-3-quiz",
+      "lessonId": "strategist-growth-3",
+      "questions": [
+        {
+          "id": "q1",
+          "sectionId": "regular",
+          "prompt": {
+            "pt-PT": "Qual é a vantagem de investir um valor fixo todos os meses?",
+            "en": "What is the advantage of investing a fixed amount every month?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Garante lucro",
+                "en": "It guarantees a profit"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Cria hábito e espalha as compras ao longo do tempo",
+                "en": "It builds the habit and spreads your buys over time"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Evita pagar impostos",
+                "en": "It avoids paying tax"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "Não garante lucro, mas torna o processo regular e menos emocional.",
+            "en": "It does not guarantee a profit, but it makes the process steady and less emotional."
+          }
+        },
+        {
+          "id": "q2",
+          "sectionId": "regular",
+          "prompt": {
+            "pt-PT": "O que é mais importante para começar a investir?",
+            "en": "What matters most to start investing?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Ter muito dinheiro",
+                "en": "Having a lot of money"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Começar, mesmo com pouco",
+                "en": "Starting, even with a little"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Esperar pela altura perfeita",
+                "en": "Waiting for the perfect moment"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "Com juros compostos, o tempo vale mais do que o valor inicial.",
+            "en": "With compound interest, time is worth more than the starting amount."
+          }
+        },
+        {
+          "id": "q3",
+          "sectionId": "costs",
+          "prompt": {
+            "pt-PT": "Porque é que as comissões importam a longo prazo?",
+            "en": "Why do fees matter in the long run?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Também se acumulam ano após ano",
+                "en": "They also add up year after year"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Só se pagam uma vez",
+                "en": "They are only paid once"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Não importam",
+                "en": "They do not matter"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Uma pequena diferença anual torna-se grande ao fim de décadas.",
+            "en": "A small yearly difference becomes large after decades."
+          }
+        },
+        {
+          "id": "q4",
+          "sectionId": "timing",
+          "prompt": {
+            "pt-PT": "O que costuma dar melhor resultado a longo prazo?",
+            "en": "What usually works better in the long run?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Entrar e sair do mercado à procura do momento certo",
+                "en": "Jumping in and out to catch the right moment"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Ficar investido durante muito tempo",
+                "en": "Staying invested for a long time"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Vender sempre que o mercado cai",
+                "en": "Selling whenever the market drops"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "Quase ninguém acerta sempre no momento. O tempo investido é mais fiável.",
+            "en": "Almost nobody times the market right every time. Time invested is more reliable."
+          }
+        },
+        {
+          "id": "q5",
+          "sectionId": "timing",
+          "prompt": {
+            "pt-PT": "Um amigo diz que vai esperar que o mercado caia para começar. O que é mais provável?",
+            "en": "A friend says they will wait for the market to drop before starting. What is most likely?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Perder anos de crescimento à espera",
+                "en": "Losing years of growth while waiting"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Comprar sempre no ponto mais baixo",
+                "en": "Always buying at the bottom"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Duplicar o dinheiro num mês",
+                "en": "Doubling their money in a month"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Ninguém sabe quando é o ponto mais baixo, e esperar também tem um custo.",
+            "en": "Nobody knows when the bottom is, and waiting has a cost too."
+          }
+        }
+      ]
+    },
+    {
+      "id": "arena-risk-1-quiz",
+      "lessonId": "arena-risk-1",
+      "questions": [
+        {
+          "id": "q1",
+          "sectionId": "swings",
+          "prompt": {
+            "pt-PT": "O que é a volatilidade?",
+            "en": "What is volatility?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "O quanto um preço sobe e desce",
+                "en": "How much a price moves up and down"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Uma garantia de lucro",
+                "en": "A guarantee of profit"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Um tipo de imposto",
+                "en": "A kind of tax"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Mede a instabilidade do preço, não se o investimento é bom.",
+            "en": "It measures how unstable the price is, not whether the investment is good."
+          }
+        },
+        {
+          "id": "q2",
+          "sectionId": "paper-vs-real",
+          "prompt": {
+            "pt-PT": "O teu investimento caiu 20%. Quando é que a perda passa a ser definitiva?",
+            "en": "Your investment fell 20%. When does the loss become permanent?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Logo que o preço desce",
+                "en": "As soon as the price drops"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Quando vendes abaixo do preço de compra",
+                "en": "When you sell below what you paid"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Nunca",
+                "en": "Never"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "Até venderes, a perda é só no papel e ainda pode recuperar.",
+            "en": "Until you sell, the loss is only on paper and can still recover."
+          }
+        },
+        {
+          "id": "q3",
+          "sectionId": "paper-vs-real",
+          "prompt": {
+            "pt-PT": "Compraste por 1000 € e vendes por 800 €. Quanto perdes?",
+            "en": "You bought for 1000 € and sell for 800 €. How much do you lose?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Nada, ainda tens 800 €",
+                "en": "Nothing, you still have 800 €"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "200 €",
+                "en": "200 €"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "800 €",
+                "en": "800 €"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "Ao vender, a diferença de 200 € fica perdida de vez.",
+            "en": "By selling, the 200 € difference is lost for good."
+          }
+        },
+        {
+          "id": "q4",
+          "sectionId": "horizon",
+          "prompt": {
+            "pt-PT": "Vais precisar de 2000 € daqui a três meses para a carta de condução. Onde os pões?",
+            "en": "You will need 2000 € in three months for driving lessons. Where do you keep it?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Numa conta segura",
+                "en": "In a safe account"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Numa criptomoeda nova",
+                "en": "In a new crypto coin"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Em ações de uma só empresa",
+                "en": "In one company's shares"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Em três meses não há tempo para recuperar de uma descida.",
+            "en": "In three months there is no time to recover from a drop."
+          }
+        },
+        {
+          "id": "q5",
+          "sectionId": "horizon",
+          "prompt": {
+            "pt-PT": "Porque é que um horizonte longo ajuda com a volatilidade?",
+            "en": "Why does a long time horizon help with volatility?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Dá tempo para as descidas recuperarem",
+                "en": "It gives drops time to recover"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Elimina todo o risco",
+                "en": "It removes all risk"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Faz os preços pararem de mexer",
+                "en": "It makes prices stop moving"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "O risco não desaparece, mas não ficas obrigado a vender no pior momento.",
+            "en": "The risk does not disappear, but you are not forced to sell at the worst moment."
+          }
+        }
+      ]
+    },
+    {
+      "id": "arena-risk-2-quiz",
+      "lessonId": "arena-risk-2",
+      "questions": [
+        {
+          "id": "q1",
+          "sectionId": "tradeoff",
+          "prompt": {
+            "pt-PT": "Um investimento promete muito mais retorno do que os outros. O que deves assumir?",
+            "en": "An investment promises far more return than others. What should you assume?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Que também tem muito mais risco",
+                "en": "That it also carries far more risk"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Que é seguro",
+                "en": "That it is safe"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Que é uma oportunidade única sem riscos",
+                "en": "That it is a once in a lifetime chance with no risk"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Retorno e risco andam juntos.",
+            "en": "Return and risk go together."
+          }
+        },
+        {
+          "id": "q2",
+          "sectionId": "diversify",
+          "prompt": {
+            "pt-PT": "O que é diversificar?",
+            "en": "What does diversifying mean?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Pôr tudo na melhor ação",
+                "en": "Putting everything in the best share"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Espalhar o dinheiro por vários investimentos",
+                "en": "Spreading money across several investments"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Vender tudo quando cai",
+                "en": "Selling everything when it drops"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "Assim um mau investimento não deita tudo abaixo.",
+            "en": "That way one bad investment does not sink everything."
+          }
+        },
+        {
+          "id": "q3",
+          "sectionId": "diversify",
+          "prompt": {
+            "pt-PT": "Porque é que um ETF ajuda a diversificar?",
+            "en": "Why does an ETF help you diversify?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Junta muitas empresas num só produto",
+                "en": "It holds many companies in one product"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Garante que nunca desce",
+                "en": "It guarantees it never drops"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "É uma só empresa muito grande",
+                "en": "It is one very big company"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Com uma compra ficas exposto a centenas de empresas.",
+            "en": "With one purchase you are exposed to hundreds of companies."
+          }
+        },
+        {
+          "id": "q4",
+          "sectionId": "afford-to-lose",
+          "prompt": {
+            "pt-PT": "Que dinheiro podes usar numa aposta de alto risco?",
+            "en": "Which money can you use for a high risk bet?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "O fundo de emergência",
+                "en": "Your emergency fund"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Dinheiro emprestado",
+                "en": "Borrowed money"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Dinheiro que podes perder sem mudar a tua vida",
+                "en": "Money you could lose without it changing your life"
+              }
+            }
+          ],
+          "correctOptionId": "c",
+          "explanation": {
+            "pt-PT": "Se desaparecer, não podes ficar sem casa nem com dívidas.",
+            "en": "If it disappears, you must not end up without a home or in debt."
+          }
+        },
+        {
+          "id": "q5",
+          "sectionId": "afford-to-lose",
+          "prompt": {
+            "pt-PT": "Pedir um crédito para investir numa criptomoeda é:",
+            "en": "Taking out a loan to invest in a crypto coin is:"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Uma forma segura de ganhar mais",
+                "en": "A safe way to earn more"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Um risco que pode deixar-te com dívidas",
+                "en": "A risk that can leave you in debt"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Obrigatório para investir",
+                "en": "Required to invest"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "Se o investimento cair, continuas a ter de pagar o crédito e os juros.",
+            "en": "If the investment falls, you still have to pay back the loan and the interest."
+          }
+        }
+      ]
+    },
+    {
+      "id": "arena-risk-3-quiz",
+      "lessonId": "arena-risk-3",
+      "questions": [
+        {
+          "id": "q1",
+          "sectionId": "guaranteed",
+          "prompt": {
+            "pt-PT": "Uma plataforma garante 10% de lucro por semana. O que é mais provável?",
+            "en": "A platform guarantees 10% profit a week. What is most likely?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "É uma burla",
+                "en": "It is a scam"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "É um investimento seguro",
+                "en": "It is a safe investment"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "É normal no mercado",
+                "en": "It is normal in the market"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Lucros altos garantidos não existem.",
+            "en": "Guaranteed high profits do not exist."
+          }
+        },
+        {
+          "id": "q2",
+          "sectionId": "pressure",
+          "prompt": {
+            "pt-PT": "Dizem-te que a oferta acaba hoje e para não contares a ninguém. Isto é:",
+            "en": "You are told the offer ends today and not to tell anyone. This is:"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Um sinal de alerta",
+                "en": "A warning sign"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Uma boa prática",
+                "en": "Good practice"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Obrigatório por lei",
+                "en": "Required by law"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "A pressa serve para não teres tempo de pensar ou pedir conselho.",
+            "en": "The rush is there so you have no time to think or ask for advice."
+          }
+        },
+        {
+          "id": "q3",
+          "sectionId": "pressure",
+          "prompt": {
+            "pt-PT": "Ganhas um bónus por cada amigo que convidares a investir. O que deves pensar?",
+            "en": "You get a bonus for every friend you bring in to invest. What should you think?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Que pode ser um esquema em pirâmide",
+                "en": "That it may be a pyramid scheme"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Que é a melhor forma de enriquecer",
+                "en": "That it is the best way to get rich"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Que é uma prática regulada",
+                "en": "That it is a regulated practice"
+              }
+            }
+          ],
+          "correctOptionId": "a",
+          "explanation": {
+            "pt-PT": "Quando o lucro vem de recrutar pessoas, o esquema cai quando deixam de entrar novas.",
+            "en": "When the profit comes from recruiting people, the scheme collapses once new people stop joining."
+          }
+        },
+        {
+          "id": "q4",
+          "sectionId": "check-regulator",
+          "prompt": {
+            "pt-PT": "Onde confirmas se uma plataforma de investimento é legítima em Portugal?",
+            "en": "Where do you check whether an investment platform is legitimate in Portugal?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Nos comentários do Instagram",
+                "en": "In Instagram comments"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Na CMVM ou no Banco de Portugal",
+                "en": "With the CMVM or the Banco de Portugal"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Perguntando ao próprio vendedor",
+                "en": "By asking the seller"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "São as entidades que registam e supervisionam quem pode receber investimentos.",
+            "en": "They are the bodies that register and supervise who may take investments."
+          }
+        },
+        {
+          "id": "q5",
+          "sectionId": "check-regulator",
+          "prompt": {
+            "pt-PT": "Alguém da \"plataforma\" pede o código que recebeste por SMS. O que fazes?",
+            "en": "Someone from the \"platform\" asks for the code you got by text message. What do you do?"
+          },
+          "options": [
+            {
+              "id": "a",
+              "text": {
+                "pt-PT": "Dás, porque é do apoio ao cliente",
+                "en": "Give it, because it is customer support"
+              }
+            },
+            {
+              "id": "b",
+              "text": {
+                "pt-PT": "Nunca partilhas códigos de acesso",
+                "en": "Never share access codes"
+              }
+            },
+            {
+              "id": "c",
+              "text": {
+                "pt-PT": "Dás só metade do código",
+                "en": "Give only half the code"
+              }
+            }
+          ],
+          "correctOptionId": "b",
+          "explanation": {
+            "pt-PT": "Nenhuma entidade séria te pede códigos. Com eles podem entrar na tua conta.",
+            "en": "No serious company asks for your codes. With them they can get into your account."
+          }
+        }
+      ]
+    }
+  ],
   "$schema": "./node_modules/json-server/schema.json"
 }

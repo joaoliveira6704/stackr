@@ -397,6 +397,23 @@
 		outline: 2px solid var(--color-brand);
 		outline-offset: 2px;
 	}
+	/* After a quiz answer is checked, data-result marks the right answer and
+	the wrong one the user picked. */
+	&[data-result="correct"] {
+		border-color: var(--color-brand);
+		background-color: color-mix(in oklab, var(--color-brand) 15%, transparent);
+	}
+	&[data-result="wrong"] {
+		border-color: var(--color-tangerine);
+		background-color: color-mix(
+			in oklab,
+			var(--color-tangerine) 15%,
+			transparent
+		);
+	}
+	&:has(:disabled) {
+		cursor: default;
+	}
 }
 
 /* The letter badge inside a choice. */

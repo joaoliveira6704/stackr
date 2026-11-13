@@ -14,13 +14,14 @@ export async function mountAt(
 	path: string,
 	component: Component,
 	locale: Locale = "en",
+	props: Record<string, unknown> = {},
 ) {
 	const router = createAppRouter(createMemoryHistory());
 	const pinia = createPinia();
 	setActivePinia(pinia);
 	await router.push(path);
 	const host = defineComponent({
-		render: () => [h(component), h(ConfirmDialog)],
+		render: () => [h(component, props), h(ConfirmDialog)],
 	});
 	const wrapper = mount(host, {
 		global: { plugins: [router, pinia, createAppI18n(locale)] },

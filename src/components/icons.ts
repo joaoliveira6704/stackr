@@ -1,6 +1,8 @@
 import {
+	ArrowLeft,
 	ArrowRight,
 	BookOpen,
+	Check,
 	CircleCheck,
 	Clock,
 	Coins,
@@ -8,6 +10,7 @@ import {
 	Globe,
 	House,
 	LayoutDashboard,
+	Lock,
 	LogOut,
 	type LucideIcon,
 	Mail,
@@ -29,13 +32,16 @@ import type { Track } from "../lib/tracks";
 // icon by what it means here, so swapping the picture is a one line change.
 export const ICONS = {
 	alert: TriangleAlert,
+	arrowLeft: ArrowLeft,
 	arrowRight: ArrowRight,
 	book: BookOpen,
+	check: Check,
 	clock: Clock,
 	dashboard: LayoutDashboard,
 	flame: Flame,
 	globe: Globe,
 	home: House,
+	lock: Lock,
 	logout: LogOut,
 	mail: Mail,
 	moon: Moon,

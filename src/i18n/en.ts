@@ -12,6 +12,7 @@ export const en: MessageSchema = {
 		lightMode: "Switch to light mode",
 		darkModeSwitch: "Dark mode",
 		profile: "Profile",
+		learn: "Learn",
 		preferences: "Preferences",
 		mainNavigation: "Main navigation",
 		otherLanguage: "Português",
@@ -34,7 +35,6 @@ export const en: MessageSchema = {
 		password: "Password",
 		back: "Back",
 		next: "Next",
-		comingSoon: "Coming soon",
 		cancel: "Cancel",
 	},
 	logoutConfirm: {
@@ -52,6 +52,9 @@ export const en: MessageSchema = {
 		onboardingNotSaved: "Could not save your track. Please try again.",
 		notSignedIn: "Your session has ended. Please log in again.",
 		passwordsDoNotMatch: "Passwords do not match.",
+		contentNotFound: "We could not find this content.",
+		progressNotSaved:
+			"Your progress could not be saved. We will try again on the next change.",
 		unknown: "Something went wrong.",
 	},
 	levels: {
@@ -196,8 +199,65 @@ export const en: MessageSchema = {
 		noTrack: "Not chosen yet",
 		changeTrack: "Retake the quiz",
 		nextStep: "Next step",
-		nextStepTitle: "Your first lesson is on its way",
-		nextStepDetail: "We are getting the lessons for your track ready.",
+		nextStepTitle: "Keep going on your track",
+		nextStepDetail: "Your lessons are waiting for you.",
+		goToLessons: "Go to lessons",
+	},
+	learn: {
+		title: "Learn",
+		subtitle:
+			"Your track, one module at a time. Every lesson ends with a five question quiz.",
+		module: "Module {number}",
+		lessonsDone: "{done} of {total} lessons done",
+		minutes: "{minutes} min",
+		status: {
+			locked: "Locked",
+			available: "Available",
+			review: "To review",
+			done: "Done",
+		},
+		lockedHint: "Finish the previous lesson to unlock it.",
+		loading: "Loading the lessons...",
+		retry: "Try again",
+	},
+	lesson: {
+		back: "Back to lessons",
+		reviewTitle: "Let's review this lesson",
+		reviewMessage:
+			"The parts tied to the questions you missed are highlighted. Read them calmly and try the quiz again.",
+		reviewTag: "Review",
+		example: "Example",
+		startQuiz: "Take the quiz",
+		locked: "This lesson is still locked.",
+		loading: "Loading the lesson...",
+	},
+	quiz: {
+		progress: "Question {current} of {total}",
+		passMark: "You need 80% to pass",
+		check: "Check",
+		next: "Next",
+		finish: "See result",
+		correct: "Correct!",
+		wrong: "Not quite.",
+		passTitle: "Lesson complete!",
+		passMessage:
+			"You got {correct} of {total} right. The next lesson is now unlocked.",
+		failTitle: "Almost there",
+		failMessage:
+			"You got {correct} of {total} right. You need 80% to move on. Review the highlighted parts and try again.",
+		score: "Score",
+		xpEarned: "+{amount} XP",
+		stacksEarned: "+{amount} Stacks",
+		alreadyDone:
+			"You had already finished this lesson, so there is no reward this time.",
+		review: "Review the lesson",
+		nextLesson: "Next lesson",
+		backToLearn: "Back to lessons",
+		loading: "Loading the quiz...",
+		readFirstTitle: "Lesson first",
+		readFirstMessage:
+			"The quiz only opens after you read the lesson to the end. If you fail, you read it again before the next try.",
+		goToLesson: "Go to the lesson",
 	},
 	onboarding: {
 		intro: {

@@ -26,6 +26,14 @@ Write the question so it stands on its own. The title is a short question about 
 
 Every piece of text a user can see goes through vue-i18n, always. That covers headings, labels, buttons, placeholders, aria labels, page titles, empty states and error messages. Never leave a plain string in a template or a script for something that ends up on screen. Whenever you add or change text, add the key to both `src/i18n/pt.ts` and `src/i18n/en.ts` in the same change, with a real translation in each and not a copy of the other language. The Portuguese file is the source of truth and the English file is typed against it, so a missing key fails the type check. Group keys by screen or feature, the way the files are already organised. The Portuguese locale code is `pt-PT`, not `pt`, because browsers read a bare `pt` as Brazilian Portuguese and format numbers the Brazilian way. Errors are thrown as an `AppError` with a code from `src/lib/errors.ts`, and the code is translated on screen under `errors`. Numbers on screen are formatted with the `n` helper from vue-i18n so they follow the current language.
 
+## Learning content and progress
+
+Tracks, lessons and quizzes live in `db/db.json`, in the `tracks`, `lessons` and `quizzes` collections, and the app loads them through `src/lib/content-api.ts`. Never put lesson or quiz content in the code. Content is the one kind of text that does not go in the i18n files: every field is an object with a `pt-PT` and an `en` version, typed as `Localized` in `src/content/types.ts`, shown through `useLocalized`, and both versions must be filled in. Each lesson has one quiz of five questions, and each question names the lesson section it tests, so a wrong answer can point back to it. `src/content/db-content.test.ts` checks all of this, so run the tests after changing content.
+
+The theory always comes first. A quiz only opens after its lesson has been read to the end, which happens when the user presses the button at the bottom of the lesson, and failing a quiz closes it again until the lesson is read once more. A quiz passes at 80% or more, rewards are paid only the first time a lesson is passed, and the amounts live in `src/lib/rewards.ts`, never in a component.
+
+Each user's progress is saved on their own record in `db.json` by `useProgressSync`, shortly after every change. json-server keeps its own copy of the data in memory, so after editing `db.json` by hand, restart `bun run dev:all`, otherwise json-server writes its old copy back on the next save.
+
 ## Code quality
 
 Write clean code and leave every file a little tidier than you found it. Give variables, functions and components names that say what they are or what they do. Keep functions short and focused on one job. If a function needs a comment to explain what it does, rename it or split it up first. Comments should explain why something is done, not what the code already says.

@@ -5,6 +5,8 @@ import { configDefaults, defineConfig } from "vitest/config";
 export default defineConfig({
 	resolve: { tsconfigPaths: true },
 	server: {
+		// json-server writes db.json on every change, which must not reload the app.
+		watch: { ignored: ["**/db/**"] },
 		// json-server (bun run api) runs on 3001; the app always talks to /api/*
 		proxy: {
 			"/api": {

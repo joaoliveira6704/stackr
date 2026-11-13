@@ -28,6 +28,10 @@ Start the app in another terminal and open http://localhost:3000. The dev server
 bun run dev
 ```
 
+## Content and saved progress
+
+Tracks, lessons and quizzes are stored in `db/db.json` and served by json-server, in both Portuguese and English. Each user's progress, such as XP, Stacks and finished lessons, is saved on their own record in the same file. If you edit `db.json` by hand while the servers are running, restart `bun run dev:all`, because json-server keeps its own copy of the data in memory and would write the old copy back on its next save.
+
 ## Tests
 
 Unit tests use Vitest and Vue Test Utils and run in jsdom. They never call the real API, so json-server does not need to be running. Run them with `bun run test`. Plain `bun test` starts Bun's own test runner instead, which cannot run these tests, so it only prints a reminder to use `bun run test`.
