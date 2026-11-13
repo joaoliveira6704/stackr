@@ -12,7 +12,7 @@ export const en: MessageSchema = {
 		lightMode: "Switch to light mode",
 	},
 	footer: {
-		tagline: "Financial literacy for people just starting out.",
+		tagline: "Financial literacy for everyone.",
 		disclaimer: "Stackr is a learning tool and does not give financial advice.",
 	},
 	notFound: {

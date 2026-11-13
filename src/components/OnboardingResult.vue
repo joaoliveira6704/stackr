@@ -14,15 +14,15 @@ const { t } = useI18n();
 
 <template>
 	<div class="flex flex-col gap-6">
-		<div class="result-reveal flex flex-col items-start gap-3">
-			<span class="icon-tile size-16 rounded-3xl" :class="TONE_CLASSES[TRACK_TONES[track]]">
+		<div class="flex animate-reveal flex-col items-start gap-3 motion-reduce:animate-none">
+			<span class="icon-tile icon-tile-xl" :class="TONE_CLASSES[TRACK_TONES[track]]">
 				<AppIcon :name="TRACK_ICONS[track]" :size="30" />
 			</span>
-			<span class="chip mt-2">{{ t("onboarding.result.eyebrow") }}</span>
-			<h1 class="text-5xl font-extrabold tracking-tight sm:text-6xl">
+			<span class="chip tone-brand mt-2">{{ t("onboarding.result.eyebrow") }}</span>
+			<h1 class="text-title sm:text-display">
 				{{ t(`tracks.${track}.name`) }}
 			</h1>
-			<p class="text-lg text-ink-muted">{{ t(`tracks.${track}.tagline`) }}</p>
+			<p class="text-lead text-ink-muted">{{ t(`tracks.${track}.tagline`) }}</p>
 		</div>
 
 		<section class="card flex flex-col gap-5">
@@ -39,14 +39,14 @@ const { t } = useI18n();
 		</section>
 
 		<section v-if="earnedXp" class="card flex items-center gap-4">
-			<span class="icon-tile" :class="TONE_CLASSES.sun">
+			<span class="icon-tile tone-sun">
 				<AppIcon name="trophy" />
 			</span>
 			<div class="flex-1">
 				<p class="font-semibold">{{ t("onboarding.result.reward") }}</p>
 				<p class="text-sm text-ink-muted">{{ t("onboarding.result.rewardDetail") }}</p>
 			</div>
-			<p class="text-2xl font-bold text-brand-strong tabular-nums">
+			<p class="text-heading text-brand-strong tabular-nums">
 				{{ t("onboarding.result.xp", { amount: ONBOARDING_XP }) }}
 			</p>
 		</section>
@@ -62,26 +62,3 @@ const { t } = useI18n();
 		</div>
 	</div>
 </template>
-
-<style scoped>
-.result-reveal {
-	animation: reveal 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-@keyframes reveal {
-	from {
-		opacity: 0;
-		transform: translateY(16px) scale(0.98);
-	}
-	to {
-		opacity: 1;
-		transform: none;
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.result-reveal {
-		animation: none;
-	}
-}
-</style>

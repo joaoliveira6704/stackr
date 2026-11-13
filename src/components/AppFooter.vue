@@ -6,9 +6,9 @@ const { t } = useI18n();
 </script>
 
 <template>
-	<footer class="border-t border-line">
+	<footer class="px-3 pb-3 sm:px-6 sm:pb-5">
 		<div
-			class="mx-auto flex w-full max-w-5xl flex-col gap-3 px-6 py-10 sm:flex-row sm:items-center sm:justify-between"
+			class="glass mx-auto flex w-full max-w-5xl flex-col gap-3 rounded-panel px-7 py-8 sm:flex-row sm:items-center sm:justify-between"
 		>
 			<div class="flex flex-col gap-1">
 				<StackrLogo />

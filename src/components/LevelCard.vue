@@ -26,7 +26,7 @@ const remainingText = computed(() => {
 				<p class="text-sm text-ink-muted">
 					{{ t("progress.level", { level: progress.level.level }) }}
 				</p>
-				<p class="text-2xl font-bold tracking-tight">
+				<p class="text-heading">
 					{{ t(`levels.${progress.level.id}`) }}
 				</p>
 			</div>

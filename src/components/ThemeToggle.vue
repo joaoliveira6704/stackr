@@ -17,7 +17,7 @@ const label = computed(() =>
 		type="button"
 		:aria-label="label"
 		:title="label"
-		class="grid size-9 place-items-center rounded-full border border-line text-ink transition-colors hover:bg-surface-muted"
+		class="btn-secondary btn-icon"
 		@click="toggleTheme"
 	>
 		<AppIcon :name="theme === 'dark' ? 'sun' : 'moon'" :size="18" />

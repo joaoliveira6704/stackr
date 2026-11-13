@@ -13,11 +13,11 @@ const { t } = useI18n();
 			:alt="t('notFound.imageAlt')"
 			class="w-full max-w-md dark:opacity-90"
 		/>
-		<span class="chip">{{ t("notFound.eyebrow") }}</span>
-		<h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">
+		<span class="chip tone-brand">{{ t("notFound.eyebrow") }}</span>
+		<h1 class="text-title sm:text-display">
 			{{ t("notFound.title") }}
 		</h1>
-		<p class="text-lg text-ink-muted">{{ t("notFound.detail") }}</p>
+		<p class="text-lead text-ink-muted">{{ t("notFound.detail") }}</p>
 		<RouterLink to="/" class="btn-primary">
 			<AppIcon name="home" :size="18" />
 			{{ t("notFound.goHome") }}

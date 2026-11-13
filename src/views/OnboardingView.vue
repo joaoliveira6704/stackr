@@ -109,23 +109,29 @@ async function finish() {
 
 <template>
 	<div class="mx-auto max-w-xl">
-		<Transition name="step" mode="out-in">
+		<Transition
+			mode="out-in"
+			enter-active-class="transition duration-200 ease-out motion-reduce:transition-none"
+			leave-active-class="transition duration-200 ease-in motion-reduce:transition-none"
+			enter-from-class="translate-x-4 opacity-0"
+			leave-to-class="-translate-x-4 opacity-0"
+		>
 			<section v-if="step === 'intro'" key="intro" class="flex flex-col gap-6">
-				<span class="chip self-start">
+				<span class="chip tone-brand self-start">
 					<AppIcon name="sparkle" :size="14" />
 					{{ t("onboarding.intro.eyebrow") }}
 				</span>
-				<h1 class="text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">
+				<h1 class="text-title text-balance sm:text-display">
 					{{ t("onboarding.intro.title") }}
 				</h1>
-				<p class="text-lg text-ink-muted">{{ t("onboarding.intro.subtitle") }}</p>
-				<div class="card grid gap-1 p-2 sm:grid-cols-3">
+				<p class="text-lead text-ink-muted">{{ t("onboarding.intro.subtitle") }}</p>
+				<div class="card grid grid-cols-1 gap-1 p-2 sm:grid-cols-3">
 					<div
 						v-for="fact in INTRO_FACTS"
 						:key="fact.key"
 						class="flex items-center gap-3 rounded-2xl p-3"
 					>
-						<span class="icon-tile size-10" :class="TONE_CLASSES[fact.tone]">
+						<span class="icon-tile icon-tile-sm" :class="TONE_CLASSES[fact.tone]">
 							<AppIcon :name="fact.icon" :size="18" />
 						</span>
 						<span class="text-sm font-semibold">
@@ -149,7 +155,7 @@ async function finish() {
 						<span class="text-ink-muted tabular-nums">
 							{{ t("onboarding.progress", { current: questionIndex + 1, total }) }}
 						</span>
-						<span class="chip" :class="question.kind === 'risk' && 'bg-tangerine/15 text-tangerine-strong'">
+						<span class="chip" :class="question.kind === 'risk' ? 'tone-tangerine' : 'tone-brand'">
 							<AppIcon :name="KIND_ICONS[question.kind]" :size="14" />
 							{{ t(`onboarding.${question.kind}`) }}
 						</span>
@@ -161,7 +167,7 @@ async function finish() {
 					/>
 				</div>
 
-				<h1 class="text-2xl font-extrabold tracking-tight sm:text-3xl">
+				<h1 class="text-heading sm:text-title">
 					{{ t(`onboarding.questions.${question.id}.prompt`) }}
 				</h1>
 
@@ -172,12 +178,7 @@ async function finish() {
 					<label
 						v-for="(option, index) in question.options"
 						:key="option"
-						class="flex cursor-pointer items-center gap-4 rounded-2xl border px-4 py-3.5 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand"
-						:class="
-							selected === option
-								? 'border-brand bg-brand/10'
-								: 'border-line hover:border-line-strong'
-						"
+						class="choice"
 					>
 						<input
 							type="radio"
@@ -187,34 +188,13 @@ async function finish() {
 							:checked="selected === option"
 							@change="choose(option)"
 						/>
-						<span
-							aria-hidden="true"
-							class="grid size-8 shrink-0 place-items-center rounded-xl text-sm font-semibold transition-colors"
-							:class="
-								selected === option
-									? 'bg-brand text-on-brand'
-									: 'bg-surface-muted text-ink-muted'
-							"
-						>
+						<span aria-hidden="true" class="choice-key">
 							{{ OPTION_LETTERS[index] }}
 						</span>
-						<span class="flex-1 font-medium">
+						<span class="flex-1 font-semibold">
 							{{ t(`onboarding.questions.${question.id}.options.${option}`) }}
 						</span>
-						<span
-							aria-hidden="true"
-							class="grid size-5 shrink-0 place-items-center rounded-full border"
-							:class="
-								selected === option
-									? 'border-brand bg-brand'
-									: 'border-line-strong'
-							"
-						>
-							<span
-								v-if="selected === option"
-								class="size-2 rounded-full bg-on-brand"
-							/>
-						</span>
+						<span aria-hidden="true" class="choice-mark" />
 					</label>
 				</fieldset>
 
@@ -252,29 +232,3 @@ async function finish() {
 		</Transition>
 	</div>
 </template>
-
-<style scoped>
-.step-enter-active,
-.step-leave-active {
-	transition:
-		opacity 200ms ease,
-		transform 200ms ease;
-}
-
-.step-enter-from {
-	opacity: 0;
-	transform: translateX(16px);
-}
-
-.step-leave-to {
-	opacity: 0;
-	transform: translateX(-16px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.step-enter-active,
-	.step-leave-active {
-		transition: none;
-	}
-}
-</style>

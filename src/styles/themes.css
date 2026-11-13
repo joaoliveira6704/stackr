@@ -1,0 +1,45 @@
+/*
+ * Light and dark values for the theme colours in tokens.css. The dark theme
+ * is turned on by the "dark" class on <html>, see src/lib/theme.ts.
+ */
+:root {
+	color-scheme: light;
+	--surface: #f6f8f7;
+	--surface-muted: #eef2f0;
+	--ink: #0b0f0d;
+	--ink-muted: #5c6863;
+	--ink-faint: #97a29d;
+	--line: #e4eae6;
+	--line-strong: #cbd4cf;
+	--brand-strong: #0c9a47;
+	--grape-strong: #6a48f5;
+	--tangerine-strong: #e2541b;
+	--sun-strong: #b57b00;
+	--glass: rgb(255 255 255 / 0.55);
+	--glass-strong: rgb(255 255 255 / 0.72);
+	--glass-border: rgb(255 255 255 / 0.7);
+	--glass-edge: rgb(255 255 255 / 0.9);
+	--glass-shadow: 0 10px 40px -12px rgb(11 15 13 / 0.18);
+	--orb-opacity: 0.45;
+}
+
+.dark {
+	color-scheme: dark;
+	--surface: #090c0b;
+	--surface-muted: #131917;
+	--ink: #f2f6f4;
+	--ink-muted: #9aa7a1;
+	--ink-faint: #5e6a65;
+	--line: #1f2724;
+	--line-strong: #2f3a36;
+	--brand-strong: #4ddf7b;
+	--grape-strong: #a891ff;
+	--tangerine-strong: #ff8d5f;
+	--sun-strong: #ffcb57;
+	--glass: rgb(22 30 27 / 0.45);
+	--glass-strong: rgb(22 30 27 / 0.68);
+	--glass-border: rgb(255 255 255 / 0.09);
+	--glass-edge: rgb(255 255 255 / 0.16);
+	--glass-shadow: 0 12px 48px -12px rgb(0 0 0 / 0.6);
+	--orb-opacity: 0.3;
+}

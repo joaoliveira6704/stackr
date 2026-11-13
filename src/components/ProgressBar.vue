@@ -15,7 +15,7 @@ const percent = computed(() =>
 		:aria-valuenow="value"
 		aria-valuemin="0"
 		:aria-valuemax="max"
-		class="h-1.5 w-full overflow-hidden rounded-full bg-surface-muted"
+		class="h-1.5 w-full overflow-hidden rounded-full bg-ink/10"
 	>
 		<div
 			class="h-full rounded-full bg-brand transition-[width] duration-500 ease-out"

@@ -11,8 +11,7 @@
 			"**/src/**/*",
 			"**/.vscode/**/*",
 			"**/index.html",
-			"**/vite.config.ts",
-			"!**/src/styles.css"
+			"**/vite.config.ts"
 		]
 	},
 	"formatter": {
@@ -39,5 +38,10 @@
 	},
 	"html": {
 		"experimentalFullSupportEnabled": true
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
 	}
 }

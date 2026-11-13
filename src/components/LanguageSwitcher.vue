@@ -14,19 +14,14 @@ function selectLocale(next: Locale) {
 	<div
 		role="group"
 		:aria-label="t('nav.language')"
-		class="flex rounded-full border border-line p-0.5 text-xs font-bold"
+		class="glass flex rounded-full p-0.5 text-xs font-bold shadow-none"
 	>
 		<button
 			v-for="option in LOCALES"
 			:key="option"
 			type="button"
 			:aria-pressed="locale === option"
-			class="rounded-full px-2.5 py-1 uppercase transition-colors"
-			:class="
-				locale === option
-					? 'bg-ink text-surface'
-					: 'text-ink-muted hover:text-ink'
-			"
+			class="rounded-full px-2.5 py-1 text-ink-muted uppercase transition-colors hover:text-ink aria-pressed:bg-ink aria-pressed:text-surface"
 			@click="selectLocale(option)"
 		>
 			{{ option }}

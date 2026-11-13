@@ -10,7 +10,7 @@ export const pt = {
 		lightMode: "Mudar para modo claro",
 	},
 	footer: {
-		tagline: "Literacia financeira para quem está a começar.",
+		tagline: "Literacia financeira para todos.",
 		disclaimer:
 			"O Stackr é uma ferramenta educativa e não dá aconselhamento financeiro.",
 	},

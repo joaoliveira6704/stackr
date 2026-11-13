@@ -1,11 +1,13 @@
 import type { Track } from "../lib/tracks";
 
-// Full class names are written out so Tailwind can find them in the source.
+// The tone-* utilities live in src/styles/components.css. Class names are
+// written out in full so Tailwind can find them in the source.
 export const TONE_CLASSES = {
-	brand: "bg-brand/15 text-brand-strong",
-	grape: "bg-grape/15 text-grape-strong",
-	tangerine: "bg-tangerine/15 text-tangerine-strong",
-	sun: "bg-sun/20 text-sun-strong",
+	brand: "tone-brand",
+	grape: "tone-grape",
+	tangerine: "tone-tangerine",
+	sun: "tone-sun",
+	neutral: "tone-neutral",
 } as const;
 
 export type Tone = keyof typeof TONE_CLASSES;

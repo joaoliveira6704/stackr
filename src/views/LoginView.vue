@@ -66,7 +66,7 @@ async function handleSubmit() {
 				{{ t("nav.signup") }}
 			</RouterLink>
 		</p>
-		<p class="mt-3 rounded-2xl bg-surface-muted px-4 py-3 text-xs text-ink-muted">
+		<p class="mt-3 rounded-2xl border border-glass-border bg-glass px-4 py-3 text-xs text-ink-muted">
 			{{ t("login.demo") }}
 		</p>
 	</AuthLayout>

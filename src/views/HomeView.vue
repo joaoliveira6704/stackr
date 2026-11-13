@@ -36,18 +36,18 @@ const primaryAction = computed(() =>
 
 <template>
 	<div class="flex flex-col gap-24 sm:gap-32">
-		<section class="grid items-center gap-10 lg:grid-cols-[1.05fr_1fr]">
+		<section class="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.05fr_1fr]">
 			<div class="flex min-w-0 flex-col items-start gap-6">
-				<span class="chip">
+				<span class="chip tone-brand">
 					<AppIcon name="sparkle" :size="14" />
 					{{ t("home.eyebrow") }}
 				</span>
 				<h1
-					class="text-5xl font-extrabold leading-[1.02] tracking-tight text-balance sm:text-6xl"
+					class="text-title text-balance sm:text-display"
 				>
 					{{ t("home.title") }}
 				</h1>
-				<p class="max-w-md text-lg text-ink-muted">{{ t("home.subtitle") }}</p>
+				<p class="max-w-md text-lead text-ink-muted">{{ t("home.subtitle") }}</p>
 				<div class="flex flex-wrap gap-3 pt-2">
 					<RouterLink :to="primaryAction.to" class="btn-primary">
 						{{ primaryAction.label }}
@@ -58,7 +58,7 @@ const primaryAction = computed(() =>
 					</RouterLink>
 				</div>
 			</div>
-			<div class="min-w-0 rounded-[2.5rem] bg-brand/12 p-4 sm:p-8">
+			<div class="panel min-w-0 bg-brand/12">
 				<!-- biome-ignore lint/a11y/useAltText: the alt text is bound from i18n -->
 				<img
 					src="/hero-image.png"
@@ -70,14 +70,14 @@ const primaryAction = computed(() =>
 			</div>
 		</section>
 
-		<section class="grid gap-4 sm:grid-cols-3">
+		<section class="grid grid-cols-1 gap-4 sm:grid-cols-3">
 			<div
 				v-for="fact in FACTS"
 				:key="fact.key"
-				class="rounded-[1.75rem] p-6"
+				class="card-tint"
 				:class="TONE_CLASSES[fact.tone]"
 			>
-				<p class="text-5xl font-extrabold tracking-tight tabular-nums">
+				<p class="text-display tabular-nums">
 					{{ t(`home.facts.${fact.key}.value`) }}
 				</p>
 				<p class="mt-2 font-semibold text-ink">
@@ -88,22 +88,22 @@ const primaryAction = computed(() =>
 
 		<section class="flex flex-col gap-10">
 			<div class="max-w-xl">
-				<h2 class="text-4xl font-extrabold tracking-tight">
+				<h2 class="text-title">
 					{{ t("home.tracksTitle") }}
 				</h2>
-				<p class="mt-3 text-lg text-ink-muted">{{ t("home.tracksSubtitle") }}</p>
+				<p class="mt-3 text-lead text-ink-muted">{{ t("home.tracksSubtitle") }}</p>
 			</div>
-			<div class="grid gap-4 md:grid-cols-3">
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 				<article
 					v-for="track in TRACKS"
 					:key="track"
-					class="card flex flex-col gap-4 p-7"
+					class="card flex flex-col gap-4"
 				>
-					<span class="icon-tile size-14" :class="TONE_CLASSES[TRACK_TONES[track]]">
+					<span class="icon-tile icon-tile-lg" :class="TONE_CLASSES[TRACK_TONES[track]]">
 						<AppIcon :name="TRACK_ICONS[track]" :size="26" />
 					</span>
 					<div>
-						<h3 class="text-2xl font-extrabold tracking-tight">
+						<h3 class="text-heading">
 							{{ t(`tracks.${track}.name`) }}
 						</h3>
 						<p class="mt-1 text-sm font-semibold">
@@ -117,13 +117,13 @@ const primaryAction = computed(() =>
 			</div>
 		</section>
 
-		<section class="grid items-center gap-10 lg:grid-cols-2">
+		<section class="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
 			<div class="flex flex-col gap-8">
 				<div>
-					<h2 class="text-4xl font-extrabold tracking-tight">
+					<h2 class="text-title">
 						{{ t("home.howTitle") }}
 					</h2>
-					<p class="mt-3 text-lg text-ink-muted">{{ t("home.howSubtitle") }}</p>
+					<p class="mt-3 text-lead text-ink-muted">{{ t("home.howSubtitle") }}</p>
 				</div>
 				<ol class="flex flex-col gap-3">
 					<li
@@ -144,8 +144,8 @@ const primaryAction = computed(() =>
 				</ol>
 			</div>
 
-			<div aria-hidden="true" class="min-w-0 rounded-[2.5rem] bg-grape/15 p-5 sm:p-10">
-				<div class="card p-7">
+			<div aria-hidden="true" class="panel min-w-0 bg-grape/15">
+				<div class="card">
 					<p class="text-sm text-ink-muted">{{ t("progress.label") }}</p>
 					<div class="mt-3">
 						<LevelCard :xp="PREVIEW.xp" />
@@ -175,7 +175,7 @@ const primaryAction = computed(() =>
 					</div>
 				</div>
 				<div class="card mt-3 ml-auto flex w-fit max-w-full items-center gap-3 p-4">
-					<span class="icon-tile" :class="TONE_CLASSES.brand">
+					<span class="icon-tile tone-brand">
 						<AppIcon name="book" />
 					</span>
 					<div class="min-w-0">
@@ -190,14 +190,14 @@ const primaryAction = computed(() =>
 		</section>
 
 		<section
-			class="grid items-center gap-8 overflow-hidden rounded-[2.5rem] bg-tangerine/12 p-8 sm:p-12 md:grid-cols-[1fr_auto]"
+			class="panel grid grid-cols-1 items-center gap-8 overflow-hidden bg-tangerine/12 md:grid-cols-[1fr_auto]"
 		>
 			<div class="flex flex-col items-start gap-4">
-				<span class="chip bg-tangerine/20 text-tangerine-strong">
+				<span class="chip tone-tangerine">
 					<AppIcon name="target" :size="14" />
 					{{ t("home.rule.eyebrow") }}
 				</span>
-				<h2 class="text-4xl font-extrabold tracking-tight">{{ t("home.rule.title") }}</h2>
+				<h2 class="text-title">{{ t("home.rule.title") }}</h2>
 				<p class="max-w-xl text-ink-muted">{{ t("home.rule.detail") }}</p>
 			</div>
 			<!-- biome-ignore lint/a11y/useAltText: the alt text is bound from i18n -->
@@ -211,13 +211,13 @@ const primaryAction = computed(() =>
 		</section>
 
 		<section
-			class="grid items-center gap-8 overflow-hidden rounded-[2.5rem] bg-on-brand p-8 text-white ring-1 ring-brand/20 sm:p-12 md:grid-cols-[1fr_auto]"
+			class="panel grid grid-cols-1 items-center gap-8 overflow-hidden bg-on-brand/90 text-white md:grid-cols-[1fr_auto]"
 		>
 			<div class="flex flex-col items-start gap-4">
-				<h2 class="text-4xl font-extrabold tracking-tight sm:text-5xl">
+				<h2 class="text-title">
 					{{ t("home.ctaTitle") }}
 				</h2>
-				<p class="text-lg text-white/70">{{ t("home.ctaSubtitle") }}</p>
+				<p class="text-lead text-white/70">{{ t("home.ctaSubtitle") }}</p>
 				<RouterLink :to="primaryAction.to" class="btn-primary mt-2">
 					{{ primaryAction.label }}
 					<AppIcon name="arrowRight" :size="18" />
