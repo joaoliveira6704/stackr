@@ -8,6 +8,11 @@ export const pt = {
 		home: "Página inicial do Stackr",
 		darkMode: "Mudar para modo escuro",
 		lightMode: "Mudar para modo claro",
+		profile: "Perfil",
+		preferences: "Preferências",
+		mainNavigation: "Navegação principal",
+		otherLanguage: "English",
+		switchLanguage: "Mudar a língua para inglês",
 	},
 	footer: {
 		tagline: "Literacia financeira para todos.",
@@ -62,6 +67,8 @@ export const pt = {
 		stacksDetail: "Moeda para conteúdo extra",
 		streak: "Dias seguidos",
 		streakDetail: "Estuda todos os dias para ganhar bónus",
+		lessons: "Aulas concluídas",
+		lessonsDetail: "Com 80% ou mais no quiz",
 	},
 	tracks: {
 		foundation: {
@@ -171,14 +178,20 @@ export const pt = {
 	dashboard: {
 		greeting: "Olá, {name}",
 		subtitle: "Aqui está o teu progresso.",
+		currentLevel: "Nível atual",
+		statsTitle: "As tuas estatísticas",
+	},
+	profile: {
+		title: "Perfil",
+		subtitle: "A tua conta, o teu trilho e o teu progresso.",
+		account: "Conta",
+		name: "Nome",
 		track: "O teu trilho",
 		noTrack: "Ainda por definir",
 		changeTrack: "Refazer o questionário",
 		nextStep: "Próximo passo",
 		nextStepTitle: "A tua primeira aula está a chegar",
 		nextStepDetail: "Estamos a preparar as aulas do teu trilho.",
-		account: "Conta",
-		name: "Nome",
 	},
 	onboarding: {
 		intro: {

@@ -1,111 +1,68 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRouter } from "vue-router";
-import AppIcon from "../components/AppIcon.vue";
-import { TRACK_ICONS } from "../components/icons";
+import type { IconName } from "../components/icons";
 import LevelCard from "../components/LevelCard.vue";
-import StatRow from "../components/StatRow.vue";
-import { TONE_CLASSES, TRACK_TONES } from "../components/tones";
-import { ONBOARDING_PATH } from "../lib/onboarding";
+import StatCard from "../components/StatCard.vue";
+import type { Tone } from "../components/tones";
 import { useAuth } from "../lib/use-auth";
 import { useProgressStore } from "../stores/progress";
 
-const { user, signOut } = useAuth();
+const { user } = useAuth();
 const progress = useProgressStore();
 const { t, n } = useI18n();
-const router = useRouter();
 
 const firstName = computed(() => user.value?.name.split(" ")[0] ?? "");
 
-function handleSignOut() {
-	signOut();
-	void router.push("/");
+interface Stat {
+	key: "xp" | "stacks" | "streak" | "lessons";
+	icon: IconName;
+	tone: Tone;
+	value: number;
 }
+
+const stats = computed<Stat[]>(() => [
+	{ key: "xp", icon: "sparkle", tone: "grape", value: progress.xp },
+	{ key: "stacks", icon: "stacks", tone: "sun", value: progress.stacks },
+	{ key: "streak", icon: "flame", tone: "tangerine", value: progress.streak },
+	{
+		key: "lessons",
+		icon: "book",
+		tone: "brand",
+		value: progress.completedLessons.length,
+	},
+]);
 </script>
 
 <template>
 	<div class="flex flex-col gap-8">
 		<div>
-			<h1 class="text-title">
+			<h1 class="text-title sm:text-display">
 				{{ t("dashboard.greeting", { name: firstName }) }}
 			</h1>
-			<p class="mt-2 text-ink-muted">{{ t("dashboard.subtitle") }}</p>
-		</div>
-
-		<div class="grid grid-cols-1 gap-4 lg:grid-cols-[1.4fr_1fr]">
-			<section class="card flex flex-col gap-6">
-				<LevelCard :xp="progress.xp" />
-				<div class="divide-y divide-line border-t border-line">
-					<StatRow
-						icon="sparkle"
-						tone="grape"
-						:title="t('stats.xp')"
-						:detail="t('stats.xpDetail')"
-						:value="n(progress.xp)"
-					/>
-					<StatRow
-						icon="stacks"
-						tone="sun"
-						:title="t('stats.stacks')"
-						:detail="t('stats.stacksDetail')"
-						:value="n(progress.stacks)"
-					/>
-					<StatRow
-						icon="flame"
-						tone="tangerine"
-						:title="t('stats.streak')"
-						:detail="t('stats.streakDetail')"
-						:value="n(progress.streak)"
-					/>
-				</div>
-			</section>
-
-			<div class="flex flex-col gap-4">
-				<section class="card flex flex-col gap-4">
-					<p class="text-sm text-ink-muted">{{ t("dashboard.track") }}</p>
-					<div v-if="user?.track" class="flex items-center gap-4">
-						<span
-							class="icon-tile icon-tile-lg"
-							:class="TONE_CLASSES[TRACK_TONES[user.track]]"
-						>
-							<AppIcon :name="TRACK_ICONS[user.track]" :size="26" />
-						</span>
-						<div>
-							<p class="text-heading">
-								{{ t(`tracks.${user.track}.name`) }}
-							</p>
-							<p class="text-sm text-ink-muted">
-								{{ t(`tracks.${user.track}.tagline`) }}
-							</p>
-						</div>
-					</div>
-					<p v-else class="text-heading">{{ t("dashboard.noTrack") }}</p>
-					<RouterLink :to="ONBOARDING_PATH" class="btn-secondary self-start px-4 py-2 text-sm">
-						{{ t("dashboard.changeTrack") }}
-					</RouterLink>
-				</section>
-
-				<section class="card-tint flex flex-col gap-3 bg-brand/12">
-					<div class="flex items-center justify-between">
-						<p class="text-sm text-ink-muted">{{ t("dashboard.nextStep") }}</p>
-						<span class="chip bg-brand text-on-brand">{{ t("common.comingSoon") }}</span>
-					</div>
-					<p class="text-subheading">{{ t("dashboard.nextStepTitle") }}</p>
-					<p class="text-sm text-ink-muted">{{ t("dashboard.nextStepDetail") }}</p>
-				</section>
-			</div>
+			<p class="mt-2 text-lead text-ink-muted">{{ t("dashboard.subtitle") }}</p>
 		</div>
 
 		<section class="card">
-			<h2 class="font-semibold">{{ t("dashboard.account") }}</h2>
-			<div class="mt-2 divide-y divide-line">
-				<StatRow icon="user" :title="t('dashboard.name')" :value="user?.name ?? '—'" />
-				<StatRow icon="mail" :title="t('common.email')" :value="user?.email ?? '—'" />
+			<h2 class="mb-4 text-sm font-semibold text-ink-muted">
+				{{ t("dashboard.currentLevel") }}
+			</h2>
+			<LevelCard :xp="progress.xp" />
+		</section>
+
+		<section class="flex flex-col gap-4">
+			<h2 class="text-heading">{{ t("dashboard.statsTitle") }}</h2>
+			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+				<StatCard
+					v-for="stat in stats"
+					:key="stat.key"
+					:icon="stat.icon"
+					:tone="stat.tone"
+					:label="t(`stats.${stat.key}`)"
+					:detail="t(`stats.${stat.key}Detail`)"
+					:value="n(stat.value)"
+				/>
 			</div>
-			<button type="button" class="btn-secondary mt-4" @click="handleSignOut">
-				{{ t("nav.logout") }}
-			</button>
 		</section>
 	</div>
 </template>

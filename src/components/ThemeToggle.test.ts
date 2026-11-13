@@ -9,7 +9,7 @@ afterEach(() => {
 	localStorage.clear();
 });
 
-function mountToggle(locale: "pt" | "en" = "en") {
+function mountToggle(locale: "pt-PT" | "en" = "en") {
 	return mount(ThemeToggle, {
 		global: { plugins: [createAppI18n(locale)] },
 	});
@@ -43,7 +43,7 @@ describe("ThemeToggle", () => {
 
 	it("labels the button in Portuguese", () => {
 		useTheme().setTheme("light");
-		const wrapper = mountToggle("pt");
+		const wrapper = mountToggle("pt-PT");
 
 		expect(wrapper.get("button").attributes("aria-label")).toBe(
 			"Mudar para modo escuro",

@@ -2,6 +2,7 @@ import {
 	createRouter,
 	createWebHistory,
 	type RouteLocationNormalized,
+	type RouteRecordRaw,
 	type RouterHistory,
 } from "vue-router";
 import { getSession } from "./lib/auth";
@@ -11,15 +12,18 @@ import HomeView from "./views/HomeView.vue";
 import LoginView from "./views/LoginView.vue";
 import NotFoundView from "./views/NotFoundView.vue";
 import OnboardingView from "./views/OnboardingView.vue";
+import ProfileView from "./views/ProfileView.vue";
 import SignupView from "./views/SignupView.vue";
 
 declare module "vue-router" {
 	interface RouteMeta {
 		requiresAuth?: boolean;
+		/** "app" pages get the sidebar, every other page the top navbar. */
+		layout?: "app";
 	}
 }
 
-const routes = [
+const routes: RouteRecordRaw[] = [
 	{ path: "/", component: HomeView },
 	{ path: "/login", component: LoginView },
 	{ path: "/signup", component: SignupView },
@@ -31,7 +35,12 @@ const routes = [
 	{
 		path: "/dashboard",
 		component: DashboardView,
-		meta: { requiresAuth: true },
+		meta: { requiresAuth: true, layout: "app" },
+	},
+	{
+		path: "/profile",
+		component: ProfileView,
+		meta: { requiresAuth: true, layout: "app" },
 	},
 	{ path: "/:pathMatch(.*)*", component: NotFoundView },
 ];

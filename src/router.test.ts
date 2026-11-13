@@ -80,4 +80,34 @@ describe("router", () => {
 
 		expect(router.currentRoute.value.matched[0]?.path).toBe("/:pathMatch(.*)*");
 	});
+
+	it("uses the app layout for the dashboard and the profile", async () => {
+		signInAsDemoUser();
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/profile");
+		expect(router.currentRoute.value.meta.layout).toBe("app");
+
+		await router.push("/dashboard");
+		expect(router.currentRoute.value.meta.layout).toBe("app");
+	});
+
+	it("keeps the public layout for the landing page and the onboarding", async () => {
+		storeSessionFor(newcomer);
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/");
+		expect(router.currentRoute.value.meta.layout).toBeUndefined();
+
+		await router.push("/onboarding");
+		expect(router.currentRoute.value.meta.layout).toBeUndefined();
+	});
+
+	it("sends a signed out visitor from the profile to login", async () => {
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/profile");
+
+		expect(router.currentRoute.value.path).toBe("/login");
+	});
 });

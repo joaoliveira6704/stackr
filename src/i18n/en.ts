@@ -10,6 +10,11 @@ export const en: MessageSchema = {
 		home: "Stackr home page",
 		darkMode: "Switch to dark mode",
 		lightMode: "Switch to light mode",
+		profile: "Profile",
+		preferences: "Preferences",
+		mainNavigation: "Main navigation",
+		otherLanguage: "Português",
+		switchLanguage: "Switch the language to Portuguese",
 	},
 	footer: {
 		tagline: "Financial literacy for everyone.",
@@ -62,6 +67,8 @@ export const en: MessageSchema = {
 		stacksDetail: "Currency for extra content",
 		streak: "Day streak",
 		streakDetail: "Study every day to earn a bonus",
+		lessons: "Lessons done",
+		lessonsDetail: "With 80% or more on the quiz",
 	},
 	tracks: {
 		foundation: {
@@ -170,14 +177,20 @@ export const en: MessageSchema = {
 	dashboard: {
 		greeting: "Hi, {name}",
 		subtitle: "Here is how you are doing.",
+		currentLevel: "Current level",
+		statsTitle: "Your statistics",
+	},
+	profile: {
+		title: "Profile",
+		subtitle: "Your account, your track and your progress.",
+		account: "Account",
+		name: "Name",
 		track: "Your track",
 		noTrack: "Not chosen yet",
 		changeTrack: "Retake the quiz",
 		nextStep: "Next step",
 		nextStepTitle: "Your first lesson is on its way",
 		nextStepDetail: "We are getting the lessons for your track ready.",
-		account: "Account",
-		name: "Name",
 	},
 	onboarding: {
 		intro: {

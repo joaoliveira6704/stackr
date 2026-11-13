@@ -17,6 +17,7 @@
 	--sun-strong: #b57b00;
 	--glass: rgb(255 255 255 / 0.55);
 	--glass-strong: rgb(255 255 255 / 0.72);
+	--glass-popover: rgb(255 255 255 / 0.88);
 	--glass-border: rgb(255 255 255 / 0.7);
 	--glass-edge: rgb(255 255 255 / 0.9);
 	--glass-shadow: 0 10px 40px -12px rgb(11 15 13 / 0.18);
@@ -38,6 +39,7 @@
 	--sun-strong: #ffcb57;
 	--glass: rgb(22 30 27 / 0.45);
 	--glass-strong: rgb(22 30 27 / 0.68);
+	--glass-popover: rgb(16 22 20 / 0.92);
 	--glass-border: rgb(255 255 255 / 0.09);
 	--glass-edge: rgb(255 255 255 / 0.16);
 	--glass-shadow: 0 12px 48px -12px rgb(0 0 0 / 0.6);

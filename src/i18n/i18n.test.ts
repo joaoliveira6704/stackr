@@ -19,8 +19,8 @@ function keysOf(messages: object, prefix = ""): string[] {
 
 describe("locale", () => {
 	it("defaults to Portuguese", () => {
-		expect(DEFAULT_LOCALE).toBe("pt");
-		expect(getSavedLocale()).toBe("pt");
+		expect(DEFAULT_LOCALE).toBe("pt-PT");
+		expect(getSavedLocale()).toBe("pt-PT");
 	});
 
 	it("remembers a saved language", () => {
@@ -32,7 +32,13 @@ describe("locale", () => {
 	it("falls back to Portuguese when the saved language is not supported", () => {
 		localStorage.setItem("stackr.locale", "fr");
 
-		expect(getSavedLocale()).toBe("pt");
+		expect(getSavedLocale()).toBe("pt-PT");
+	});
+
+	it("treats a locale saved as plain pt before the switch to pt-PT as the default", () => {
+		localStorage.setItem("stackr.locale", "pt");
+
+		expect(getSavedLocale()).toBe("pt-PT");
 	});
 
 	it("has the same keys in English and Portuguese", () => {
@@ -42,7 +48,7 @@ describe("locale", () => {
 
 describe("LanguageSwitcher", () => {
 	it("switches to English and remembers the choice", async () => {
-		const i18n = createAppI18n("pt");
+		const i18n = createAppI18n("pt-PT");
 		const wrapper = mount(LanguageSwitcher, { global: { plugins: [i18n] } });
 
 		const english = wrapper.findAll("button").find((b) => b.text() === "en");
@@ -55,7 +61,7 @@ describe("LanguageSwitcher", () => {
 
 	it("marks the active language as pressed", () => {
 		const wrapper = mount(LanguageSwitcher, {
-			global: { plugins: [createAppI18n("pt")] },
+			global: { plugins: [createAppI18n("pt-PT")] },
 		});
 
 		const pressed = wrapper.find('[aria-pressed="true"]');

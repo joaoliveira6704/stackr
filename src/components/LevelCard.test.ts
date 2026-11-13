@@ -33,7 +33,7 @@ describe("LevelCard", () => {
 	});
 
 	it("speaks Portuguese when the app is in Portuguese", () => {
-		const wrapper = mountLevelCard(0, "pt");
+		const wrapper = mountLevelCard(0, "pt-PT");
 
 		expect(wrapper.text()).toContain("Iniciante");
 		expect(wrapper.text()).toContain("Faltam 200 XP para Aprendiz");

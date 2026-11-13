@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import { LOCALES, type Locale, saveLocale } from "../i18n";
+import { LOCALES, localeShortName } from "../i18n";
+import { useLocale } from "../i18n/use-locale";
 
-const { locale, t } = useI18n();
-
-function selectLocale(next: Locale) {
-	locale.value = next;
-	saveLocale(next);
-}
+const { t } = useI18n();
+const { locale, setLocale } = useLocale();
 </script>
 
 <template>
@@ -22,9 +19,9 @@ function selectLocale(next: Locale) {
 			type="button"
 			:aria-pressed="locale === option"
 			class="rounded-full px-2.5 py-1 text-ink-muted uppercase transition-colors hover:text-ink aria-pressed:bg-ink aria-pressed:text-surface"
-			@click="selectLocale(option)"
+			@click="setLocale(option)"
 		>
-			{{ option }}
+			{{ localeShortName(option) }}
 		</button>
 	</div>
 </template>

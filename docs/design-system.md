@@ -106,6 +106,14 @@ Buttons already handle hover, press and disabled states. To hide a button on sma
 
 `chip` is a pill label and always takes a tone, like `chip tone-brand`. `icon-tile` is the square that holds an icon and also takes a tone, with `icon-tile-sm`, `icon-tile-lg` and `icon-tile-xl` for other sizes. List rows use the `StatRow` component, which already combines an icon tile, a title, a muted detail and a right aligned value.
 
+## Navigation and layouts
+
+The app has two layouts, picked by the `layout` field in a route's `meta` in `src/router.ts`. Public pages such as the landing, login, sign up, onboarding and 404 use the floating glass pill along the top, from `PublicNavbar`, with the footer below. Pages inside the app, currently the dashboard and the profile, set `layout: "app"` and get `AppSidebar` instead, with no footer.
+
+The sidebar is a compact vertical glass pill centred on the left edge, with its items grouped together and a thin divider between the pages and the settings. It shows only icons and grows to show their labels while it is hovered or holds keyboard focus. On phones it turns into a bar of icons along the bottom of the screen with only the pages and a "Preferências" button, which opens a small glass menu above the bar holding the language, theme and logout options. Floating menus like that one use `popover`, a denser glass that stays readable on top of other content, and their rows use `menu-item`. Its pieces are utilities, `sidebar` for the container, `nav-item` for a row with an icon and a label, and `sidebar-label` for the text that fades in. The current page is marked by `aria-current="page"`, which RouterLink sets on its own, and `nav-item` turns green for it. To add a link, add a `SidebarItem` with a `to`, an `icon` and a translated `label`. Without `to` it becomes a button that emits `click`.
+
+Statistics on the dashboard use the `StatCard` component, a card with a toned icon tile, a label, a large value and a muted detail.
+
 ## Forms
 
 Inputs use `field`, which is what the `TextField` component renders. Selectable answers use `choice`, a label that wraps a hidden radio or checkbox and turns green on its own when the input is checked. Inside it, `choice-key` is the letter badge and `choice-mark` is the round mark at the end. No class binding is needed for the selected state.
