@@ -1,0 +1,5 @@
+# The tests in this project run on Vitest with jsdom, through "bun run test".
+# Bun's own runner ("bun test") cannot run them, so it is pointed at a single
+# test that explains this instead of failing on every file.
+[test]
+root = "tooling/bun-test"

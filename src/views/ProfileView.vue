@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRouter } from "vue-router";
 import AppIcon from "../components/AppIcon.vue";
 import { TRACK_ICONS } from "../components/icons";
 import LevelCard from "../components/LevelCard.vue";
@@ -9,12 +8,13 @@ import StatRow from "../components/StatRow.vue";
 import { TONE_CLASSES, TRACK_TONES } from "../components/tones";
 import { ONBOARDING_PATH } from "../lib/onboarding";
 import { useAuth } from "../lib/use-auth";
+import { useLogout } from "../lib/use-logout";
 import { useProgressStore } from "../stores/progress";
 
-const { user, signOut } = useAuth();
+const { user } = useAuth();
+const { logOut } = useLogout();
 const progress = useProgressStore();
 const { t, n } = useI18n();
-const router = useRouter();
 
 const initials = computed(() =>
 	(user.value?.name ?? "")
@@ -25,10 +25,6 @@ const initials = computed(() =>
 		.join(""),
 );
 
-function handleSignOut() {
-	signOut();
-	void router.push("/");
-}
 </script>
 
 <template>
@@ -52,7 +48,7 @@ function handleSignOut() {
 				<StatRow icon="user" :title="t('profile.name')" :value="user?.name ?? '—'" />
 				<StatRow icon="mail" :title="t('common.email')" :value="user?.email ?? '—'" />
 			</div>
-			<button type="button" class="btn-secondary self-start" @click="handleSignOut">
+			<button type="button" class="btn-secondary self-start" @click="logOut">
 				{{ t("nav.logout") }}
 			</button>
 		</section>

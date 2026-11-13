@@ -30,7 +30,7 @@ bun run dev
 
 ## Tests
 
-Unit tests use Vitest and Vue Test Utils and run in jsdom. They never call the real API, so json-server does not need to be running.
+Unit tests use Vitest and Vue Test Utils and run in jsdom. They never call the real API, so json-server does not need to be running. Run them with `bun run test`. Plain `bun test` starts Bun's own test runner instead, which cannot run these tests, so it only prints a reminder to use `bun run test`.
 
 ```bash
 bun run test

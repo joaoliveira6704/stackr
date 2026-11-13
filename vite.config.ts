@@ -1,6 +1,6 @@
 import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
 	resolve: { tsconfigPaths: true },
@@ -16,6 +16,12 @@ export default defineConfig({
 	plugins: [tailwindcss(), vue()],
 	test: {
 		environment: "jsdom",
+		// Builds jsdom once per worker instead of once per test file, while
+		// still running each file in its own context, so module state such as
+		// the signed in user cannot leak from one file into the next.
+		pool: "vmThreads",
 		setupFiles: ["src/test/setup.ts"],
+		// Only there to answer "bun test" with a helpful message, see bunfig.toml.
+		exclude: [...configDefaults.exclude, "tooling/**"],
 	},
 });

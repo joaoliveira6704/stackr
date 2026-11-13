@@ -1,19 +1,14 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import { useRouter } from "vue-router";
 import { useAuth } from "../lib/use-auth";
+import { useLogout } from "../lib/use-logout";
 import LanguageSwitcher from "./LanguageSwitcher.vue";
 import StackrLogo from "./StackrLogo.vue";
 import ThemeToggle from "./ThemeToggle.vue";
 
-const { user, signOut } = useAuth();
+const { user } = useAuth();
+const { logOut } = useLogout();
 const { t } = useI18n();
-const router = useRouter();
-
-function handleSignOut() {
-	signOut();
-	void router.push("/");
-}
 </script>
 
 <template>
@@ -33,7 +28,7 @@ function handleSignOut() {
 					>
 						{{ t("nav.dashboard") }}
 					</RouterLink>
-					<button type="button" class="btn-secondary btn-sm" @click="handleSignOut">
+					<button type="button" class="btn-secondary btn-sm" @click="logOut">
 						{{ t("nav.logout") }}
 					</button>
 				</template>

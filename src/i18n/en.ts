@@ -10,6 +10,7 @@ export const en: MessageSchema = {
 		home: "Stackr home page",
 		darkMode: "Switch to dark mode",
 		lightMode: "Switch to light mode",
+		darkModeSwitch: "Dark mode",
 		profile: "Profile",
 		preferences: "Preferences",
 		mainNavigation: "Main navigation",
@@ -34,6 +35,12 @@ export const en: MessageSchema = {
 		back: "Back",
 		next: "Next",
 		comingSoon: "Coming soon",
+		cancel: "Cancel",
+	},
+	logoutConfirm: {
+		title: "Log out?",
+		message: "You will need to log in again to keep learning.",
+		confirm: "Log out",
 	},
 	errors: {
 		invalidCredentials: "Invalid email or password.",

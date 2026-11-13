@@ -43,5 +43,19 @@
 		"parser": {
 			"tailwindDirectives": true
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": [
+				"**/*.vue"
+			],
+			"linter": {
+				"rules": {
+					"a11y": {
+						"useAriaPropsForRole": "off"
+					}
+				}
+			}
+		}
+	]
 }

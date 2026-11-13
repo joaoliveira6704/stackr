@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { useAuth } from "../lib/use-auth";
 import { useTheme } from "../lib/use-theme";
 import { DEMO_PASSWORD, demoUser, fakeUsersApi } from "../test/fake-api";
-import { mountAt } from "../test/mount";
+import { answerConfirmDialog, mountAt } from "../test/mount";
 import AppSidebar from "./AppSidebar.vue";
 
 afterEach(() => {
@@ -65,23 +65,61 @@ describe("AppSidebar", () => {
 		expect(wrapper.text()).toContain("Painel");
 	});
 
-	it("switches the theme", async () => {
+	it("shows dark mode as a switch that is off in the light theme", async () => {
 		useTheme().setTheme("light");
 		const { wrapper } = await mountSidebar();
 
-		await buttonNamed(wrapper, "Switch to dark mode").trigger("click");
-
-		expect(document.documentElement.classList.contains("dark")).toBe(true);
+		const darkMode = wrapper.get('nav [role="switch"]');
+		expect(darkMode.text()).toContain("Dark mode");
+		expect(darkMode.attributes("aria-checked")).toBe("false");
 	});
 
-	it("signs the user out and goes home", async () => {
+	it("turns dark mode on and flips the switch", async () => {
+		useTheme().setTheme("light");
+		const { wrapper } = await mountSidebar();
+
+		await wrapper.get('nav [role="switch"]').trigger("click");
+
+		expect(document.documentElement.classList.contains("dark")).toBe(true);
+		expect(wrapper.get('nav [role="switch"]').attributes("aria-checked")).toBe(
+			"true",
+		);
+	});
+
+	it("keeps the same label whether dark mode is on or off", async () => {
+		useTheme().setTheme("dark");
+		const { wrapper } = await mountSidebar();
+
+		const darkMode = wrapper.get('nav [role="switch"]');
+		expect(darkMode.text()).toContain("Dark mode");
+		expect(darkMode.attributes("aria-checked")).toBe("true");
+	});
+
+	it("asks before logging out and signs out once confirmed", async () => {
 		const { wrapper, router } = await mountSidebar();
 
 		await buttonNamed(wrapper, "Log out").trigger("click");
 		await flushPromises();
 
+		expect(wrapper.get('[role="alertdialog"]').text()).toContain("Log out?");
+		expect(useAuth().user.value).not.toBeNull();
+
+		await answerConfirmDialog(wrapper, "confirm");
+
 		expect(useAuth().user.value).toBeNull();
 		expect(router.currentRoute.value.path).toBe("/");
+	});
+
+	it("keeps the user signed in when they cancel the logout", async () => {
+		const { wrapper, router } = await mountSidebar();
+
+		await buttonNamed(wrapper, "Log out").trigger("click");
+		await flushPromises();
+		await answerConfirmDialog(wrapper, "cancel");
+
+		expect(useAuth().user.value).not.toBeNull();
+		expect(router.currentRoute.value.path).toBe("/dashboard");
+		expect(wrapper.find('[role="alertdialog"]').exists()).toBe(false);
 	});
 
 	it("labels the navigation in Portuguese", async () => {
@@ -119,23 +157,41 @@ describe("AppSidebar", () => {
 				"true",
 			);
 			expect(menu.text()).toContain("Português");
-			expect(menu.text()).toContain("Switch to dark mode");
+			expect(menu.text()).toContain("Dark mode");
 			expect(menu.text()).toContain("Log out");
 		});
 
-		it("runs the chosen option and closes", async () => {
+		it("runs an action such as logout and closes", async () => {
+			const { wrapper, router } = await mountSidebar();
+			await preferencesButton(wrapper).trigger("click");
+
+			const logout = wrapper
+				.get("#preferences-menu")
+				.findAll("button")
+				.find((option) => option.text().includes("Log out"));
+			await logout?.trigger("click");
+			await flushPromises();
+
+			expect(wrapper.find("#preferences-menu").exists()).toBe(false);
+			await answerConfirmDialog(wrapper, "confirm");
+
+			expect(useAuth().user.value).toBeNull();
+			expect(router.currentRoute.value.path).toBe("/");
+		});
+
+		it("flips the dark mode switch and stays open so the change is visible", async () => {
 			useTheme().setTheme("light");
 			const { wrapper } = await mountSidebar();
 			await preferencesButton(wrapper).trigger("click");
 
-			const themeOption = wrapper
-				.get("#preferences-menu")
-				.findAll("button")
-				.find((option) => option.text().includes("dark mode"));
-			await themeOption?.trigger("click");
+			await wrapper.get('#preferences-menu [role="switch"]').trigger("click");
 
 			expect(document.documentElement.classList.contains("dark")).toBe(true);
-			expect(wrapper.find("#preferences-menu").exists()).toBe(false);
+			expect(
+				wrapper
+					.get('#preferences-menu [role="switch"]')
+					.attributes("aria-checked"),
+			).toBe("true");
 		});
 
 		it("closes when Escape is pressed", async () => {
@@ -162,6 +218,9 @@ describe("AppSidebar", () => {
 			const { wrapper } = await mountSidebar("/dashboard", "pt-PT");
 
 			expect(preferencesButton(wrapper).text()).toContain("Preferências");
+			expect(wrapper.get('nav [role="switch"]').text()).toContain(
+				"Modo escuro",
+			);
 		});
 	});
 });
