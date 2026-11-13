@@ -13,7 +13,7 @@ const logoMarkup = logoSource
 	<span
 		role="img"
 		aria-label="Stackr"
-		class="inline-block h-6 text-ink sm:h-8 [&>svg]:block [&>svg]:h-full [&>svg]:w-auto"
+		class="inline-block h-6 mt-2 text-ink sm:h-8 [&>svg]:block [&>svg]:h-full [&>svg]:w-auto"
 		v-html="logoMarkup"
 	/>
 </template>

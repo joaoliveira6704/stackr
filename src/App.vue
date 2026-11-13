@@ -4,6 +4,7 @@ import { useRoute } from "vue-router";
 import AppBackdrop from "./components/AppBackdrop.vue";
 import AppFooter from "./components/AppFooter.vue";
 import AppSidebar from "./components/AppSidebar.vue";
+import ConfirmDialog from "./components/ConfirmDialog.vue";
 import PublicNavbar from "./components/PublicNavbar.vue";
 
 const route = useRoute();
@@ -26,5 +27,6 @@ const isAppLayout = computed(() => route.meta.layout === "app");
 			</main>
 			<AppFooter />
 		</template>
+		<ConfirmDialog />
 	</div>
 </template>

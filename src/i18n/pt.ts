@@ -8,6 +8,7 @@ export const pt = {
 		home: "Página inicial do Stackr",
 		darkMode: "Mudar para modo escuro",
 		lightMode: "Mudar para modo claro",
+		darkModeSwitch: "Modo escuro",
 		profile: "Perfil",
 		preferences: "Preferências",
 		mainNavigation: "Navegação principal",
@@ -33,6 +34,12 @@ export const pt = {
 		back: "Voltar",
 		next: "Seguinte",
 		comingSoon: "Em breve",
+		cancel: "Cancelar",
+	},
+	logoutConfirm: {
+		title: "Sair da conta?",
+		message: "Vais precisar de entrar outra vez para continuar a aprender.",
+		confirm: "Sair",
 	},
 	errors: {
 		invalidCredentials: "Email ou palavra-passe incorretos.",

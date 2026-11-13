@@ -97,6 +97,7 @@ The surface style is liquid glass. The `AppBackdrop` component paints soft blurr
 | `btn-primary` | The one main action on a screen, green with dark text |
 | `btn-secondary` | Any other action, an outlined glass pill |
 | `btn-ghost` | Quiet text actions such as navigation links |
+| `btn-danger` | The confirm button of a destructive action, inside the confirm dialog |
 | `btn-sm` | The smaller size, added next to any of the above |
 | `btn-icon` | A round button that only holds an icon, used with `btn-secondary` |
 
@@ -106,17 +107,27 @@ Buttons already handle hover, press and disabled states. To hide a button on sma
 
 `chip` is a pill label and always takes a tone, like `chip tone-brand`. `icon-tile` is the square that holds an icon and also takes a tone, with `icon-tile-sm`, `icon-tile-lg` and `icon-tile-xl` for other sizes. List rows use the `StatRow` component, which already combines an icon tile, a title, a muted detail and a right aligned value.
 
+## Icons
+
+Icons come from Lucide, through the `lucide-vue-next` package. Components never import Lucide directly. They use `AppIcon` with one of our own names, such as `<AppIcon name="flame" />`, and `ICONS` in `src/components/icons.ts` maps each name to its Lucide icon, so changing a picture is one line in one place. To add an icon, import it from `lucide-vue-next` in that file and give it a name that says what it means in the app, like `stacks` or `logout`, rather than what it looks like. Icons are 20 pixels with a 1.75 stroke by default, take the text colour, and are hidden from screen readers because the label next to them already says what they mean. The tracks have their icons in `TRACK_ICONS`. Browse the set at lucide.dev.
+
 ## Navigation and layouts
 
 The app has two layouts, picked by the `layout` field in a route's `meta` in `src/router.ts`. Public pages such as the landing, login, sign up, onboarding and 404 use the floating glass pill along the top, from `PublicNavbar`, with the footer below. Pages inside the app, currently the dashboard and the profile, set `layout: "app"` and get `AppSidebar` instead, with no footer.
 
 The sidebar is a compact vertical glass pill centred on the left edge, with its items grouped together and a thin divider between the pages and the settings. It shows only icons and grows to show their labels while it is hovered or holds keyboard focus. On phones it turns into a bar of icons along the bottom of the screen with only the pages and a "Preferências" button, which opens a small glass menu above the bar holding the language, theme and logout options. Floating menus like that one use `popover`, a denser glass that stays readable on top of other content, and their rows use `menu-item`. Its pieces are utilities, `sidebar` for the container, `nav-item` for a row with an icon and a label, and `sidebar-label` for the text that fades in. The current page is marked by `aria-current="page"`, which RouterLink sets on its own, and `nav-item` turns green for it. To add a link, add a `SidebarItem` with a `to`, an `icon` and a translated `label`. Without `to` it becomes a button that emits `click`.
 
+Dark mode in the sidebar and the phone menu is a switch, not a sentence. The row always reads "Modo escuro" and ends with `ThemeSwitch`, a small track whose knob slides across and turns from a sun into a moon while a few stars appear. The button carries `role="switch"` and `aria-checked`, and `ThemeSwitch` reads that state through the `group/switch` class on the button, so there is no extra state to keep in sync. Give a `SidebarItem` a `switch-state` of `on` or `off` to render it this way. The round icon button in the public navbar stays as it is.
+
 Statistics on the dashboard use the `StatCard` component, a card with a toned icon tile, a label, a large value and a muted detail.
 
 ## Forms
 
 Inputs use `field`, which is what the `TextField` component renders. Selectable answers use `choice`, a label that wraps a hidden radio or checkbox and turns green on its own when the input is checked. Inside it, `choice-key` is the letter badge and `choice-mark` is the round mark at the end. No class binding is needed for the selected state.
+
+## Confirming destructive actions
+
+Destructive actions such as logging out never happen on the first click. They call `useConfirm().confirm()` with a title, a message, a confirm label and `destructive: true`, and wait for the answer, which is `true` only when the user presses the confirm button. The question appears in `ConfirmDialog`, mounted once in `App.vue`: a dense glass `popover` centred over a `scrim`, the dimmed and blurred layer behind it, with a warning icon in a `tone-tangerine` tile, Cancel as a `btn-secondary` and the action as a `btn-danger`. Focus starts on Cancel, Tab stays inside the dialog, and Escape or a click on the scrim cancels. Logout already wraps all of this in `useLogout`.
 
 ## States through variants
 

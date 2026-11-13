@@ -8,7 +8,7 @@ import {
 	fakeUsersApi,
 	newcomer,
 } from "../test/fake-api";
-import { mountAt } from "../test/mount";
+import { answerConfirmDialog, mountAt } from "../test/mount";
 import DashboardView from "./DashboardView.vue";
 import HomeView from "./HomeView.vue";
 import LoginView from "./LoginView.vue";
@@ -210,15 +210,30 @@ describe("ProfileView", () => {
 		expect(wrapper.text()).toContain("Total XP");
 	});
 
-	it("signs the user out and goes home", async () => {
+	it("asks before logging out and signs out once confirmed", async () => {
 		await signInAsDemoUser();
 		const { wrapper, router } = await mountAt("/profile", ProfileView);
 
 		await wrapper.find("section button").trigger("click");
 		await flushPromises();
+		expect(useAuth().user.value).not.toBeNull();
+
+		await answerConfirmDialog(wrapper, "confirm");
 
 		expect(useAuth().user.value).toBeNull();
 		expect(router.currentRoute.value.path).toBe("/");
+	});
+
+	it("stays signed in on the profile when the logout is cancelled", async () => {
+		await signInAsDemoUser();
+		const { wrapper, router } = await mountAt("/profile", ProfileView);
+
+		await wrapper.find("section button").trigger("click");
+		await flushPromises();
+		await answerConfirmDialog(wrapper, "cancel");
+
+		expect(useAuth().user.value).not.toBeNull();
+		expect(router.currentRoute.value.path).toBe("/profile");
 	});
 
 	it("is in Portuguese by default", async () => {

@@ -1,34 +1,31 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useLocale } from "../i18n/use-locale";
-import { useAuth } from "../lib/use-auth";
+import { useLogout } from "../lib/use-logout";
 import { useTheme } from "../lib/use-theme";
 import AppIcon from "./AppIcon.vue";
 import type { IconName } from "./icons";
 import SidebarItem from "./SidebarItem.vue";
+import ThemeSwitch from "./ThemeSwitch.vue";
 
-const { signOut } = useAuth();
+const { logOut } = useLogout();
 const { theme, toggleTheme } = useTheme();
 const { toggleLocale } = useLocale();
 const { t } = useI18n();
 const route = useRoute();
-const router = useRouter();
 
 const PREFERENCES_MENU_ID = "preferences-menu";
 const preferencesOpen = ref(false);
-
-function handleSignOut() {
-	signOut();
-	void router.push("/");
-}
 
 interface Preference {
 	key: string;
 	icon: IconName;
 	label: string;
 	hint?: string;
+	/** Set for options that are an on and off switch rather than an action. */
+	switchState?: "on" | "off";
 	run: () => void;
 }
 
@@ -44,19 +41,22 @@ const preferences = computed<Preference[]>(() => [
 	},
 	{
 		key: "theme",
-		icon: theme.value === "dark" ? "sun" : "moon",
-		label: theme.value === "dark" ? t("nav.lightMode") : t("nav.darkMode"),
+		icon: "moon",
+		label: t("nav.darkModeSwitch"),
+		switchState: theme.value === "dark" ? "on" : "off",
 		run: toggleTheme,
 	},
-	{ key: "logout", icon: "logout", label: t("nav.logout"), run: handleSignOut },
+	{ key: "logout", icon: "logout", label: t("nav.logout"), run: logOut },
 ]);
 
 function closePreferences() {
 	preferencesOpen.value = false;
 }
 
+// A switch keeps the menu open so the user sees it flip. Any other option
+// is a one off action, so the menu closes.
 function choosePreference(preference: Preference) {
-	closePreferences();
+	if (!preference.switchState) closePreferences();
 	preference.run();
 }
 
@@ -93,6 +93,7 @@ onUnmounted(() => window.removeEventListener("keydown", closeOnEscape));
 				:icon="preference.icon"
 				:label="preference.label"
 				:title="preference.hint"
+				:switch-state="preference.switchState"
 				@click="preference.run"
 			/>
 		</div>
@@ -130,12 +131,15 @@ onUnmounted(() => window.removeEventListener("keydown", closeOnEscape));
 				v-for="preference in preferences"
 				:key="preference.key"
 				type="button"
+				:role="preference.switchState ? 'switch' : undefined"
+				:aria-checked="preference.switchState ? preference.switchState === 'on' : undefined"
 				:title="preference.hint"
-				class="menu-item"
+				class="menu-item group/switch"
 				@click="choosePreference(preference)"
 			>
 				<AppIcon :name="preference.icon" class="shrink-0" />
-				{{ preference.label }}
+				<span class="flex-1 text-left">{{ preference.label }}</span>
+				<ThemeSwitch v-if="preference.switchState" />
 			</button>
 		</div>
 	</Transition>
