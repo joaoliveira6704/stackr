@@ -11,17 +11,17 @@ const textId = useId();
 </script>
 
 <template>
-	<!--
-		The button stretches over the whole card through its ::after layer, so a
-		click anywhere on the card toggles it while keyboard and screen reader
-		users still get a real button with aria-expanded. The layer needs z-10
-		because the text block is positioned and the icon tiles transform on
-		hover, and both would otherwise be painted above it and swallow clicks.
-	-->
 	<div
 		class="group card relative flex flex-col gap-4 transition duration-300 ease-out hover:-translate-y-1 hover:bg-glass-strong has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-brand motion-reduce:transition-none motion-reduce:hover:translate-y-0"
 		:data-revealed="revealed || undefined"
 	>
+		<!--
+			The button stretches over the whole card through its ::after layer, so a
+			click anywhere on the card toggles it while keyboard and screen reader
+			users still get a real button with aria-expanded. The layer needs z-10
+			because the text block is positioned and the icon tiles transform on
+			hover, and both would otherwise be painted above it and swallow clicks.
+		-->
 		<div class="flex items-center gap-4">
 			<span
 				class="icon-tile tone-sun transition duration-300 group-hover:-rotate-6 group-hover:scale-110 motion-reduce:transition-none"

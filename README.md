@@ -22,7 +22,7 @@ You can also run them separately. Start the mock API in one terminal. It listens
 bun run api
 ```
 
-Start the app in another terminal and open http://localhost:3000. The dev server forwards every `/api` request to json-server. You can log in with the demo account `joao@example.com` and the password `123456`.
+Start the app in another terminal and open http://localhost:3000. The dev server forwards every `/api` request to json-server, and every `/market` request to Yahoo Finance, which the investment simulator uses for ticker search and price history. Those Yahoo endpoints are public and need no key, but they are unofficial, so when they fail the simulator still works with a return typed by hand. You can log in with the demo account `joao@example.com` and the password `123456`.
 
 ```bash
 bun run dev

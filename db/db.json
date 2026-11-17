@@ -6,7 +6,50 @@
       "email": "joao@example.com",
       "password": "$2a$12$b1Hro2p7ZmVqSqj0MLhPpOkAdfBgsgf1zzvNnWKxLhunos/32N7gW",
       "onboardingDone": true,
-      "track": "foundation"
+      "track": "strategist",
+      "portfolio": {
+        "years": 43,
+        "inflationPercent": 2,
+        "holdings": [
+          {
+            "id": "ce71eca6-1202-45bc-8bc1-5bf524e2d891",
+            "symbol": "VWCE.DE",
+            "kind": "etf",
+            "initial": 1000,
+            "monthly": 300,
+            "annualReturnPercent": 9.9,
+            "returnSource": "history",
+            "yearlyReturns": [
+              {
+                "year": 2020,
+                "percent": 5.4
+              },
+              {
+                "year": 2021,
+                "percent": 28.6
+              },
+              {
+                "year": 2022,
+                "percent": -13.5
+              },
+              {
+                "year": 2023,
+                "percent": 18.2
+              },
+              {
+                "year": 2024,
+                "percent": 24.4
+              },
+              {
+                "year": 2025,
+                "percent": 9.2
+              }
+            ],
+            "historyYears": 7,
+            "name": "Vanguard FTSE All-World"
+          }
+        ]
+      }
     },
     {
       "name": "Emanuel Gomes",

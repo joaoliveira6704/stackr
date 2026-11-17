@@ -11,6 +11,15 @@ export default defineConfig({
 				target: "http://localhost:3001",
 				rewrite: (path) => path.replace(/^\/api/, ""),
 			},
+			// Yahoo Finance has no CORS headers, so the browser reaches it through
+			// the dev server. The public endpoints need no key, only a browser
+			// like User-Agent.
+			"/market": {
+				target: "https://query1.finance.yahoo.com",
+				changeOrigin: true,
+				headers: { "User-Agent": "Mozilla/5.0" },
+				rewrite: (path) => path.replace(/^\/market/, ""),
+			},
 		},
 	},
 	plugins: [tailwindcss(), vue()],

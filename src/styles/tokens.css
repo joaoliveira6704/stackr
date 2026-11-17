@@ -31,6 +31,13 @@
 	--color-glass-strong: var(--glass-strong);
 	--color-glass-border: var(--glass-border);
 
+	/* Chart series, in this fixed order. Never cycle them, fold extra series
+	into "Outros" instead. */
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+
 	/* Type scale. Each step sets size, line height, tracking and weight. */
 	--text-display: 3.75rem;
 	--text-display--line-height: 1.02;
