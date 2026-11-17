@@ -25,7 +25,7 @@ const isAppLayout = computed(() => route.meta.layout === "app");
 			<main class="mx-auto w-full max-w-5xl flex-1 px-6 pt-32 pb-14 sm:pt-36">
 				<RouterView />
 			</main>
-			<AppFooter />
+			<AppFooter v-if="!route.meta.hideFooter" />
 		</template>
 		<ConfirmDialog />
 	</div>

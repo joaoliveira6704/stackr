@@ -215,6 +215,12 @@ export const en: MessageSchema = {
 		risk: "Risk",
 		seeResult: "See result",
 		saving: "Saving...",
+		explanation: {
+			title: "Detailed explanation",
+			showHint: "For when you want to know more",
+			hideHint: "Press again to hide it",
+			reveal: "Show explanation",
+		},
 		result: {
 			eyebrow: "Your track",
 			why: "Why this track",
@@ -228,6 +234,8 @@ export const en: MessageSchema = {
 		questions: {
 			budgetRule: {
 				prompt: "What does the 50/30/20 rule split?",
+				explanation:
+					"The 50/30/20 rule is a simple way to split what you earn each month. About 50% goes to needs, like rent, bills and food. Up to 30% is for wants, like dinners out or subscriptions. At least 20% goes to savings or to paying off debt. It is not a law, just a starting point you can adjust to your life.",
 				options: {
 					needsWantsSavings: "Needs, wants and savings",
 					taxesRentFood: "Taxes, rent and food",
@@ -238,6 +246,8 @@ export const en: MessageSchema = {
 			inflation: {
 				prompt:
 					"Your savings earn 1% a year and inflation is at 3%. What happens to your buying power?",
+				explanation:
+					"Inflation measures how fast prices go up over time. If your savings earn 1% and prices rise 3%, your money grows more slowly than the cost of things. After a year you have more euros, but they buy less, so your buying power shrinks. That is why it pays to look for ways to make your money grow faster than inflation.",
 				options: {
 					grows: "It grows",
 					staysTheSame: "It stays the same",
@@ -247,6 +257,8 @@ export const en: MessageSchema = {
 			},
 			etf: {
 				prompt: "What is an ETF?",
+				explanation:
+					"ETF stands for Exchange Traded Fund. It bundles dozens or hundreds of assets, like shares or bonds, into one product that you buy and sell just like a normal share. With a single purchase your money is spread across many companies, so you do not depend on any one of them doing well. Many ETFs follow a whole index and have low fees.",
 				options: {
 					singleShare: "A share in a single company",
 					basketFund:
@@ -257,6 +269,8 @@ export const en: MessageSchema = {
 			},
 			marketDrop: {
 				prompt: "Your investment drops 20% in a month. What do you do?",
+				explanation:
+					"Drops of 20% happen in markets more often than you might think, and in the past they have recovered, although nothing guarantees it. Selling in a panic turns a loss on paper into a real one. Waiting shows patience, and buying more can lower your average price, but only with money you will not need any time soon. There is no right answer, only the one that fits you.",
 				options: {
 					sellEverything: "Sell everything so I don't lose more",
 					wait: "Wait and leave it alone",
@@ -265,6 +279,8 @@ export const en: MessageSchema = {
 			},
 			betChoice: {
 				prompt: "Which of these would you pick?",
+				explanation:
+					"This question weighs certainty against risk. On average, the sure 100 € is worth 100 €, the coin flip is worth 125 € and the long shot is worth 200 €. Even so, many people prefer the sure amount, because losing hurts more than winning feels good. Seeing how you react to this choice helps you know how much risk you can take without losing sleep.",
 				options: {
 					sureAmount: "Get 100 € for sure",
 					coinFlip: "A 50% chance of getting 250 €",
@@ -274,6 +290,8 @@ export const en: MessageSchema = {
 			hotTip: {
 				prompt:
 					"A friend swears a new crypto coin will be worth ten times more this month. What do you do?",
+				explanation:
+					"Promises of huge gains in a short time are one of the most common signs of scams and bubbles. New crypto coins can shoot up, but they can also lose almost all their value overnight. Before you invest, ask who gains from the tip, research the project and never put in more than you are ready to lose.",
 				options: {
 					ignore: "Ignore it, it sounds too good to be true",
 					research: "Research first and maybe put in a little",
