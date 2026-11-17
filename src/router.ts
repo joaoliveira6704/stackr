@@ -20,6 +20,8 @@ declare module "vue-router" {
 		requiresAuth?: boolean;
 		/** "app" pages get the sidebar, every other page the top navbar. */
 		layout?: "app";
+		/** Public pages that need the bottom of the screen for their own content. */
+		hideFooter?: boolean;
 	}
 }
 
@@ -30,7 +32,7 @@ const routes: RouteRecordRaw[] = [
 	{
 		path: ONBOARDING_PATH,
 		component: OnboardingView,
-		meta: { requiresAuth: true },
+		meta: { requiresAuth: true, hideFooter: true },
 	},
 	{
 		path: "/dashboard",

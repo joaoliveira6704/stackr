@@ -216,6 +216,12 @@ export const pt = {
 		risk: "Risco",
 		seeResult: "Ver resultado",
 		saving: "A guardar...",
+		explanation: {
+			title: "Explicação detalhada",
+			showHint: "Para quando quiseres saber mais",
+			hideHint: "Carrega de novo para esconder",
+			reveal: "Ver explicação",
+		},
 		result: {
 			eyebrow: "O teu trilho",
 			why: "Porquê este trilho",
@@ -229,6 +235,8 @@ export const pt = {
 		questions: {
 			budgetRule: {
 				prompt: "O que divide a regra 50/30/20?",
+				explanation:
+					"A regra 50/30/20 é uma forma simples de dividir o que ganhas todos os meses. Cerca de 50% vai para as necessidades, como a renda, as contas e a comida. Até 30% fica para os desejos, como jantares fora ou subscrições. Pelo menos 20% vai para a poupança ou para pagar dívidas. Não é uma lei, é um ponto de partida que podes ajustar à tua vida.",
 				options: {
 					needsWantsSavings: "Necessidades, desejos e poupança",
 					taxesRentFood: "Impostos, renda e alimentação",
@@ -239,6 +247,8 @@ export const pt = {
 			inflation: {
 				prompt:
 					"As tuas poupanças rendem 1% ao ano e a inflação está nos 3%. O que acontece ao teu poder de compra?",
+				explanation:
+					"A inflação mede quanto os preços sobem ao longo do tempo. Se as tuas poupanças rendem 1% e os preços sobem 3%, o teu dinheiro cresce mais devagar do que o custo das coisas. Ao fim de um ano tens mais euros, mas compras menos com eles, por isso o teu poder de compra diminui. É por isso que vale a pena procurar formas de pôr o dinheiro a render acima da inflação.",
 				options: {
 					grows: "Aumenta",
 					staysTheSame: "Fica igual",
@@ -248,6 +258,8 @@ export const pt = {
 			},
 			etf: {
 				prompt: "O que é um ETF?",
+				explanation:
+					"ETF quer dizer Exchange Traded Fund, um fundo negociado em bolsa. Junta dezenas ou centenas de ativos, como ações ou obrigações, num só produto que compras e vendes como uma ação normal. Com uma única compra espalhas o teu dinheiro por muitas empresas, por isso não dependes do sucesso de uma só. Muitos ETF seguem um índice inteiro e têm custos baixos.",
 				options: {
 					singleShare: "Uma ação de uma única empresa",
 					basketFund:
@@ -258,6 +270,8 @@ export const pt = {
 			},
 			marketDrop: {
 				prompt: "O teu investimento cai 20% num mês. O que fazes?",
+				explanation:
+					"Quedas de 20% acontecem nos mercados mais vezes do que parece, e no passado acabaram por recuperar, embora nada o garanta. Quem vende em pânico transforma uma perda no papel numa perda real. Esperar mostra paciência, e comprar mais pode baixar o teu preço médio, mas só faz sentido com dinheiro de que não vais precisar tão cedo. Não há uma resposta certa, só a que combina contigo.",
 				options: {
 					sellEverything: "Vendo tudo para não perder mais",
 					wait: "Espero e não mexo em nada",
@@ -266,6 +280,8 @@ export const pt = {
 			},
 			betChoice: {
 				prompt: "Qual destas opções escolhias?",
+				explanation:
+					"Esta pergunta compara a certeza com o risco. Em média, os 100 € garantidos valem 100 €, a moeda ao ar vale 125 € e a aposta mais difícil vale 200 €. Mesmo assim, muita gente prefere o valor certo, porque perder custa mais do que ganhar sabe bem. Perceber como reages a esta escolha ajuda-te a saber quanto risco aguentas sem perder o sono.",
 				options: {
 					sureAmount: "Receber 100 € garantidos",
 					coinFlip: "50% de hipótese de receber 250 €",
@@ -275,6 +291,8 @@ export const pt = {
 			hotTip: {
 				prompt:
 					"Um amigo garante que uma nova criptomoeda vai valer dez vezes mais este mês. O que fazes?",
+				explanation:
+					"Promessas de ganhos enormes em pouco tempo são um dos sinais mais comuns de esquemas e de bolhas. As criptomoedas novas podem subir muito, mas também podem perder quase todo o valor de um dia para o outro. Antes de investir, pergunta quem ganha com a dica, pesquisa o projeto e nunca ponhas lá mais do que estás disposto a perder.",
 				options: {
 					ignore: "Ignoro, parece bom demais para ser verdade",
 					research: "Pesquiso primeiro e talvez invista pouco",

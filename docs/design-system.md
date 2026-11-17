@@ -113,7 +113,7 @@ Icons come from Lucide, through the `lucide-vue-next` package. Components never 
 
 ## Navigation and layouts
 
-The app has two layouts, picked by the `layout` field in a route's `meta` in `src/router.ts`. Public pages such as the landing, login, sign up, onboarding and 404 use the floating glass pill along the top, from `PublicNavbar`, with the footer below. Pages inside the app, currently the dashboard and the profile, set `layout: "app"` and get `AppSidebar` instead, with no footer.
+The app has two layouts, picked by the `layout` field in a route's `meta` in `src/router.ts`. Public pages such as the landing, login, sign up, onboarding and 404 use the floating glass pill along the top, from `PublicNavbar`, with the footer below. Pages inside the app, currently the dashboard and the profile, set `layout: "app"` and get `AppSidebar` instead, with no footer. A public page that needs the bottom of the screen for its own content sets `hideFooter: true` in its meta, which the onboarding does so each question can end with its explanation card.
 
 The sidebar is a compact vertical glass pill centred on the left edge, with its items grouped together and a thin divider between the pages and the settings. It shows only icons and grows to show their labels while it is hovered or holds keyboard focus. On phones it turns into a bar of icons along the bottom of the screen with only the pages and a "Preferências" button, which opens a small glass menu above the bar holding the language, theme and logout options. Floating menus like that one use `popover`, a denser glass that stays readable on top of other content, and their rows use `menu-item`. Its pieces are utilities, `sidebar` for the container, `nav-item` for a row with an icon and a label, and `sidebar-label` for the text that fades in. The current page is marked by `aria-current="page"`, which RouterLink sets on its own, and `nav-item` turns green for it. To add a link, add a `SidebarItem` with a `to`, an `icon` and a translated `label`. Without `to` it becomes a button that emits `click`.
 
@@ -124,6 +124,8 @@ Statistics on the dashboard use the `StatCard` component, a card with a toned ic
 ## Forms
 
 Inputs use `field`, which is what the `TextField` component renders. Selectable answers use `choice`, a label that wraps a hidden radio or checkbox and turns green on its own when the input is checked. Inside it, `choice-key` is the letter badge and `choice-mark` is the round mark at the end. No class binding is needed for the selected state.
+
+Below the answers, every question ends with `QuestionExplanation`, a card that holds a longer explanation of the topic. The text starts blurred behind a `chip tone-brand` that reads "Ver explicação", with a lightbulb in a `tone-sun` tile on the left. On hover the card lifts a little, the lightbulb tilts and the blur softens to tease the text. A press anywhere on the card reveals it, because its button stretches over the whole card through an `after:` layer, and a second press blurs it again. The open state lives in `data-revealed` on the card, so the children style themselves with `group-data-revealed:` rather than class bindings, and the button carries `aria-expanded` while the hidden text stays `aria-hidden` until it is shown.
 
 ## Confirming destructive actions
 

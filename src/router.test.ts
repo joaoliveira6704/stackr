@@ -103,6 +103,17 @@ describe("router", () => {
 		expect(router.currentRoute.value.meta.layout).toBeUndefined();
 	});
 
+	it("hides the footer on the onboarding so the explanation card owns the bottom", async () => {
+		storeSessionFor(newcomer);
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/");
+		expect(router.currentRoute.value.meta.hideFooter).toBeUndefined();
+
+		await router.push("/onboarding");
+		expect(router.currentRoute.value.meta.hideFooter).toBe(true);
+	});
+
 	it("sends a signed out visitor from the profile to login", async () => {
 		const router = createAppRouter(createMemoryHistory());
 

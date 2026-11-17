@@ -6,6 +6,7 @@ import AppIcon from "../components/AppIcon.vue";
 import type { IconName } from "../components/icons";
 import OnboardingResult from "../components/OnboardingResult.vue";
 import ProgressBar from "../components/ProgressBar.vue";
+import QuestionExplanation from "../components/QuestionExplanation.vue";
 import { TONE_CLASSES } from "../components/tones";
 import { type ErrorCode, errorCode } from "../lib/errors";
 import {
@@ -219,6 +220,10 @@ async function finish() {
 						<template v-else>{{ t("common.next") }}</template>
 					</button>
 				</div>
+
+				<QuestionExplanation
+					:text="t(`onboarding.questions.${question.id}.explanation`)"
+				/>
 			</section>
 
 			<OnboardingResult
