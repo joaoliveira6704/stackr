@@ -1,6 +1,7 @@
 export const pt = {
 	nav: {
 		dashboard: "Painel",
+		simulator: "Simulador",
 		login: "Entrar",
 		signup: "Criar conta",
 		logout: "Sair",
@@ -52,6 +53,19 @@ export const pt = {
 			"Não foi possível guardar o teu trilho. Tenta outra vez.",
 		notSignedIn: "A tua sessão terminou. Entra outra vez.",
 		passwordsDoNotMatch: "As palavras-passe não coincidem.",
+		invalidYears: "Escolhe um prazo entre 1 e 50 anos.",
+		invalidInflation: "A inflação tem de ser um número acima de -100%.",
+		invalidAmount:
+			"Os valores investidos têm de ser números iguais ou acima de zero.",
+		invalidReturn: "A rentabilidade tem de ser um número acima de -100%.",
+		marketUnavailable:
+			"Não conseguimos ir buscar dados ao mercado agora. Tenta outra vez daqui a pouco.",
+		tickerNotFound: "Não encontrámos esse ticker.",
+		portfolioNotLoaded: "Não foi possível carregar a tua carteira.",
+		portfolioNotSaved:
+			"Não foi possível guardar a tua carteira. Tenta outra vez.",
+		tooManyHoldings: "A carteira já tem o máximo de investimentos.",
+		holdingExists: "Esse investimento já está na tua carteira.",
 		unknown: "Algo correu mal.",
 	},
 	levels: {
@@ -300,6 +314,145 @@ export const pt = {
 				},
 			},
 		},
+	},
+	simulator: {
+		eyebrow: "Simulador",
+		title: "Projeta o teu investimento.",
+		subtitle:
+			"Monta a tua carteira, escolhe quanto pões em cada investimento e vê quanto pode valer no futuro, já com inflação e impostos.",
+		save: "Guardar carteira",
+		saving: "A guardar...",
+		saved: "Carteira guardada.",
+		unsaved: "Tens alterações por guardar.",
+		loading: "A carregar a tua carteira...",
+		retry: "Tentar outra vez",
+		settings: {
+			title: "Inflação",
+			subtitle:
+				"Quanto achas que os preços vão subir por ano. O Banco Central Europeu aponta para 2%.",
+			inflation: "Inflação por ano",
+		},
+		holdings: {
+			title: "A tua carteira",
+			subtitle:
+				"Procura ações, ETF ou cripto pelo nome ou ticker, até {max} investimentos.",
+			addManual: "Adicionar à mão",
+			full: "Chegaste ao máximo de {max} investimentos.",
+			emptyTitle: "Ainda não tens investimentos.",
+			emptyDetail:
+				"Procura um ticker acima, escolhe um dos populares ou adiciona um investimento à mão com a tua própria estimativa.",
+		},
+		search: {
+			label: "Procurar investimento",
+			placeholder: "Por exemplo VWCE, Apple ou Bitcoin",
+			searching: "A procurar...",
+			noResults: "Sem resultados para esta pesquisa.",
+			popular: "Populares:",
+			adding: "A ir buscar o histórico...",
+			noHistoryNotice:
+				"Não conseguimos ir buscar o histórico de {name}. Escreve a rentabilidade que esperas.",
+		},
+		kinds: {
+			stock: "Ação",
+			etf: "ETF",
+			fund: "Fundo",
+			crypto: "Cripto",
+			index: "Índice",
+			manual: "Adicionado à mão",
+		},
+		holding: {
+			name: "Nome",
+			initial: "Valor inicial",
+			monthly: "Por mês",
+			return: "Rentabilidade por ano",
+			remove: "Remover {name}",
+			fromHistory:
+				"Média real do último ano | Média real dos últimos {years} anos",
+			noHistory: "Sem histórico, escreve a tua estimativa",
+			manual: "A tua estimativa",
+			defaultName: "Investimento {number}",
+			yearlyTitle: "Variação em cada ano",
+			yearlyEntry: "{year}: {change}",
+		},
+		duration: {
+			label: "Durante quanto tempo?",
+			years: "{years} ano | {years} anos",
+			slider: "Prazo do investimento, em anos",
+		},
+		confirmRemove: {
+			title: "Remover {name}?",
+			message:
+				"Sai da tua carteira com os valores que escreveste. Para o voltares a ter, tens de o adicionar outra vez.",
+			confirm: "Remover",
+		},
+		confirmLeave: {
+			title: "Sair sem guardar?",
+			message: "As alterações à tua carteira perdem-se se saíres agora.",
+			confirm: "Sair sem guardar",
+		},
+		results: {
+			title: "Daqui a {years} ano | Daqui a {years} anos",
+			invested: "Total investido",
+			investedDetail: "{initial} no início e {monthly} por mês",
+			value: "Valor final",
+			valueDetail: "{rate} sobre o que investiste",
+			gain: "Ganho",
+			gainDetail: "{net} depois de impostos",
+			realGain: "Acima da inflação",
+			realGainUp: "Quanto o teu poder de compra cresce, em dinheiro de hoje",
+			realGainDown: "Perdes poder de compra, a inflação ganha a este plano",
+		},
+		chart: {
+			title: "Como o teu dinheiro cresce",
+			subtitle: "Passa o rato ou usa as setas para ver cada ano.",
+			label: "Gráfico do crescimento da carteira ao longo dos anos",
+			hint: "Usa as setas para a esquerda e para a direita para ver cada ano.",
+			value: "Valor da carteira",
+			invested: "Total investido",
+			realValue: "Em dinheiro de hoje",
+			yearTick: "{year}a",
+			yearLabel: "Ano {year}",
+			year: "Ano",
+			showTable: "Ver tabela",
+			hideTable: "Esconder tabela",
+		},
+		allocation: {
+			title: "Como está dividida",
+			subtitle:
+				"O peso de cada investimento no que pões ao fim de {years} ano. | O peso de cada investimento no que pões ao fim de {years} anos.",
+			empty: "Escreve valores para ver como se divide a tua carteira.",
+			others: "{count} outros",
+		},
+		reality: {
+			title: "Inflação e impostos",
+			subtitle: "O que sobra de verdade no fim.",
+			realValue: "Em dinheiro de hoje",
+			realValueDetail: "O que o valor final compraria hoje",
+			inflationCost: "O que a inflação come",
+			inflationCostDetail: "Diferença entre o valor final e o de hoje",
+			tax: "Imposto sobre o ganho",
+			taxDetail: "Taxa de {rate} em Portugal, ao vender",
+			averageReturn: "Rentabilidade média",
+			averageReturnDetail: "Da carteira toda, por ano",
+		},
+		scenarios: {
+			title: "Cenários",
+			subtitle: "Ninguém sabe o futuro, por isso vê o intervalo.",
+			pessimistic: "Pessimista",
+			expected: "Esperado",
+			optimistic: "Otimista",
+			expectedDetail: "Com as rentabilidades que escolheste",
+			lowerDetail: "Com {points} pontos a menos por ano",
+			higherDetail: "Com {points} pontos a mais por ano",
+		},
+		breakdown: {
+			title: "Por investimento",
+			subtitle:
+				"Quanto vale cada um daqui a {years} ano. | Quanto vale cada um daqui a {years} anos.",
+			detail: "Investes {invested}, ganhas {gain}",
+		},
+		disclaimer:
+			"Isto é uma simulação educativa e não é aconselhamento financeiro. Rentabilidades passadas não garantem as futuras, e o histórico vem na moeda de cada ativo, sem contar com o câmbio.",
 	},
 };
 

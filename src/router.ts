@@ -14,6 +14,7 @@ import NotFoundView from "./views/NotFoundView.vue";
 import OnboardingView from "./views/OnboardingView.vue";
 import ProfileView from "./views/ProfileView.vue";
 import SignupView from "./views/SignupView.vue";
+import SimulatorView from "./views/SimulatorView.vue";
 
 declare module "vue-router" {
 	interface RouteMeta {
@@ -42,6 +43,11 @@ const routes: RouteRecordRaw[] = [
 	{
 		path: "/profile",
 		component: ProfileView,
+		meta: { requiresAuth: true, layout: "app" },
+	},
+	{
+		path: "/simulator",
+		component: SimulatorView,
 		meta: { requiresAuth: true, layout: "app" },
 	},
 	{ path: "/:pathMatch(.*)*", component: NotFoundView },

@@ -3,6 +3,7 @@ import type { MessageSchema } from "./pt";
 export const en: MessageSchema = {
 	nav: {
 		dashboard: "Dashboard",
+		simulator: "Simulator",
 		login: "Log in",
 		signup: "Sign up",
 		logout: "Log out",
@@ -52,6 +53,18 @@ export const en: MessageSchema = {
 		onboardingNotSaved: "Could not save your track. Please try again.",
 		notSignedIn: "Your session has ended. Please log in again.",
 		passwordsDoNotMatch: "Passwords do not match.",
+		invalidYears: "Pick a period between 1 and 50 years.",
+		invalidInflation: "Inflation has to be a number above -100%.",
+		invalidAmount: "Amounts invested have to be numbers of zero or more.",
+		invalidReturn: "The return has to be a number above -100%.",
+		marketUnavailable:
+			"We could not reach the market data right now. Try again in a moment.",
+		tickerNotFound: "We could not find that ticker.",
+		portfolioNotLoaded: "Could not load your portfolio.",
+		portfolioNotSaved: "Could not save your portfolio. Try again.",
+		tooManyHoldings:
+			"Your portfolio already has the most investments it can hold.",
+		holdingExists: "That investment is already in your portfolio.",
 		unknown: "Something went wrong.",
 	},
 	levels: {
@@ -299,5 +312,144 @@ export const en: MessageSchema = {
 				},
 			},
 		},
+	},
+	simulator: {
+		eyebrow: "Simulator",
+		title: "Project your investment.",
+		subtitle:
+			"Build your portfolio, choose how much goes into each investment and see what it could be worth, with inflation and taxes included.",
+		save: "Save portfolio",
+		saving: "Saving...",
+		saved: "Portfolio saved.",
+		unsaved: "You have unsaved changes.",
+		loading: "Loading your portfolio...",
+		retry: "Try again",
+		settings: {
+			title: "Inflation",
+			subtitle:
+				"How much you expect prices to rise each year. The European Central Bank aims for 2%.",
+			inflation: "Inflation per year",
+		},
+		holdings: {
+			title: "Your portfolio",
+			subtitle:
+				"Search stocks, ETFs or crypto by name or ticker, up to {max} investments.",
+			addManual: "Add by hand",
+			full: "You reached the limit of {max} investments.",
+			emptyTitle: "You have no investments yet.",
+			emptyDetail:
+				"Search for a ticker above, pick one of the popular ones or add an investment by hand with your own estimate.",
+		},
+		search: {
+			label: "Search for an investment",
+			placeholder: "For example VWCE, Apple or Bitcoin",
+			searching: "Searching...",
+			noResults: "No results for this search.",
+			popular: "Popular:",
+			adding: "Fetching the history...",
+			noHistoryNotice:
+				"We could not fetch the history of {name}. Type the return you expect.",
+		},
+		kinds: {
+			stock: "Stock",
+			etf: "ETF",
+			fund: "Fund",
+			crypto: "Crypto",
+			index: "Index",
+			manual: "Added by hand",
+		},
+		holding: {
+			name: "Name",
+			initial: "Starting amount",
+			monthly: "Per month",
+			return: "Return per year",
+			remove: "Remove {name}",
+			fromHistory:
+				"Real average of the last year | Real average of the last {years} years",
+			noHistory: "No history, type your estimate",
+			manual: "Your estimate",
+			defaultName: "Investment {number}",
+			yearlyTitle: "Change in each year",
+			yearlyEntry: "{year}: {change}",
+		},
+		duration: {
+			label: "For how long?",
+			years: "{years} year | {years} years",
+			slider: "Investment period, in years",
+		},
+		confirmRemove: {
+			title: "Remove {name}?",
+			message:
+				"It leaves your portfolio with the amounts you typed. To get it back you have to add it again.",
+			confirm: "Remove",
+		},
+		confirmLeave: {
+			title: "Leave without saving?",
+			message: "The changes to your portfolio are lost if you leave now.",
+			confirm: "Leave without saving",
+		},
+		results: {
+			title: "In {years} year | In {years} years",
+			invested: "Total invested",
+			investedDetail: "{initial} at the start and {monthly} a month",
+			value: "Final value",
+			valueDetail: "{rate} on what you put in",
+			gain: "Gain",
+			gainDetail: "{net} after taxes",
+			realGain: "Above inflation",
+			realGainUp: "How much your buying power grows, in today's money",
+			realGainDown: "You lose buying power, inflation beats this plan",
+		},
+		chart: {
+			title: "How your money grows",
+			subtitle: "Hover or use the arrow keys to see each year.",
+			label: "Chart of how the portfolio grows over the years",
+			hint: "Use the left and right arrow keys to see each year.",
+			value: "Portfolio value",
+			invested: "Total invested",
+			realValue: "In today's money",
+			yearTick: "{year}y",
+			yearLabel: "Year {year}",
+			year: "Year",
+			showTable: "Show table",
+			hideTable: "Hide table",
+		},
+		allocation: {
+			title: "How it is split",
+			subtitle:
+				"The weight of each investment in what you put in over {years} year. | The weight of each investment in what you put in over {years} years.",
+			empty: "Type some amounts to see how your portfolio is split.",
+			others: "{count} others",
+		},
+		reality: {
+			title: "Inflation and taxes",
+			subtitle: "What is really left at the end.",
+			realValue: "In today's money",
+			realValueDetail: "What the final value would buy today",
+			inflationCost: "What inflation eats",
+			inflationCostDetail: "Gap between the final value and today's",
+			tax: "Tax on the gain",
+			taxDetail: "{rate} rate in Portugal, when you sell",
+			averageReturn: "Average return",
+			averageReturnDetail: "Of the whole portfolio, per year",
+		},
+		scenarios: {
+			title: "Scenarios",
+			subtitle: "Nobody knows the future, so look at the range.",
+			pessimistic: "Pessimistic",
+			expected: "Expected",
+			optimistic: "Optimistic",
+			expectedDetail: "With the returns you chose",
+			lowerDetail: "With {points} points less per year",
+			higherDetail: "With {points} points more per year",
+		},
+		breakdown: {
+			title: "By investment",
+			subtitle:
+				"What each one is worth in {years} year. | What each one is worth in {years} years.",
+			detail: "You put in {invested}, you gain {gain}",
+		},
+		disclaimer:
+			"This is an educational simulation, not financial advice. Past returns do not guarantee future ones, and the history comes in each asset's own currency, without exchange rates.",
 	},
 };

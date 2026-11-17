@@ -65,6 +65,83 @@ export function fakeUsersApi(users: User[] = [demoUser, newcomer]) {
 	return fetchMock;
 }
 
+/**
+ * A Yahoo chart answer with one price at the start of every month, growing
+ * by the given percent each calendar year from a price of 100.
+ */
+export function chartBody(
+	symbol: string,
+	growthByYear: Record<number, number>,
+	name = `${symbol} Fund`,
+) {
+	const timestamps: number[] = [];
+	const prices: number[] = [];
+	let price = 100;
+	for (const [year, percent] of Object.entries(growthByYear)) {
+		const monthly = (1 + percent / 100) ** (1 / 12);
+		for (let month = 0; month < 12; month++) {
+			price *= monthly;
+			timestamps.push(Date.UTC(Number(year), month, 1) / 1000);
+			prices.push(price);
+		}
+	}
+	return {
+		chart: {
+			result: [
+				{
+					meta: { symbol, currency: "EUR", longName: name },
+					timestamp: timestamps,
+					indicators: { adjclose: [{ adjclose: prices }] },
+				},
+			],
+		},
+	};
+}
+
+export function searchBody(
+	quotes: { symbol: string; longname: string; quoteType: string }[],
+) {
+	return { quotes: quotes.map((quote) => ({ exchDisp: "XETRA", ...quote })) };
+}
+
+interface SimulatorApiOptions {
+	portfolio?: unknown;
+	charts?: Record<string, unknown>;
+	search?: unknown;
+	marketDown?: boolean;
+	saveFails?: boolean;
+}
+
+/**
+ * Stands in for json-server and the Yahoo proxy on the simulator: the user
+ * record with its saved portfolio, PATCH to save it, ticker search and price
+ * history. Every PATCH body is kept in `saved` for the test to read.
+ */
+export function fakeSimulatorApi(options: SimulatorApiOptions = {}) {
+	const saved: unknown[] = [];
+	const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+		if (url.startsWith("/market")) {
+			if (options.marketDown) throw new TypeError("Failed to fetch");
+			if (url.includes("/finance/search")) {
+				return jsonResponse(options.search ?? { quotes: [] });
+			}
+			const symbol = decodeURIComponent(
+				url.split("/chart/")[1]?.split("?")[0] ?? "",
+			);
+			const chart = options.charts?.[symbol];
+			return chart ? jsonResponse(chart) : jsonResponse({}, 404);
+		}
+		if (init?.method === "PATCH") {
+			if (options.saveFails) return jsonResponse({}, 500);
+			saved.push(JSON.parse(String(init.body)));
+			return jsonResponse({});
+		}
+		return jsonResponse({ ...demoUser, portfolio: options.portfolio });
+	});
+	vi.stubGlobal("fetch", fetchMock);
+	return { fetchMock, saved };
+}
+
 export function unreachableApi() {
 	vi.stubGlobal(
 		"fetch",

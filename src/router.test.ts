@@ -103,6 +103,24 @@ describe("router", () => {
 		expect(router.currentRoute.value.meta.layout).toBeUndefined();
 	});
 
+	it("opens the simulator in the app layout for a signed in user", async () => {
+		signInAsDemoUser();
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/simulator");
+
+		expect(router.currentRoute.value.path).toBe("/simulator");
+		expect(router.currentRoute.value.meta.layout).toBe("app");
+	});
+
+	it("sends a signed out visitor from the simulator to login", async () => {
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/simulator");
+
+		expect(router.currentRoute.value.path).toBe("/login");
+	});
+
 	it("hides the footer on the onboarding so the explanation card owns the bottom", async () => {
 		storeSessionFor(newcomer);
 		const router = createAppRouter(createMemoryHistory());
