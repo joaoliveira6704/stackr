@@ -162,6 +162,25 @@ describe("SimulatorView", () => {
 		]);
 	});
 
+	it("lists every match from a long search in a list that scrolls", async () => {
+		vi.useFakeTimers();
+		const matches = Array.from({ length: 12 }, (_, index) => ({
+			symbol: `ETF${index}`,
+			longname: `Fund number ${index}`,
+			quoteType: "ETF",
+		}));
+		fakeSimulatorApi({ search: searchBody(matches) });
+		const { wrapper } = await mountSimulator();
+
+		await wrapper.get('input[type="search"]').setValue("fund");
+		await vi.advanceTimersByTimeAsync(400);
+		await flushPromises();
+
+		const list = wrapper.get("ul.popover");
+		expect(list.findAll("li")).toHaveLength(12);
+		expect(list.classes()).toContain("overflow-y-auto");
+	});
+
 	it("does nothing to a holding until the removal is confirmed", async () => {
 		fakeSimulatorApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator();
