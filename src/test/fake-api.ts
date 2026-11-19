@@ -104,8 +104,9 @@ export function searchBody(
 	return { quotes: quotes.map((quote) => ({ exchDisp: "XETRA", ...quote })) };
 }
 
-interface SimulatorApiOptions {
+interface AppApiOptions {
 	portfolio?: unknown;
+	budget?: unknown;
 	charts?: Record<string, unknown>;
 	search?: unknown;
 	marketDown?: boolean;
@@ -113,11 +114,12 @@ interface SimulatorApiOptions {
 }
 
 /**
- * Stands in for json-server and the Yahoo proxy on the simulator: the user
- * record with its saved portfolio, PATCH to save it, ticker search and price
- * history. Every PATCH body is kept in `saved` for the test to read.
+ * Stands in for json-server and the Yahoo proxy on the screens inside the
+ * app: the user record with its saved portfolio and budget, PATCH to save
+ * them, ticker search and price history. Every PATCH body is kept in `saved`
+ * for the test to read.
  */
-export function fakeSimulatorApi(options: SimulatorApiOptions = {}) {
+export function fakeAppApi(options: AppApiOptions = {}) {
 	const saved: unknown[] = [];
 	const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
 		if (url.startsWith("/market")) {
@@ -136,7 +138,11 @@ export function fakeSimulatorApi(options: SimulatorApiOptions = {}) {
 			saved.push(JSON.parse(String(init.body)));
 			return jsonResponse({});
 		}
-		return jsonResponse({ ...demoUser, portfolio: options.portfolio });
+		return jsonResponse({
+			...demoUser,
+			portfolio: options.portfolio,
+			budget: options.budget,
+		});
 	});
 	vi.stubGlobal("fetch", fetchMock);
 	return { fetchMock, saved };

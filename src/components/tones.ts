@@ -1,3 +1,5 @@
+import type { BadgeId } from "../lib/badges";
+import type { BudgetGroup } from "../lib/budget";
 import type { Track } from "../lib/tracks";
 
 // The tone-* utilities live in src/styles/components.css. Class names are
@@ -16,4 +18,20 @@ export const TRACK_TONES: Record<Track, Tone> = {
 	foundation: "brand",
 	strategist: "grape",
 	arena: "tangerine",
+};
+
+export const BUDGET_GROUP_TONES: Record<BudgetGroup, Tone> = {
+	needs: "grape",
+	wants: "tangerine",
+	savings: "brand",
+};
+
+export const BADGE_TONES: Record<BadgeId, Tone> = {
+	budgetOnTrack: "brand",
+	budgetRule: "grape",
+	solidFund: "sun",
+	compoundInterest: "grape",
+	inflation: "tangerine",
+	diversification: "brand",
+	prudentInvestor: "sun",
 };

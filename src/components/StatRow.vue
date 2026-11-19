@@ -27,5 +27,7 @@ defineProps<{
 		<p class="shrink-0 text-right text-subheading whitespace-nowrap tabular-nums">
 			{{ value }}
 		</p>
+		<!-- A status chip or a small action that belongs to the row. -->
+		<slot name="trailing" />
 	</div>
 </template>

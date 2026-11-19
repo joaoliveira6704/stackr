@@ -1,8 +1,6 @@
-import { JSON_HEADERS, requestApi } from "./api";
-import { getSession } from "./auth";
-import { AppError } from "./errors";
 import type { AssetKind, YearReturn } from "./market";
 import { MAX_YEARS } from "./projection";
+import { isRecord, loadUserField, numberOr, saveUserField } from "./user-data";
 
 export const MAX_HOLDINGS = 10;
 export const DEFAULT_YEARS = 20;
@@ -41,14 +39,6 @@ export function emptyPortfolio(): Portfolio {
 		inflationPercent: DEFAULT_INFLATION_PERCENT,
 		holdings: [],
 	};
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null;
-}
-
-function numberOr(value: unknown, fallback: number): number {
-	return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
 
 function parseYearReturns(value: unknown): YearReturn[] {
@@ -102,30 +92,10 @@ export function parsePortfolio(value: unknown): Portfolio {
 	};
 }
 
-function sessionUserPath(): string {
-	const session = getSession();
-	if (!session) {
-		throw new AppError("notSignedIn");
-	}
-	return `/users/${encodeURIComponent(session.id)}`;
-}
-
 export async function loadPortfolio(): Promise<Portfolio> {
-	const response = await requestApi(sessionUserPath());
-	if (!response.ok) {
-		throw new AppError("portfolioNotLoaded");
-	}
-	const user = (await response.json()) as { portfolio?: unknown };
-	return parsePortfolio(user.portfolio);
+	return parsePortfolio(await loadUserField("portfolio", "portfolioNotLoaded"));
 }
 
 export async function savePortfolio(portfolio: Portfolio): Promise<void> {
-	const response = await requestApi(sessionUserPath(), {
-		method: "PATCH",
-		headers: JSON_HEADERS,
-		body: JSON.stringify({ portfolio }),
-	});
-	if (!response.ok) {
-		throw new AppError("portfolioNotSaved");
-	}
+	await saveUserField("portfolio", portfolio, "portfolioNotSaved");
 }

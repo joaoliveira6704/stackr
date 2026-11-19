@@ -3,6 +3,8 @@ defineProps<{
 	label: string;
 	type?: string;
 	autocomplete?: string;
+	/** Fields are required unless they say otherwise. */
+	optional?: boolean;
 }>();
 
 const value = defineModel<string>({ required: true });
@@ -15,7 +17,7 @@ const value = defineModel<string>({ required: true });
 			v-model="value"
 			:type="type ?? 'text'"
 			:autocomplete="autocomplete"
-			required
+			:required="!optional"
 			class="field font-normal"
 		/>
 	</label>

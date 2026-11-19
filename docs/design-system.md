@@ -57,7 +57,7 @@ The palette is the logo green plus three supporting colours. Use the plain colou
 
 ## Tones
 
-A tone is a soft tinted background with matching strong text, which is what icon tiles, chips and highlighted cards need. Use `tone-brand`, `tone-grape`, `tone-tangerine`, `tone-sun` or `tone-neutral`. When the tone comes from data, use the maps in `src/components/tones.ts`, `TONE_CLASSES` to turn a tone name into its class and `TRACK_TONES` to get the colour of a track. Write the class out in full rather than building it from a string, because Tailwind only ships classes it can find in the source.
+A tone is a soft tinted background with matching strong text, which is what icon tiles, chips and highlighted cards need. Use `tone-brand`, `tone-grape`, `tone-tangerine`, `tone-sun` or `tone-neutral`. When the tone comes from data, use the maps in `src/components/tones.ts`, `TONE_CLASSES` to turn a tone name into its class, `TRACK_TONES` to get the colour of a track and `BUDGET_GROUP_TONES` for the budget groups, needs in grape, wants in tangerine and savings in brand green. Write the class out in full rather than building it from a string, because Tailwind only ships classes it can find in the source.
 
 ## Type
 
@@ -105,7 +105,9 @@ Buttons already handle hover, press and disabled states. To hide a button on sma
 
 ## Small pieces
 
-`chip` is a pill label and always takes a tone, like `chip tone-brand`. `icon-tile` is the square that holds an icon and also takes a tone, with `icon-tile-sm`, `icon-tile-lg` and `icon-tile-xl` for other sizes. List rows use the `StatRow` component, which already combines an icon tile, a title, a muted detail and a right aligned value. A row that stands for a chart series fills its `leading` slot with the series colour instead of an icon, so the list and the chart read as one.
+`chip` is a pill label and always takes a tone, like `chip tone-brand`. `icon-tile` is the square that holds an icon and also takes a tone, with `icon-tile-sm`, `icon-tile-lg` and `icon-tile-xl` for other sizes. List rows use the `StatRow` component, which already combines an icon tile, a title, a muted detail and a right aligned value. A row that stands for a chart series fills its `leading` slot with the series colour instead of an icon, so the list and the chart read as one. Its `trailing` slot, after the value, holds a status chip or a small action that belongs to the row, such as the round remove button on an expense.
+
+`LessonBadges` sits under the heading of every screen inside the app that puts lessons into practice, such as the budget and the simulator. It lists the badges of the lessons behind that screen from `LESSON_BADGES` in `src/lib/badges.ts`. A badge the user has earned shows its own icon in its tone from `BADGE_ICONS` and `BADGE_TONES`, and one still to earn shows a lock in `tone-neutral` with the lesson that earns it. The locked state lives in `data-locked` on the row, so the text mutes itself with `group-data-locked:`. To give a new screen its badges, add the screen to the badges it belongs to and render `<LessonBadges screen="..." />`.
 
 ## Icons
 
@@ -113,7 +115,7 @@ Icons come from Lucide, through the `lucide-vue-next` package. Components never 
 
 ## Navigation and layouts
 
-The app has two layouts, picked by the `layout` field in a route's `meta` in `src/router.ts`. Public pages such as the landing, login, sign up, onboarding and 404 use the floating glass pill along the top, from `PublicNavbar`, with the footer below. Pages inside the app, currently the dashboard, the simulator and the profile, set `layout: "app"` and get `AppSidebar` instead, with no footer. A public page that needs the bottom of the screen for its own content sets `hideFooter: true` in its meta, which the onboarding does so each question can end with its explanation card.
+The app has two layouts, picked by the `layout` field in a route's `meta` in `src/router.ts`. Public pages such as the landing, login, sign up, onboarding and 404 use the floating glass pill along the top, from `PublicNavbar`, with the footer below. Pages inside the app, currently the dashboard, the budget, the simulator and the profile, set `layout: "app"` and get `AppSidebar` instead, with no footer. A public page that needs the bottom of the screen for its own content sets `hideFooter: true` in its meta, which the onboarding does so each question can end with its explanation card.
 
 The sidebar is a compact vertical glass pill centred on the left edge, with its items grouped together and a thin divider between the pages and the settings. It shows only icons and grows to show their labels while it is hovered or holds keyboard focus. On phones it turns into a bar of icons along the bottom of the screen with only the pages and a "Preferências" button, which opens a small glass menu above the bar holding the language, theme and logout options. Floating menus like that one use `popover`, a denser glass that stays readable on top of other content, and their rows use `menu-item`. Its pieces are utilities, `sidebar` for the container, `nav-item` for a row with an icon and a label, and `sidebar-label` for the text that fades in. The current page is marked by `aria-current="page"`, which RouterLink sets on its own, and `nav-item` turns green for it. To add a link, add a `SidebarItem` with a `to`, an `icon` and a translated `label`. Without `to` it becomes a button that emits `click`.
 
@@ -124,6 +126,10 @@ Statistics on the dashboard use the `StatCard` component, a card with a toned ic
 ## Forms
 
 Inputs use `field`, which is what the `TextField` component renders. Selectable answers use `choice`, a label that wraps a hidden radio or checkbox and turns green on its own when the input is checked. Inside it, `choice-key` is the letter badge and `choice-mark` is the round mark at the end. No class binding is needed for the selected state.
+
+A choice from a short list, such as the category of an expense, uses `SelectField`, a labelled `field` around a native select. `TextField` fields are required unless they pass `optional`.
+
+Screens that edit a plan saved on the user, such as the budget and the simulator, put `SaveControl` in their header, the `btn-primary` save button with a short line under it saying whether the changes are saved. The loading, saving and the question before leaving with unsaved changes come from `useSavedPlan` in `src/lib/use-saved-plan.ts`, so every such screen behaves the same.
 
 Numbers use `NumberField`, a `field` with a unit such as "€" or "%" shown inside it and read out to screen readers. An empty or half typed field gives `NaN` rather than zero, so the screen can say the value is missing instead of quietly using zero. A value with a few common choices, such as the period in the simulator, uses `DurationPicker`: `btn-secondary btn-sm` presets that turn green through `aria-pressed:bg-brand`, above a range slider coloured with `accent-brand` for anything in between.
 

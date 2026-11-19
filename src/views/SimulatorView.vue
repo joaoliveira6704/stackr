@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { onBeforeRouteLeave } from "vue-router";
 import AppIcon from "../components/AppIcon.vue";
 import { seriesColor } from "../components/chart-colors";
 import DurationPicker from "../components/DurationPicker.vue";
 import HoldingCard from "../components/HoldingCard.vue";
+import LessonBadges from "../components/LessonBadges.vue";
 import NumberField from "../components/NumberField.vue";
+import SaveControl from "../components/SaveControl.vue";
 import SimulatorResults from "../components/SimulatorResults.vue";
 import TickerSearch from "../components/TickerSearch.vue";
 import { type ErrorCode, errorCode } from "../lib/errors";
@@ -20,6 +21,7 @@ import {
 	type Scenarios,
 } from "../lib/projection";
 import { useConfirm } from "../lib/use-confirm";
+import { useSavedPlan } from "../lib/use-saved-plan";
 import { type TickerChoice, usePortfolioStore } from "../stores/portfolio";
 
 const store = usePortfolioStore();
@@ -27,28 +29,16 @@ const { portfolio, hasUnsavedChanges, isFull } = storeToRefs(store);
 const { confirm } = useConfirm();
 const { t } = useI18n();
 
-const loading = ref(true);
-const loadError = ref<ErrorCode | null>(null);
-const saving = ref(false);
-const saveError = ref<ErrorCode | null>(null);
-const justSaved = ref(false);
 const adding = ref(false);
 const addError = ref<ErrorCode | null>(null);
 const addNotice = ref<string | null>(null);
 
-async function load() {
-	loading.value = true;
-	loadError.value = null;
-	try {
-		await store.load();
-	} catch (cause) {
-		loadError.value = errorCode(cause);
-	} finally {
-		loading.value = false;
-	}
-}
-
-onMounted(load);
+const { loading, loadError, saving, saveError, justSaved, load, save } =
+	useSavedPlan(store, hasUnsavedChanges, () => ({
+		title: t("simulator.confirmLeave.title"),
+		message: t("simulator.confirmLeave.message"),
+		confirmLabel: t("simulator.confirmLeave.confirm"),
+	}));
 
 type Outcome =
 	| { projection: Projection; scenarios: Scenarios; error: null }
@@ -112,30 +102,6 @@ async function removeHolding(holding: Holding) {
 	});
 	if (confirmed) store.removeHolding(holding.id);
 }
-
-async function save() {
-	saving.value = true;
-	saveError.value = null;
-	try {
-		await store.save();
-		justSaved.value = true;
-	} catch (cause) {
-		saveError.value = errorCode(cause);
-	} finally {
-		saving.value = false;
-	}
-}
-
-// Leaving with unsaved changes would throw the plan away, so ask first.
-onBeforeRouteLeave(async () => {
-	if (!hasUnsavedChanges.value) return true;
-	return confirm({
-		title: t("simulator.confirmLeave.title"),
-		message: t("simulator.confirmLeave.message"),
-		confirmLabel: t("simulator.confirmLeave.confirm"),
-		destructive: true,
-	});
-});
 </script>
 
 <template>
@@ -149,25 +115,19 @@ onBeforeRouteLeave(async () => {
 				<h1 class="text-title sm:text-display">{{ t("simulator.title") }}</h1>
 				<p class="text-lead text-ink-muted">{{ t("simulator.subtitle") }}</p>
 			</div>
-			<div v-if="!loading && !loadError" class="flex flex-col items-end gap-1.5">
-				<button
-					type="button"
-					class="btn-primary"
-					:disabled="!hasUnsavedChanges || saving"
-					@click="save"
-				>
-					<AppIcon name="save" :size="18" />
-					{{ saving ? t("simulator.saving") : t("simulator.save") }}
-				</button>
-				<p class="text-xs text-ink-muted" aria-live="polite">
-					<template v-if="saveError">
-						<span class="font-semibold text-tangerine-strong">{{ t(`errors.${saveError}`) }}</span>
-					</template>
-					<template v-else-if="hasUnsavedChanges">{{ t("simulator.unsaved") }}</template>
-					<template v-else-if="justSaved">{{ t("simulator.saved") }}</template>
-				</p>
-			</div>
+			<SaveControl
+				v-if="!loading && !loadError"
+				:label="t('simulator.save')"
+				:saved-message="t('simulator.saved')"
+				:has-unsaved-changes="hasUnsavedChanges"
+				:saving="saving"
+				:just-saved="justSaved"
+				:error="saveError"
+				@save="save"
+			/>
 		</header>
+
+		<LessonBadges screen="simulator" />
 
 		<p v-if="loading" class="text-ink-muted" aria-live="polite">{{ t("simulator.loading") }}</p>
 

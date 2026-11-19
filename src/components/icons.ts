@@ -1,6 +1,8 @@
 import {
 	ArrowRight,
+	Award,
 	BookOpen,
+	CalendarDays,
 	ChartLine,
 	ChartPie,
 	CircleCheck,
@@ -15,16 +17,21 @@ import {
 	Landmark,
 	LayoutDashboard,
 	Lightbulb,
+	Lock,
 	LogOut,
 	type LucideIcon,
 	Mail,
 	Moon,
 	PencilLine,
 	Percent,
+	PiggyBank,
 	Plus,
+	Receipt,
 	Save,
+	Scale,
 	Search,
 	ShieldCheck,
+	ShoppingBag,
 	SlidersHorizontal,
 	Sparkles,
 	Sprout,
@@ -39,6 +46,8 @@ import {
 	User,
 	Wallet,
 } from "lucide-vue-next";
+import type { BadgeId } from "../lib/badges";
+import type { BudgetGroup } from "../lib/budget";
 import type { Track } from "../lib/tracks";
 
 // Our own names for the Lucide icons the app uses. Components ask for an
@@ -47,7 +56,11 @@ export const ICONS = {
 	add: Plus,
 	alert: TriangleAlert,
 	arrowRight: ArrowRight,
+	badge: Award,
 	book: BookOpen,
+	budget: Wallet,
+	budgetRule: Scale,
+	calendar: CalendarDays,
 	clock: Clock,
 	dashboard: LayoutDashboard,
 	explanation: Lightbulb,
@@ -56,17 +69,21 @@ export const ICONS = {
 	growth: ChartLine,
 	hide: EyeOff,
 	home: House,
+	expense: Receipt,
 	info: Info,
 	inflation: Percent,
 	invested: Wallet,
+	lock: Lock,
 	logout: LogOut,
 	mail: Mail,
 	manual: PencilLine,
 	moon: Moon,
 	quiz: CircleCheck,
 	remove: Trash2,
+	savings: PiggyBank,
 	save: Save,
 	search: Search,
+	shopping: ShoppingBag,
 	shield: ShieldCheck,
 	show: Eye,
 	simulator: ChartPie,
@@ -90,4 +107,20 @@ export const TRACK_ICONS: Record<Track, IconName> = {
 	foundation: "sprout",
 	strategist: "trendingUp",
 	arena: "shield",
+};
+
+export const BUDGET_GROUP_ICONS: Record<BudgetGroup, IconName> = {
+	needs: "home",
+	wants: "shopping",
+	savings: "savings",
+};
+
+export const BADGE_ICONS: Record<BadgeId, IconName> = {
+	budgetOnTrack: "target",
+	budgetRule: "budgetRule",
+	solidFund: "shield",
+	compoundInterest: "growth",
+	inflation: "inflation",
+	diversification: "simulator",
+	prudentInvestor: "trophy",
 };
