@@ -97,6 +97,14 @@ describe("searchTickers", () => {
 		);
 	});
 
+	it("asks for up to twenty matches so there is more to choose from", async () => {
+		const fetchMock = stubFetch(() => jsonResponse({ quotes: [] }));
+
+		await searchTickers("apple");
+
+		expect(String(fetchMock.mock.calls[0])).toContain("quotesCount=20");
+	});
+
 	it("reports the market as unavailable when the request fails", async () => {
 		stubFetch(() => {
 			throw new TypeError("Failed to fetch");

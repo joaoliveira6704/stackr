@@ -8,7 +8,7 @@ import { roundPercent } from "./money";
 
 const MARKET_BASE = "/market";
 const HISTORY_RANGE = "10y";
-const SEARCH_LIMIT = 6;
+const SEARCH_LIMIT = 20;
 const YEAR_MS = 365.25 * 24 * 60 * 60 * 1000;
 
 export type AssetKind = "stock" | "etf" | "fund" | "crypto" | "index";
