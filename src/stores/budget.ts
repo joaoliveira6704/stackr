@@ -3,9 +3,10 @@ import { computed, ref } from "vue";
 import {
 	type Budget,
 	type BudgetCategory,
+	checkedCategory,
 	checkedExpense,
-	emptyBudget,
 	type Expense,
+	emptyBudget,
 	loadBudget,
 	MAX_CATEGORIES,
 	saveBudget,
@@ -32,13 +33,17 @@ export const useBudgetStore = defineStore("budget", () => {
 		markSaved();
 	}
 
-	function addCategories(categories: NewCategory[]): void {
-		if (budget.value.categories.length + categories.length > MAX_CATEGORIES) {
-			throw new AppError("tooManyCategories");
-		}
-		for (const category of categories) {
-			budget.value.categories.push({ id: crypto.randomUUID(), ...category });
-		}
+	function addCategory(category: NewCategory): BudgetCategory {
+		if (isFull.value) throw new AppError("tooManyCategories");
+		const added = { id: crypto.randomUUID(), ...checkedCategory(category) };
+		budget.value.categories.push(added);
+		return added;
+	}
+
+	function updateCategory(id: string, changes: NewCategory): void {
+		const category = budget.value.categories.find((entry) => entry.id === id);
+		if (!category) throw new AppError("categoryMissing");
+		Object.assign(category, checkedCategory(changes));
 	}
 
 	/** Removes the category together with every expense logged on it. */
@@ -72,7 +77,8 @@ export const useBudgetStore = defineStore("budget", () => {
 		isFull,
 		load,
 		save,
-		addCategories,
+		addCategory,
+		updateCategory,
 		removeCategory,
 		addExpense,
 		removeExpense,

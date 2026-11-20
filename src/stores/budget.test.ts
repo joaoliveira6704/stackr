@@ -15,9 +15,16 @@ afterEach(() => {
 	vi.unstubAllGlobals();
 });
 
+const HOME = {
+	name: "Home",
+	description: "",
+	group: "needs" as const,
+	planned: 500,
+};
+
 function storeWithHome() {
 	const store = useBudgetStore();
-	store.addCategories([{ name: "Home", group: "needs", planned: 500 }]);
+	store.addCategory(HOME);
 	return { store, homeId: store.budget.categories[0].id };
 }
 
@@ -46,18 +53,83 @@ describe("budget store", () => {
 		expect(store.hasUnsavedChanges).toBe(false);
 	});
 
-	it("refuses categories past the maximum and adds none of them", () => {
+	it("adds a category checked and tidied, with its description", () => {
 		const store = useBudgetStore();
-		const tooMany = Array.from({ length: MAX_CATEGORIES + 1 }, () => ({
-			name: "Extra",
-			group: "wants" as const,
-			planned: 0,
-		}));
 
-		expect(() => store.addCategories(tooMany)).toThrow(
-			new AppError("tooManyCategories"),
+		const added = store.addCategory({
+			name: " Gym ",
+			description: " Monthly fee ",
+			group: "wants",
+			planned: 29.999,
+		});
+
+		expect(store.budget.categories).toEqual([
+			{
+				id: added.id,
+				name: "Gym",
+				description: "Monthly fee",
+				group: "wants",
+				planned: 30,
+			},
+		]);
+	});
+
+	it("refuses a category without a name and adds nothing", () => {
+		const store = useBudgetStore();
+
+		expect(() => store.addCategory({ ...HOME, name: "" })).toThrow(
+			new AppError("categoryNameMissing"),
 		);
 		expect(store.budget.categories).toHaveLength(0);
+	});
+
+	it("refuses a category past the maximum", () => {
+		const store = useBudgetStore();
+		for (let index = 0; index < MAX_CATEGORIES; index++)
+			store.addCategory(HOME);
+
+		expect(() => store.addCategory(HOME)).toThrow(
+			new AppError("tooManyCategories"),
+		);
+		expect(store.budget.categories).toHaveLength(MAX_CATEGORIES);
+	});
+
+	it("changes a category in place and keeps its id", () => {
+		const { store, homeId } = storeWithHome();
+
+		store.updateCategory(homeId, {
+			name: "Rent",
+			description: "Flat in Lisbon",
+			group: "needs",
+			planned: 650,
+		});
+
+		expect(store.budget.categories).toEqual([
+			{
+				id: homeId,
+				name: "Rent",
+				description: "Flat in Lisbon",
+				group: "needs",
+				planned: 650,
+			},
+		]);
+	});
+
+	it("leaves a category untouched when the change is not valid", () => {
+		const { store, homeId } = storeWithHome();
+
+		expect(() =>
+			store.updateCategory(homeId, { ...HOME, planned: -10 }),
+		).toThrow(new AppError("invalidPlannedAmount"));
+		expect(store.budget.categories[0].planned).toBe(500);
+	});
+
+	it("refuses to change a category that does not exist", () => {
+		const { store } = storeWithHome();
+
+		expect(() => store.updateCategory("gone", HOME)).toThrow(
+			new AppError("categoryMissing"),
+		);
 	});
 
 	it("logs an expense on a category, rounded to cents", () => {
@@ -93,7 +165,7 @@ describe("budget store", () => {
 
 	it("removes a category together with its expenses", () => {
 		const { store, homeId } = storeWithHome();
-		store.addCategories([{ name: "Fun", group: "wants", planned: 100 }]);
+		store.addCategory({ ...HOME, name: "Fun", group: "wants", planned: 100 });
 		const funId = store.budget.categories[1].id;
 		store.addExpense({ ...RENT, categoryId: homeId });
 		store.addExpense({ ...RENT, amount: 20, categoryId: funId });

@@ -52,12 +52,15 @@ The palette is the logo green plus three supporting colours. Use the plain colou
 | Grape | `bg-grape` | `text-grape-strong` | XP, Strategist |
 | Tangerine | `bg-tangerine` | `text-tangerine-strong` | Streaks, risk, errors, Arena |
 | Sun | `bg-sun` | `text-sun-strong` | Stacks and rewards |
+| Cherry | `bg-cherry` | `text-cherry-strong` | A limit reached or passed, such as a budget bar at its end |
+
+Cherry is a warning colour, not part of the brand. Keep it for the moment something runs out, never for decoration, icon tiles or tones.
 
 `text-on-brand` is the near black used on top of a green fill.
 
 ## Tones
 
-A tone is a soft tinted background with matching strong text, which is what icon tiles, chips and highlighted cards need. Use `tone-brand`, `tone-grape`, `tone-tangerine`, `tone-sun` or `tone-neutral`. When the tone comes from data, use the maps in `src/components/tones.ts`, `TONE_CLASSES` to turn a tone name into its class, `TRACK_TONES` to get the colour of a track and `BUDGET_GROUP_TONES` for the budget groups, needs in grape, wants in tangerine and savings in brand green. Write the class out in full rather than building it from a string, because Tailwind only ships classes it can find in the source.
+A tone is a soft tinted background with matching strong text, which is what icon tiles, chips and highlighted cards need. Use `tone-brand`, `tone-grape`, `tone-tangerine`, `tone-sun` or `tone-neutral`. When the tone comes from data, use the maps in `src/components/tones.ts`, `TONE_CLASSES` to turn a tone name into its class, `TRACK_TONES` to get the colour of a track and `BUDGET_GROUP_TONES` for the budget groups, needs in grape, wants in tangerine and savings in brand green. `SPENDING_LEVEL_CLASSES` gives the bar fill and the text colour for how much of a budget line is spent, green while there is room, tangerine from 70% and cherry from 90% or once it is over. Write the class out in full rather than building it from a string, because Tailwind only ships classes it can find in the source.
 
 ## Type
 

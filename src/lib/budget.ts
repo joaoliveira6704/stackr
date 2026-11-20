@@ -22,6 +22,8 @@ const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 export interface BudgetCategory {
 	id: string;
 	name: string;
+	/** A short note the user writes about it, empty when there is none. */
+	description: string;
 	group: BudgetGroup;
 	/** What the user plans to spend on it each month, in euros. */
 	planned: number;
@@ -57,6 +59,7 @@ function parseCategory(value: unknown): BudgetCategory | null {
 	return {
 		id: value.id,
 		name: value.name,
+		description: typeof value.description === "string" ? value.description : "",
 		group: isBudgetGroup(value.group) ? value.group : "needs",
 		planned: Math.max(numberOr(value.planned, 0), 0),
 	};
@@ -136,6 +139,21 @@ function assertAmount(amount: number, code: ErrorCode): void {
 	if (!Number.isFinite(amount) || amount < 0) throw new AppError(code);
 }
 
+/** Checks a category before it is added or changed, and tidies its text. */
+export function checkedCategory(
+	category: Omit<BudgetCategory, "id">,
+): Omit<BudgetCategory, "id"> {
+	const name = category.name.trim();
+	if (!name) throw new AppError("categoryNameMissing");
+	assertAmount(category.planned, "invalidPlannedAmount");
+	return {
+		name,
+		description: category.description.trim(),
+		group: category.group,
+		planned: roundCents(category.planned),
+	};
+}
+
 /** Checks an expense before it is logged and rounds it to whole cents. */
 export function checkedExpense(
 	expense: Omit<Expense, "id">,
@@ -165,8 +183,6 @@ export interface MonthlyPlan {
 	totalPlanned: number;
 	/** Needs and wants together, the money that leaves for good. */
 	spending: number;
-	/** What is left after spending, negative when the plan costs more than the salary. */
-	saving: number;
 	/** Salary not given to any category yet, negative when over planned. */
 	unassigned: number;
 }
@@ -195,7 +211,6 @@ export function planMonth(budget: Budget): MonthlyPlan {
 		planned,
 		totalPlanned,
 		spending,
-		saving: roundCents(salary - spending),
 		unassigned: roundCents(salary - totalPlanned),
 	};
 }
@@ -203,15 +218,20 @@ export function planMonth(budget: Budget): MonthlyPlan {
 export interface YearlyEstimate {
 	income: number;
 	spending: number;
+	/** Only what is planned as savings, never the salary left unassigned. */
 	saving: number;
+	/** How much the plan asks for above the salary, zero when it fits. */
+	shortfall: number;
 }
 
 /** What the monthly plan adds up to over twelve months. */
 export function estimateYear(plan: MonthlyPlan): YearlyEstimate {
+	const yearly = (monthly: number) => roundCents(monthly * MONTHS_PER_YEAR);
 	return {
-		income: roundCents(plan.salary * MONTHS_PER_YEAR),
-		spending: roundCents(plan.spending * MONTHS_PER_YEAR),
-		saving: roundCents(plan.saving * MONTHS_PER_YEAR),
+		income: yearly(plan.salary),
+		spending: yearly(plan.spending),
+		saving: yearly(plan.planned.savings),
+		shortfall: yearly(Math.max(-plan.unassigned, 0)),
 	};
 }
 
@@ -225,23 +245,19 @@ export interface RuleCheck {
 }
 
 /**
- * Compares the plan with the 50/30/20 rule. Savings count everything that is
- * not spent on needs or wants, planned or not. Null without a salary, because
- * there is nothing to take a share of.
+ * Compares the plan with the 50/30/20 rule. Savings count only what is
+ * planned as savings, so salary left unassigned is not taken as saved. Null
+ * without a salary, because there is nothing to take a share of.
  */
 export function checkRule(plan: MonthlyPlan): RuleCheck[] | null {
 	if (plan.salary <= 0) return null;
-	const amounts: Record<BudgetGroup, number> = {
-		needs: plan.planned.needs,
-		wants: plan.planned.wants,
-		savings: Math.max(plan.saving, 0),
-	};
 	return BUDGET_GROUPS.map((group) => {
-		const share = amounts[group] / plan.salary;
+		const amount = plan.planned[group];
+		const share = amount / plan.salary;
 		const target = RULE_SHARES[group];
 		return {
 			group,
-			amount: amounts[group],
+			amount,
 			share,
 			target,
 			onTrack: group === "savings" ? share >= target : share <= target,
@@ -272,4 +288,44 @@ export function totalSpent(expenses: Expense[], month: string): number {
 	return sumMoney(
 		expensesInMonth(expenses, month).map((expense) => expense.amount),
 	);
+}
+
+/** How close spending is to the plan, which picks the colour of its bar. */
+export type SpendingLevel = "calm" | "close" | "limit";
+/** What the line under the bar says. */
+export type SpendingState = "left" | "paidOff" | "over" | "unplanned";
+
+/** From this share of the plan on, the bar turns orange. */
+export const CLOSE_SHARE = 0.7;
+/** From this share of the plan on, the bar turns red. */
+export const LIMIT_SHARE = 0.9;
+
+export interface SpendingProgress {
+	/** Planned minus spent, negative when more was spent than planned. */
+	remaining: number;
+	level: SpendingLevel;
+	state: SpendingState;
+}
+
+function spendingState(planned: number, remaining: number): SpendingState {
+	if (remaining < 0) return "over";
+	if (planned === 0) return "unplanned";
+	return remaining === 0 ? "paidOff" : "left";
+}
+
+function spendingLevel(share: number): SpendingLevel {
+	if (share >= LIMIT_SHARE) return "limit";
+	return share >= CLOSE_SHARE ? "close" : "calm";
+}
+
+/** Where a category stands this month, compared in whole cents. */
+export function spendingProgress(
+	spent: number,
+	planned: number,
+): SpendingProgress {
+	const remaining = roundCents(planned - spent);
+	const state = spendingState(planned, remaining);
+	if (state === "over") return { remaining, level: "limit", state };
+	const share = planned > 0 ? spent / planned : 0;
+	return { remaining, level: spendingLevel(share), state };
 }

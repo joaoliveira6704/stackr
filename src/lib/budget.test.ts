@@ -3,13 +3,14 @@ import { demoUser, fakeAppApi, storeSessionFor } from "../test/fake-api";
 import {
 	type Budget,
 	type BudgetCategory,
+	checkedCategory,
 	checkedExpense,
 	checkRule,
 	dateFromKey,
 	dateKey,
+	type Expense,
 	emptyBudget,
 	estimateYear,
-	type Expense,
 	expensesInMonth,
 	loadBudget,
 	MAX_CATEGORIES,
@@ -17,6 +18,7 @@ import {
 	parseBudget,
 	planMonth,
 	saveBudget,
+	spendingProgress,
 	spentByCategory,
 	totalSpent,
 } from "./budget";
@@ -32,7 +34,7 @@ function category(
 	group: BudgetCategory["group"],
 	planned: number,
 ): BudgetCategory {
-	return { id, name: id, group, planned };
+	return { id, name: id, description: "", group, planned };
 }
 
 function expense(
@@ -98,9 +100,22 @@ describe("parseBudget", () => {
 		});
 		expect(parsed.salary).toBe(0);
 		expect(parsed.categories).toEqual([
-			{ id: "home", name: "Home", group: "needs", planned: 0 },
+			{ id: "home", name: "Home", description: "", group: "needs", planned: 0 },
 		]);
 		expect(parsed.expenses).toEqual([]);
+	});
+
+	it("keeps the description of a category and reads a missing one as empty", () => {
+		const parsed = parseBudget({
+			categories: [
+				{ ...category("gym", "wants", 30), description: "Mensalidade" },
+				{ id: "old", name: "Old", group: "needs", planned: 10 },
+			],
+		});
+		expect(parsed.categories.map((entry) => entry.description)).toEqual([
+			"Mensalidade",
+			"",
+		]);
 	});
 
 	it("keeps no more than the maximum number of categories", () => {
@@ -152,7 +167,6 @@ describe("planMonth", () => {
 		expect(plan.planned).toEqual({ needs: 1000, wants: 250, savings: 400 });
 		expect(plan.totalPlanned).toBe(1650);
 		expect(plan.spending).toBe(1250);
-		expect(plan.saving).toBe(750);
 		expect(plan.unassigned).toBe(350);
 	});
 
@@ -164,19 +178,18 @@ describe("planMonth", () => {
 			]),
 		);
 		expect(plan.planned.needs).toBe(0.3);
-		expect(plan.saving).toBe(999.7);
+		expect(plan.unassigned).toBe(999.7);
 	});
 
 	it("gives zero everywhere for an empty budget", () => {
 		const plan = planMonth(emptyBudget());
 		expect(plan.totalPlanned).toBe(0);
-		expect(plan.saving).toBe(0);
+		expect(plan.planned.savings).toBe(0);
 		expect(plan.unassigned).toBe(0);
 	});
 
-	it("shows a negative saving when the plan costs more than the salary", () => {
+	it("shows negative unassigned money when the plan costs more than the salary", () => {
 		const plan = planMonth(budgetWith(800, [category("home", "needs", 1000)]));
-		expect(plan.saving).toBe(-200);
 		expect(plan.unassigned).toBe(-200);
 	});
 
@@ -184,7 +197,7 @@ describe("planMonth", () => {
 		const plan = planMonth(
 			budgetWith(10_000_000.55, [category("home", "needs", 1_000_000.25)]),
 		);
-		expect(plan.saving).toBe(9_000_000.3);
+		expect(plan.unassigned).toBe(9_000_000.3);
 	});
 
 	it("refuses a negative or missing salary", () => {
@@ -212,27 +225,52 @@ describe("estimateYear", () => {
 			budgetWith(1500, [
 				category("home", "needs", 600),
 				category("fun", "wants", 200),
+				category("save", "savings", 300),
 			]),
 		);
 		expect(estimateYear(plan)).toEqual({
 			income: 18000,
 			spending: 9600,
-			saving: 8400,
+			saving: 3600,
+			shortfall: 0,
 		});
+	});
+
+	it("does not count unassigned salary as savings", () => {
+		const plan = planMonth(budgetWith(1000, [category("home", "needs", 400)]));
+		expect(estimateYear(plan).saving).toBe(0);
 	});
 
 	it("rounds the yearly amounts to whole cents", () => {
-		const plan = planMonth(budgetWith(1000.01, [category("a", "wants", 0.07)]));
+		const plan = planMonth(
+			budgetWith(1000.01, [
+				category("a", "wants", 0.07),
+				category("b", "savings", 0.33),
+			]),
+		);
 		expect(estimateYear(plan)).toEqual({
 			income: 12000.12,
 			spending: 0.84,
-			saving: 11999.28,
+			saving: 3.96,
+			shortfall: 0,
 		});
 	});
 
-	it("keeps a yearly shortfall negative", () => {
-		const plan = planMonth(budgetWith(500, [category("a", "needs", 600)]));
-		expect(estimateYear(plan).saving).toBe(-1200);
+	it("gives the yearly shortfall when the plan asks for more than the salary", () => {
+		const plan = planMonth(
+			budgetWith(500, [
+				category("a", "needs", 450),
+				category("b", "savings", 150),
+			]),
+		);
+		expect(estimateYear(plan)).toMatchObject({ saving: 1800, shortfall: 1200 });
+	});
+
+	it("handles a large plan without losing cents", () => {
+		const plan = planMonth(
+			budgetWith(10_000_000, [category("a", "savings", 1_000_000.01)]),
+		);
+		expect(estimateYear(plan).saving).toBe(12_000_000.12);
 	});
 });
 
@@ -247,6 +285,7 @@ describe("checkRule", () => {
 				budgetWith(1000, [
 					category("home", "needs", 500),
 					category("fun", "wants", 300),
+					category("save", "savings", 200),
 				]),
 			),
 		);
@@ -265,6 +304,7 @@ describe("checkRule", () => {
 				budgetWith(1000, [
 					category("home", "needs", 600),
 					category("fun", "wants", 350),
+					category("save", "savings", 50),
 				]),
 			),
 		);
@@ -272,11 +312,11 @@ describe("checkRule", () => {
 		expect(checks?.[2].amount).toBe(50);
 	});
 
-	it("never shows a negative share of savings", () => {
+	it("does not count unassigned salary as savings", () => {
 		const checks = checkRule(
-			planMonth(budgetWith(500, [category("home", "needs", 800)])),
+			planMonth(budgetWith(1000, [category("home", "needs", 400)])),
 		);
-		expect(checks?.[2].share).toBe(0);
+		expect(checks?.[2]).toMatchObject({ amount: 0, share: 0, onTrack: false });
 	});
 });
 
@@ -346,5 +386,112 @@ describe("dates", () => {
 
 	it("reads a day key back into the same day", () => {
 		expect(dateKey(dateFromKey("2026-02-03"))).toBe("2026-02-03");
+	});
+});
+
+describe("checkedCategory", () => {
+	const gym = {
+		name: "  Gym ",
+		description: " Monthly fee ",
+		group: "wants" as const,
+		planned: 29.999,
+	};
+
+	it("trims the text and rounds the planned amount to cents", () => {
+		expect(checkedCategory(gym)).toEqual({
+			name: "Gym",
+			description: "Monthly fee",
+			group: "wants",
+			planned: 30,
+		});
+	});
+
+	it("accepts a planned amount of zero", () => {
+		expect(checkedCategory({ ...gym, planned: 0 }).planned).toBe(0);
+	});
+
+	it("keeps a large planned amount exact to the cent", () => {
+		expect(checkedCategory({ ...gym, planned: 12_345_678.905 }).planned).toBe(
+			12_345_678.91,
+		);
+	});
+
+	it("refuses a category without a name", () => {
+		expect(codeOf(() => checkedCategory({ ...gym, name: "   " }))).toBe(
+			"categoryNameMissing",
+		);
+	});
+
+	it("refuses a negative or empty planned amount", () => {
+		expect(codeOf(() => checkedCategory({ ...gym, planned: -1 }))).toBe(
+			"invalidPlannedAmount",
+		);
+		expect(codeOf(() => checkedCategory({ ...gym, planned: Number.NaN }))).toBe(
+			"invalidPlannedAmount",
+		);
+	});
+});
+
+describe("spendingProgress", () => {
+	it("stays green with plenty of room left", () => {
+		expect(spendingProgress(100, 500)).toEqual({
+			remaining: 400,
+			level: "calm",
+			state: "left",
+		});
+	});
+
+	it("turns orange from 70% of the plan", () => {
+		expect(spendingProgress(69.99, 100).level).toBe("calm");
+		expect(spendingProgress(70, 100).level).toBe("close");
+	});
+
+	it("turns red from 90% of the plan", () => {
+		expect(spendingProgress(89.99, 100).level).toBe("close");
+		expect(spendingProgress(90, 100)).toEqual({
+			remaining: 10,
+			level: "limit",
+			state: "left",
+		});
+	});
+
+	it("is paid off when exactly the plan is spent", () => {
+		expect(spendingProgress(550, 550)).toEqual({
+			remaining: 0,
+			level: "limit",
+			state: "paidOff",
+		});
+	});
+
+	it("is paid off when the gap is lost in floating point rounding", () => {
+		expect(spendingProgress(0.1 + 0.2, 0.3).state).toBe("paidOff");
+	});
+
+	it("says how much is over the plan, as a negative remainder", () => {
+		expect(spendingProgress(850, 550)).toEqual({
+			remaining: -300,
+			level: "limit",
+			state: "over",
+		});
+	});
+
+	it("counts any spending as over when nothing was planned", () => {
+		expect(spendingProgress(5, 0)).toEqual({
+			remaining: -5,
+			level: "limit",
+			state: "over",
+		});
+	});
+
+	it("says nothing is planned when there is no plan and no spending", () => {
+		expect(spendingProgress(0, 0)).toEqual({
+			remaining: 0,
+			level: "calm",
+			state: "unplanned",
+		});
+	});
+
+	it("handles large amounts to the cent", () => {
+		expect(spendingProgress(1_000_000.01, 1_000_000).remaining).toBe(-0.01);
 	});
 });

@@ -52,19 +52,8 @@
       },
       "budget": {
         "salary": 1400,
-        "categories": [
-          { "id": "casa", "name": "Casa", "group": "needs", "planned": 550 },
-          { "id": "supermercado", "name": "Supermercado", "group": "needs", "planned": 200 },
-          { "id": "transportes", "name": "Transportes", "group": "needs", "planned": 60 },
-          { "id": "lazer", "name": "Lazer", "group": "wants", "planned": 150 },
-          { "id": "poupanca", "name": "Poupança", "group": "savings", "planned": 300 }
-        ],
-        "expenses": [
-          { "id": "renda-novembro", "categoryId": "casa", "amount": 550, "description": "Renda", "date": "2026-11-01" },
-          { "id": "compras-semana", "categoryId": "supermercado", "amount": 64.3, "description": "Compras da semana", "date": "2026-11-08" },
-          { "id": "passe", "categoryId": "transportes", "amount": 40, "description": "Passe Navegante", "date": "2026-11-02" },
-          { "id": "jantar-amigos", "categoryId": "lazer", "amount": 32.5, "description": "Jantar com amigos", "date": "2026-11-14" }
-        ]
+        "categories": [],
+        "expenses": []
       }
     },
     {

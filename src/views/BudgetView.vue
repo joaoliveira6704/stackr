@@ -4,6 +4,7 @@ import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import AppIcon from "../components/AppIcon.vue";
 import BudgetCategoryCard from "../components/BudgetCategoryCard.vue";
+import BudgetCategoryDialog from "../components/BudgetCategoryDialog.vue";
 import BudgetRuleCheck from "../components/BudgetRuleCheck.vue";
 import ExpenseForm from "../components/ExpenseForm.vue";
 import { BUDGET_GROUP_ICONS } from "../components/icons";
@@ -18,8 +19,8 @@ import {
 	type BudgetGroup,
 	checkRule,
 	dateFromKey,
-	estimateYear,
 	type Expense,
+	estimateYear,
 	expensesInMonth,
 	MAX_CATEGORIES,
 	type MonthlyPlan,
@@ -33,7 +34,7 @@ import {
 import { type ErrorCode, errorCode } from "../lib/errors";
 import { useConfirm } from "../lib/use-confirm";
 import { useSavedPlan } from "../lib/use-saved-plan";
-import { type NewCategory, useBudgetStore } from "../stores/budget";
+import { useBudgetStore } from "../stores/budget";
 
 const store = useBudgetStore();
 const { budget, hasUnsavedChanges, isFull } = storeToRefs(store);
@@ -47,18 +48,12 @@ const { loading, loadError, saving, saveError, justSaved, load, save } =
 		confirmLabel: t("budget.confirmLeave.confirm"),
 	}));
 
-const SUGGESTED_CATEGORIES: { key: string; group: BudgetGroup }[] = [
-	{ key: "housing", group: "needs" },
-	{ key: "groceries", group: "needs" },
-	{ key: "transport", group: "needs" },
-	{ key: "leisure", group: "wants" },
-	{ key: "savings", group: "savings" },
-];
-
 // The month is read once, so a page left open past midnight on the last day
 // keeps showing the month the user started in.
 const month = monthKey(new Date());
-const addError = ref<ErrorCode | null>(null);
+
+// Null while the dialog is closed, "new" to add a category, or the one being edited.
+const categoryInDialog = ref<BudgetCategory | "new" | null>(null);
 
 type Outcome =
 	| { plan: MonthlyPlan; rule: RuleCheck[] | null; year: YearlyEstimate; error: null }
@@ -80,31 +75,9 @@ const categoriesById = computed(
 	() => new Map(budget.value.categories.map((category) => [category.id, category])),
 );
 
-function addCategories(categories: NewCategory[]) {
-	addError.value = null;
+function openCategoryDialog(category: BudgetCategory | "new") {
 	justSaved.value = false;
-	try {
-		store.addCategories(categories);
-	} catch (cause) {
-		addError.value = errorCode(cause);
-	}
-}
-
-function addCategory() {
-	const number = budget.value.categories.length + 1;
-	addCategories([
-		{ name: t("budget.category.defaultName", { number }), group: "needs", planned: 0 },
-	]);
-}
-
-function addSuggestedCategories() {
-	addCategories(
-		SUGGESTED_CATEGORIES.map(({ key, group }) => ({
-			name: t(`budget.suggested.${key}`),
-			group,
-			planned: 0,
-		})),
-	);
+	categoryInDialog.value = category;
 }
 
 async function removeCategory(category: BudgetCategory) {
@@ -225,10 +198,11 @@ async function removeExpense(expense: Expense) {
 						</p>
 					</div>
 					<button
+						v-if="budget.categories.length"
 						type="button"
-						class="btn-secondary btn-sm"
+						class="btn-primary btn-sm"
 						:disabled="isFull"
-						@click="addCategory"
+						@click="openCategoryDialog('new')"
 					>
 						<AppIcon name="add" :size="16" />
 						{{ t("budget.categories.add") }}
@@ -237,9 +211,6 @@ async function removeExpense(expense: Expense) {
 				<p v-if="isFull" class="text-sm text-ink-muted">
 					{{ t("budget.categories.full", { max: MAX_CATEGORIES }) }}
 				</p>
-				<p v-if="addError" class="text-sm font-semibold text-tangerine-strong" role="alert">
-					{{ t(`errors.${addError}`) }}
-				</p>
 
 				<div v-if="budget.categories.length" class="grid grid-cols-1 gap-4 lg:grid-cols-2">
 					<BudgetCategoryCard
@@ -247,21 +218,28 @@ async function removeExpense(expense: Expense) {
 						:key="category.id"
 						:category="category"
 						:spent="spent.get(category.id) ?? 0"
+						@edit="openCategoryDialog(category)"
 						@remove="removeCategory(category)"
 					/>
 				</div>
 				<div v-else class="panel tone-neutral flex flex-col items-start gap-3">
 					<span class="icon-tile tone-brand">
-						<AppIcon name="budget" />
+						<AppIcon name="expense" />
 					</span>
 					<h3 class="text-subheading">{{ t("budget.categories.emptyTitle") }}</h3>
 					<p class="text-ink-muted">{{ t("budget.categories.emptyDetail") }}</p>
-					<button type="button" class="btn-secondary btn-sm" @click="addSuggestedCategories">
-						<AppIcon name="sparkle" :size="16" />
-						{{ t("budget.categories.useSuggested") }}
+					<button type="button" class="btn-primary btn-sm" @click="openCategoryDialog('new')">
+						<AppIcon name="add" :size="16" />
+						{{ t("budget.categories.add") }}
 					</button>
 				</div>
 			</section>
+
+			<BudgetCategoryDialog
+				v-if="categoryInDialog"
+				:category="categoryInDialog === 'new' ? undefined : categoryInDialog"
+				@close="categoryInDialog = null"
+			/>
 
 			<section class="flex flex-col gap-4">
 				<div>
@@ -347,7 +325,7 @@ async function removeExpense(expense: Expense) {
 							:detail="t('budget.year.spendingDetail')"
 						/>
 						<StatCard
-							v-if="outcome.year.saving >= 0"
+							v-if="outcome.year.shortfall === 0"
 							icon="savings"
 							tone="brand"
 							:label="t('budget.year.saving')"
@@ -359,7 +337,7 @@ async function removeExpense(expense: Expense) {
 							icon="alert"
 							tone="tangerine"
 							:label="t('budget.year.deficit')"
-							:value="n(-outcome.year.saving, 'currency')"
+							:value="n(outcome.year.shortfall, 'currency')"
 							:detail="t('budget.year.deficitDetail')"
 						/>
 					</div>
