@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import {
-	computed,
-	nextTick,
-	onMounted,
-	onUnmounted,
-	ref,
-	useTemplateRef,
-	watch,
-} from "vue";
+import { computed, nextTick, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { niceTicks, yearTicks } from "../lib/chart-scale";
 import type { YearPoint } from "../lib/projection";
+import { useElementWidth } from "../lib/use-element-width";
 import { SERIES } from "./chart-colors";
 
 const props = defineProps<{ timeline: YearPoint[] }>();
@@ -38,18 +31,8 @@ const END_LABEL_SPACE = 92;
 const FALLBACK_TOOLTIP_WIDTH = 240;
 
 const container = useTemplateRef<HTMLDivElement>("container");
-const width = ref(FALLBACK_WIDTH);
+const width = useElementWidth(container, FALLBACK_WIDTH);
 const activeIndex = ref<number | null>(null);
-let resizeObserver: ResizeObserver | null = null;
-
-onMounted(() => {
-	if (!container.value || typeof ResizeObserver === "undefined") return;
-	resizeObserver = new ResizeObserver(([entry]) => {
-		width.value = Math.max(entry.contentRect.width, 1);
-	});
-	resizeObserver.observe(container.value);
-});
-onUnmounted(() => resizeObserver?.disconnect());
 
 const showEndLabels = computed(() => width.value >= END_LABELS_MIN_WIDTH);
 const padding = computed(() => ({

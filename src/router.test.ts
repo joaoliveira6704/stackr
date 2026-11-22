@@ -131,6 +131,14 @@ describe("router", () => {
 		expect(router.currentRoute.value.path).toBe("/login");
 	});
 
+	it("sends a signed out visitor from the register to login", async () => {
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/register");
+
+		expect(router.currentRoute.value.path).toBe("/login");
+	});
+
 	it("sends a signed out visitor from the simulator to login", async () => {
 		const router = createAppRouter(createMemoryHistory());
 

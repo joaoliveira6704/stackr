@@ -23,7 +23,7 @@ function pick(event: Event) {
 					v-for="preset in PRESETS"
 					:key="preset"
 					type="button"
-					class="btn-secondary btn-sm tabular-nums aria-pressed:border-brand aria-pressed:bg-brand aria-pressed:text-on-brand"
+					class="btn-secondary btn-toggle btn-sm tabular-nums"
 					:aria-pressed="years === preset"
 					@click="years = preset"
 				>

@@ -458,25 +458,16 @@ describe("BudgetView", () => {
 
 		expect(wrapper.text()).toContain("Yearly income€18,000.00");
 		expect(wrapper.text()).toContain("Yearly spending€9,600.00");
-		expect(wrapper.text()).toContain("Estimated savings€3,000.00");
+		expect(wrapper.text()).toContain("Yearly savings€0.00");
 	});
 
-	it("counts no savings when nothing is planned as savings", async () => {
+	it("shows savings below the aim when nothing is planned as savings", async () => {
 		fakeAppApi({ budget: savedBudget });
 		const { wrapper } = await mountBudget();
 
-		expect(wrapper.text()).toContain("Estimated savings€0.00");
 		expect(wrapper.text()).toContain(
 			"SavingsAim for at least 20% · €0.000%Below the aim",
 		);
-	});
-
-	it("shows a yearly shortfall when the plan costs more than the salary", async () => {
-		fakeAppApi({ budget: { ...savedBudget, salary: 700 } });
-		const { wrapper } = await mountBudget();
-
-		expect(wrapper.text()).toContain("Estimated shortfall€1,200.00");
-		expect(wrapper.text()).not.toContain("Estimated savings");
 	});
 
 	it("compares the plan with the 50/30/20 rule", async () => {
@@ -706,9 +697,179 @@ describe("BudgetView", () => {
 
 		expect(wrapper.text()).toContain("Organiza o teu mês.");
 		expect(wrapper.text()).toContain("Regra 50/30/20");
-		expect(wrapper.text()).toContain("Poupança estimada");
+		expect(wrapper.text()).toContain("Rendimento anual");
 		expect(wrapper.text()).toContain("Gastos deste mês");
 		expect(wrapper.text()).toContain("Já pago");
 		expect(wrapper.text()).toContain("Faltam");
+	});
+
+	it("counts only what was really added this month as savings", async () => {
+		fakeAppApi({
+			budget: { salary: 1000, categories: [], expenses: [] },
+			portfolio: {
+				holdings: [],
+				savings: [
+					{
+						id: "s1",
+						name: "Retirement",
+						type: "ppr",
+						initial: 5000,
+						monthly: 999,
+						annualReturnPercent: 3,
+						deposits: [
+							{ id: "d1", amount: 200, date: today },
+							{
+								id: "d2",
+								amount: 50,
+								date: `${Number(today.slice(0, 4)) - 1}-06-15`,
+							},
+						],
+					},
+				],
+			},
+		});
+		const { wrapper } = await mountAt("/budget", BudgetView);
+		await flushPromises();
+
+		expect(wrapper.text()).toContain("Where your money goes");
+		expect(wrapper.text()).toMatch(
+			/Added to the register this month.*€200\.00/,
+		);
+		expect(wrapper.text()).not.toContain("€999.00");
+		expect(wrapper.text()).toContain("€5,000.00 recorded in total");
+		expect(wrapper.text()).toContain("€200.00");
+		expect(wrapper.find("svg text").exists()).toBe(true);
+	});
+
+	it("lists every flow in a table for readers who prefer one", async () => {
+		fakeAppApi({ budget: { salary: 1000, categories: [], expenses: [] } });
+		const { wrapper } = await mountAt("/budget", BudgetView);
+		await flushPromises();
+
+		const toggle = wrapper
+			.findAll("button")
+			.find((button) => button.text() === "Show table");
+		await toggle?.trigger("click");
+
+		expect(wrapper.get("tbody").text()).toContain("Salary");
+		expect(wrapper.get("tbody").text()).toContain("€1,000.00");
+	});
+
+	it("switches the funds flow from the month to the year", async () => {
+		fakeAppApi({
+			budget: { salary: 1000, categories: [], expenses: [] },
+			portfolio: {
+				holdings: [],
+				savings: [
+					{
+						id: "s1",
+						name: "Retirement",
+						type: "ppr",
+						interest: "compoundYearly",
+						initial: 5000,
+						monthly: 999,
+						annualReturnPercent: 3,
+						deposits: [
+							{ id: "d1", amount: 200, date: today },
+							{
+								id: "d2",
+								amount: 50,
+								date: `${Number(today.slice(0, 4)) - 1}-06-15`,
+							},
+						],
+					},
+				],
+			},
+		});
+		const { wrapper } = await mountAt("/budget", BudgetView);
+		await flushPromises();
+		const yearButton = wrapper
+			.findAll("button")
+			.find((button) => button.text() === "Year");
+
+		await yearButton?.trigger("click");
+
+		expect(yearButton?.attributes("aria-pressed")).toBe("true");
+		expect(wrapper.text()).toMatch(/Added to the register this year.*€200\.00/);
+	});
+
+	it("marks each row of the flow table with the colour of its type", async () => {
+		fakeAppApi({
+			budget: {
+				salary: 1000,
+				categories: [
+					{ id: "home", name: "Rent", group: "needs", planned: 400 },
+				],
+				expenses: [],
+			},
+		});
+		const { wrapper } = await mountAt("/budget", BudgetView);
+		await flushPromises();
+		const toggle = wrapper
+			.findAll("button")
+			.find((button) => button.text() === "Show table");
+		await toggle?.trigger("click");
+
+		const rentRow = wrapper
+			.findAll("tbody tr")
+			.find((row) => row.text().includes("Rent"));
+
+		expect(rentRow?.find("span.bg-chart-1").exists()).toBe(true);
+		expect(rentRow?.text()).toContain("(Needs)");
+	});
+
+	it("shows what was recorded this year in the third yearly card", async () => {
+		const year = Number(today.slice(0, 4));
+		fakeAppApi({
+			budget: savedBudget,
+			portfolio: {
+				holdings: [],
+				savings: [
+					{
+						id: "s1",
+						name: "Retirement",
+						type: "ppr",
+						initial: 5000,
+						monthly: 999,
+						annualReturnPercent: 3,
+						deposits: [
+							{ id: "d1", amount: 200, date: today },
+							{ id: "d2", amount: 75.5, date: `${year}-01-01` },
+							{ id: "d3", amount: 50, date: `${year - 1}-06-15` },
+						],
+					},
+				],
+			},
+		});
+		const { wrapper } = await mountAt("/budget", BudgetView);
+		await flushPromises();
+
+		expect(wrapper.text()).toContain("Yearly savings€275.50");
+		expect(wrapper.text()).toContain("Recorded this year up to");
+	});
+
+	it("names the yearly savings card in Portuguese", async () => {
+		fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountAt("/budget", BudgetView, "pt-PT");
+		await flushPromises();
+
+		expect(wrapper.text()).toContain("Poupança anual");
+		expect(wrapper.text()).toContain("Registado este ano até");
+	});
+
+	it("explains an empty funds flow", async () => {
+		fakeAppApi();
+		const { wrapper } = await mountAt("/budget", BudgetView);
+		await flushPromises();
+
+		expect(wrapper.text()).toContain("Enter your salary or add expenses");
+	});
+
+	it("names the funds flow in Portuguese", async () => {
+		fakeAppApi({ budget: { salary: 1000, categories: [], expenses: [] } });
+		const { wrapper } = await mountAt("/budget", BudgetView, "pt-PT");
+		await flushPromises();
+
+		expect(wrapper.text()).toContain("Para onde vai o teu dinheiro");
 	});
 });

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useId } from "vue";
 import { useI18n } from "vue-i18n";
-import type { Holding } from "../lib/portfolio";
 import {
 	CAPITAL_GAINS_TAX,
 	type Projection,
@@ -20,7 +19,7 @@ import type { Tone } from "./tones";
 const props = defineProps<{
 	projection: Projection;
 	scenarios: Scenarios;
-	holdings: Holding[];
+	holdings: { id: string; name: string; initial: number; monthly: number }[];
 	years: number;
 }>();
 const { t, n } = useI18n();

@@ -5,9 +5,9 @@ export const LESSON_BADGES = [
 	{ id: "budgetOnTrack", screens: ["budget"] },
 	{ id: "budgetRule", screens: ["budget"] },
 	{ id: "solidFund", screens: ["budget"] },
-	{ id: "compoundInterest", screens: ["simulator"] },
+	{ id: "compoundInterest", screens: ["simulator", "register"] },
 	{ id: "inflation", screens: ["simulator"] },
-	{ id: "diversification", screens: ["simulator"] },
+	{ id: "diversification", screens: ["simulator", "register"] },
 	{ id: "prudentInvestor", screens: ["simulator"] },
 ] as const;
 

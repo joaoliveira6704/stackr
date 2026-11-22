@@ -1,11 +1,19 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { chartBody, jsonResponse, searchBody } from "../test/fake-api";
+import {
+	chartBody,
+	fakeAppApi,
+	jsonResponse,
+	quoteBody,
+	searchBody,
+} from "../test/fake-api";
 import { AppError } from "./errors";
 import {
 	averageAnnualReturn,
 	fetchPriceHistory,
+	fetchQuote,
 	historyYears,
 	parseHistory,
+	parseQuote,
 	parseSearch,
 	searchTickers,
 	yearlyReturns,
@@ -236,5 +244,59 @@ describe("historyYears", () => {
 
 		expect(historyYears(points)).toBe(3);
 		expect(historyYears([])).toBe(0);
+	});
+});
+
+describe("fetchQuote", () => {
+	it("reads a price in euros with no conversion", async () => {
+		fakeAppApi({ charts: { "VWCE.DE": quoteBody("VWCE.DE", 140.5) } });
+
+		await expect(fetchQuote("VWCE.DE")).resolves.toMatchObject({
+			price: 140.5,
+			currency: "EUR",
+			rateToEur: 1,
+		});
+	});
+
+	it("fetches the exchange rate for another currency", async () => {
+		fakeAppApi({
+			charts: {
+				AAPL: quoteBody("AAPL", 200, "USD"),
+				"USDEUR=X": quoteBody("USDEUR=X", 0.9, "EUR"),
+			},
+		});
+
+		await expect(fetchQuote("AAPL")).resolves.toMatchObject({
+			price: 200,
+			currency: "USD",
+			rateToEur: 0.9,
+		});
+	});
+
+	it("turns pence into pounds", async () => {
+		fakeAppApi({
+			charts: {
+				"VOD.L": quoteBody("VOD.L", 7500, "GBp"),
+				"GBPEUR=X": quoteBody("GBPEUR=X", 1.15, "EUR"),
+			},
+		});
+
+		await expect(fetchQuote("VOD.L")).resolves.toMatchObject({
+			price: 75,
+			currency: "GBP",
+			rateToEur: 1.15,
+		});
+	});
+
+	it("fails rather than read dollars as euros without a rate", async () => {
+		fakeAppApi({ charts: { AAPL: quoteBody("AAPL", 200, "USD") } });
+
+		await expect(fetchQuote("AAPL")).rejects.toBeInstanceOf(AppError);
+	});
+
+	it("fails on an answer with no price", () => {
+		expect(() => parseQuote({ chart: { result: [{ meta: {} }] } })).toThrow(
+			new AppError("marketUnavailable"),
+		);
 	});
 });

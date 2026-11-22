@@ -3,17 +3,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type Component, defineComponent, h } from "vue";
 import { RouterView } from "vue-router";
 import {
-	chartBody,
 	demoUser,
 	fakeAppApi,
 	jsonResponse,
-	searchBody,
 	storeSessionFor,
 } from "../test/fake-api";
 import { answerConfirmDialog, mountAt } from "../test/mount";
 import SimulatorView from "./SimulatorView.vue";
-
-const STEADY_GROWTH = { 2019: 8, 2020: 8, 2021: 8, 2022: 8, 2023: 8 };
 
 const savedPortfolio = {
 	years: 10,
@@ -27,6 +23,7 @@ const savedPortfolio = {
 			initial: 1000,
 			monthly: 0,
 			annualReturnPercent: 0,
+			deposits: [],
 			returnSource: "manual",
 			yearlyReturns: [],
 			historyYears: 0,
@@ -69,13 +66,299 @@ async function click(wrapper: VueWrapper, text: string) {
 	await flushPromises();
 }
 
+// The results below have sections of their own, without record cards.
+function recordGroups(wrapper: VueWrapper) {
+	return wrapper
+		.findAll("section section")
+		.filter((section) => section.find("article").exists());
+}
+
 describe("SimulatorView", () => {
-	it("invites the user to add a first investment", async () => {
+	it("points to the register when nothing is recorded", async () => {
 		fakeAppApi();
 		const { wrapper } = await mountSimulator();
 
-		expect(wrapper.text()).toContain("You have no investments yet.");
+		expect(wrapper.text()).toContain("You have nothing recorded yet.");
+		expect(wrapper.find('a[href="/register"]').exists()).toBe(true);
 		expect(wrapper.text()).not.toContain("Final value");
+	});
+
+	it("projects the savings recorded in the register", async () => {
+		fakeAppApi({
+			portfolio: {
+				...savedPortfolio,
+				holdings: [],
+				savings: [
+					{
+						id: "s1",
+						name: "Certificates",
+						type: "savingsCertificates",
+						initial: 2000,
+						monthly: 0,
+						annualReturnPercent: 0,
+					},
+				],
+			},
+		});
+		const { wrapper } = await mountSimulator();
+
+		expect(wrapper.text()).toContain("Certificates");
+		expect(wrapper.text()).toContain("€2,000.00");
+	});
+
+	it("brings in each record with only the deposit and return to change", async () => {
+		fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+
+		const card = wrapper.get("article");
+
+		expect(card.text()).toContain("Savings plan");
+		expect(card.text()).toContain("Current value€1,000.00");
+		expect(card.text()).toContain("Monthly deposit");
+		expect(card.findAll("input")).toHaveLength(2);
+	});
+
+	it("projects a bigger monthly deposit without touching the value", async () => {
+		fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+
+		await wrapper.get('article input[type="number"]').setValue("100");
+
+		// 1000 today plus 100 a month for 10 years, with no return.
+		expect(wrapper.text()).toContain("€13,000.00");
+		expect(wrapper.get("article").text()).toContain("Current value€1,000.00");
+	});
+
+	it("projects the return the user types in", async () => {
+		fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+
+		await wrapper.findAll('article input[type="number"]')[1].setValue("10");
+
+		// 1000 growing 10% a year for 10 years.
+		expect(wrapper.text()).toContain("€2,593.74");
+	});
+
+	it("saves the simulated deposit without adding a real one", async () => {
+		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+
+		await wrapper.get('article input[type="number"]').setValue("100");
+		await click(wrapper, "Save settings");
+
+		expect(saved[0]).toMatchObject({
+			portfolio: { holdings: [{ initial: 1000, monthly: 100, deposits: [] }] },
+		});
+	});
+
+	it("takes a bigger simulated deposit out of what the budget leaves free", async () => {
+		fakeAppApi({
+			portfolio: savedPortfolio,
+			budget: { salary: 1000, categories: [], expenses: [] },
+		});
+		const { wrapper } = await mountSimulator();
+		await wrapper.get('article input[type="number"]').setValue("300");
+
+		await click(wrapper, "Add by hand");
+
+		expect(wrapper.text()).toContain("€600.00 a month still free");
+	});
+
+	it("shows a nametag and the same rate as TANB, TANL and TAE", async () => {
+		fakeAppApi({
+			portfolio: {
+				...savedPortfolio,
+				holdings: [],
+				savings: [
+					{
+						id: "s1",
+						name: "Certificates",
+						nametag: "Rainy day",
+						type: "savingsCertificates",
+						interest: "compoundMonthly",
+						rateBasis: "tanb",
+						initial: 1000,
+						monthly: 0,
+						annualReturnPercent: 12,
+					},
+				],
+			},
+		});
+		const { wrapper } = await mountSimulator();
+
+		const card = wrapper.get("article");
+
+		expect(card.get("h4").text()).toBe("Rainy day");
+		expect(card.text()).toContain("TANB per year");
+		expect(card.text()).toContain("TANB 12.00% · TANL 8.64% · TAE 12.68%");
+	});
+
+	it("tries another rate without moving the real value", async () => {
+		const lastYear = `${new Date().getFullYear() - 1}-01-01`;
+		const { saved } = fakeAppApi({
+			portfolio: {
+				...savedPortfolio,
+				holdings: [],
+				savings: [
+					{
+						id: "s1",
+						name: "Certificates",
+						type: "savingsCertificates",
+						interest: "simple",
+						rateBasis: "tanl",
+						initial: 1000,
+						monthly: 0,
+						annualReturnPercent: 0,
+						contractRatePercent: 0,
+						startDate: lastYear,
+					},
+				],
+			},
+		});
+		const { wrapper } = await mountSimulator();
+
+		await wrapper.findAll('article input[type="number"]')[1].setValue("50");
+
+		expect(wrapper.get("article").text()).toContain("Current value€1,000.00");
+		expect(saved).toHaveLength(0);
+	});
+
+	it("splits the records into investments and savings", async () => {
+		fakeAppApi({
+			portfolio: {
+				...savedPortfolio,
+				savings: [
+					{
+						id: "s1",
+						name: "Certificates",
+						type: "savingsCertificates",
+						initial: 2000,
+						monthly: 0,
+						annualReturnPercent: 0,
+					},
+				],
+			},
+		});
+		const { wrapper } = await mountSimulator();
+
+		const groups = recordGroups(wrapper);
+
+		expect(groups.map((group) => group.get("h3").text())).toEqual([
+			"Investments",
+			"Savings",
+		]);
+		expect(groups[0].text()).toContain("Savings plan");
+		expect(groups[0].text()).toContain("€1,000.00");
+		expect(groups[1].text()).toContain("Certificates");
+		expect(groups[1].text()).toContain("€2,000.00");
+		expect(groups[0].text()).not.toContain("Certificates");
+	});
+
+	it("hides a group with nothing in it", async () => {
+		fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+
+		expect(
+			recordGroups(wrapper).map((group) => group.get("h3").text()),
+		).toEqual(["Investments"]);
+	});
+
+	it("names the groups in Portuguese", async () => {
+		fakeAppApi({
+			portfolio: {
+				...savedPortfolio,
+				savings: [
+					{ id: "s1", name: "PPR", type: "ppr", initial: 100, monthly: 0 },
+				],
+			},
+		});
+		const { wrapper } = await mountSimulator("pt-PT");
+
+		expect(
+			recordGroups(wrapper).map((group) => group.get("h3").text()),
+		).toEqual(["Investimentos", "Poupanças"]);
+	});
+
+	it("tries a new investment without saving it to the register", async () => {
+		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+
+		await click(wrapper, "Add by hand");
+
+		expect(wrapper.text()).toContain("Is it worth it?");
+		expect(wrapper.text()).toContain("New investment");
+		expect(
+			buttonWithText(wrapper, "Save settings").attributes("disabled"),
+		).toBeDefined();
+		expect(saved).toHaveLength(0);
+	});
+
+	it("says a new investment fits when the budget has room", async () => {
+		fakeAppApi({
+			portfolio: savedPortfolio,
+			budget: { salary: 1000, categories: [], expenses: [] },
+		});
+		const { wrapper } = await mountSimulator();
+
+		await click(wrapper, "Add by hand");
+
+		expect(wrapper.text()).toContain("Fits your budget");
+		expect(wrapper.text()).toContain("€900.00 a month still free");
+	});
+
+	it("says a new investment does not fit a tight budget", async () => {
+		fakeAppApi({
+			portfolio: savedPortfolio,
+			budget: { salary: 50, categories: [], expenses: [] },
+		});
+		const { wrapper } = await mountSimulator();
+
+		await click(wrapper, "Add by hand");
+
+		expect(wrapper.text()).toContain("Does not fit your budget");
+		expect(wrapper.text()).toContain("€50.00 a month short");
+	});
+
+	it("asks for a budget when there is no salary to compare with", async () => {
+		fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+
+		await click(wrapper, "Add by hand");
+
+		expect(wrapper.text()).toContain("Your budget is missing");
+	});
+
+	it("keeps the trial until its removal is confirmed", async () => {
+		fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+		await click(wrapper, "Add by hand");
+		const remove = 'button[aria-label="Remove New investment"]';
+
+		await wrapper.get(remove).trigger("click");
+		await flushPromises();
+		expect(wrapper.text()).toContain(
+			"Remove New investment from the simulation?",
+		);
+		await answerConfirmDialog(wrapper, "cancel");
+		expect(wrapper.find(remove).exists()).toBe(true);
+
+		await wrapper.get(remove).trigger("click");
+		await flushPromises();
+		await answerConfirmDialog(wrapper, "confirm");
+		expect(wrapper.find(remove).exists()).toBe(false);
+	});
+
+	it("explains an empty trial amount instead of projecting it as zero", async () => {
+		fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+		await click(wrapper, "Add by hand");
+
+		await wrapper.findAll('article input[type="number"]')[0].setValue("");
+
+		expect(wrapper.text()).toContain(
+			"Amounts invested have to be numbers of zero or more.",
+		);
+		expect(wrapper.text()).not.toContain("Is it worth it?");
 	});
 
 	it("shows the badges of the investing lessons", async () => {
@@ -105,158 +388,24 @@ describe("SimulatorView", () => {
 
 		await click(wrapper, "Try again");
 
-		expect(wrapper.text()).toContain("You have no investments yet.");
-	});
-
-	it("projects an investment added by hand with the default amounts", async () => {
-		fakeAppApi();
-		const { wrapper } = await mountSimulator();
-
-		await click(wrapper, "Add by hand");
-
-		expect(wrapper.text()).toContain("Investment 1");
-		expect(wrapper.text()).toContain("Your estimate");
-		// 1000 at the start plus 100 a month for 20 years.
-		expect(wrapper.text()).toContain("€25,000.00");
-		expect(wrapper.text()).toContain("Final value");
-		expect(wrapper.text()).toContain("Above inflation");
-		expect(wrapper.text()).toContain("Pessimistic");
-	});
-
-	it("uses the real past growth of a popular ETF", async () => {
-		fakeAppApi({
-			charts: { "VWCE.DE": chartBody("VWCE.DE", STEADY_GROWTH) },
-		});
-		const { wrapper } = await mountSimulator();
-
-		await click(wrapper, "Vanguard FTSE All-World");
-
-		expect(wrapper.text()).toContain("Real average of the last 4 years");
-		expect(wrapper.text()).toContain("Change in each year");
-		const returnField = wrapper.findAll<HTMLInputElement>(
-			'input[type="number"]',
-		)[3];
-		expect(returnField.element.value).toBe("8");
-	});
-
-	it("still adds a ticker and asks for a return when the market is down", async () => {
-		fakeAppApi({ marketDown: true });
-		const { wrapper } = await mountSimulator();
-
-		await click(wrapper, "Bitcoin");
-
-		expect(wrapper.text()).toContain(
-			"We could not fetch the history of Bitcoin. Type the return you expect.",
-		);
-		expect(wrapper.text()).toContain("No history, type your estimate");
-	});
-
-	it("finds a ticker by searching and adds the one picked", async () => {
-		vi.useFakeTimers();
-		fakeAppApi({
-			search: searchBody([
-				{ symbol: "AAPL", longname: "Apple Inc.", quoteType: "EQUITY" },
-			]),
-			charts: { AAPL: chartBody("AAPL", STEADY_GROWTH, "Apple Inc.") },
-		});
-		const { wrapper } = await mountSimulator();
-
-		await wrapper.get('input[type="search"]').setValue("apple");
-		await vi.advanceTimersByTimeAsync(400);
-		await flushPromises();
-		await click(wrapper, "Apple Inc.");
-
-		expect(wrapper.findAll("article h3").map((title) => title.text())).toEqual([
-			"Apple Inc.",
-		]);
-	});
-
-	it("lists every match from a long search in a list that scrolls", async () => {
-		vi.useFakeTimers();
-		const matches = Array.from({ length: 12 }, (_, index) => ({
-			symbol: `ETF${index}`,
-			longname: `Fund number ${index}`,
-			quoteType: "ETF",
-		}));
-		fakeAppApi({ search: searchBody(matches) });
-		const { wrapper } = await mountSimulator();
-
-		await wrapper.get('input[type="search"]').setValue("fund");
-		await vi.advanceTimersByTimeAsync(400);
-		await flushPromises();
-
-		const list = wrapper.get("ul.popover");
-		expect(list.findAll("li")).toHaveLength(12);
-		expect(list.classes()).toContain("overflow-y-auto");
-	});
-
-	it("does nothing to a holding until the removal is confirmed", async () => {
-		fakeAppApi({ portfolio: savedPortfolio });
-		const { wrapper } = await mountSimulator();
-
-		await wrapper
-			.get('button[aria-label="Remove Savings plan"]')
-			.trigger("click");
-		await flushPromises();
-
-		expect(wrapper.text()).toContain("Remove Savings plan?");
-		expect(wrapper.findAll("article h3")).toHaveLength(1);
-	});
-
-	it("keeps the holding when the removal is cancelled", async () => {
-		fakeAppApi({ portfolio: savedPortfolio });
-		const { wrapper } = await mountSimulator();
-
-		await wrapper
-			.get('button[aria-label="Remove Savings plan"]')
-			.trigger("click");
-		await flushPromises();
-		await answerConfirmDialog(wrapper, "cancel");
-
-		expect(wrapper.findAll("article h3")).toHaveLength(1);
-	});
-
-	it("removes the holding once the removal is confirmed", async () => {
-		fakeAppApi({ portfolio: savedPortfolio });
-		const { wrapper } = await mountSimulator();
-
-		await wrapper
-			.get('button[aria-label="Remove Savings plan"]')
-			.trigger("click");
-		await flushPromises();
-		await answerConfirmDialog(wrapper, "confirm");
-
-		expect(wrapper.findAll("article h3")).toHaveLength(0);
-		expect(wrapper.text()).toContain("You have no investments yet.");
-	});
-
-	it("explains an empty amount instead of projecting it as zero", async () => {
-		fakeAppApi({ portfolio: savedPortfolio });
-		const { wrapper } = await mountSimulator();
-
-		await wrapper.findAll('input[type="number"]')[1].setValue("");
-
-		expect(wrapper.text()).toContain(
-			"Amounts invested have to be numbers of zero or more.",
-		);
-		expect(wrapper.text()).not.toContain("Final value");
+		expect(wrapper.text()).toContain("You have nothing recorded yet.");
 	});
 
 	it("only lets the user save once something changed", async () => {
 		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator();
-		const saveButton = () => buttonWithText(wrapper, "Save portfolio");
+		const saveButton = () => buttonWithText(wrapper, "Save settings");
 
 		expect(saveButton().attributes("disabled")).toBeDefined();
 
 		await click(wrapper, "30 years");
 		expect(saveButton().attributes("disabled")).toBeUndefined();
 
-		await click(wrapper, "Save portfolio");
+		await click(wrapper, "Save settings");
 
 		expect(saved).toHaveLength(1);
 		expect(saved[0]).toMatchObject({ portfolio: { years: 30 } });
-		expect(wrapper.text()).toContain("Portfolio saved.");
+		expect(wrapper.text()).toContain("Settings saved.");
 	});
 
 	it("shows a clear error and keeps the changes when saving fails", async () => {
@@ -264,13 +413,13 @@ describe("SimulatorView", () => {
 		const { wrapper } = await mountSimulator();
 		await click(wrapper, "30 years");
 
-		await click(wrapper, "Save portfolio");
+		await click(wrapper, "Save settings");
 
 		expect(wrapper.text()).toContain(
 			"Could not save your portfolio. Try again.",
 		);
 		expect(
-			buttonWithText(wrapper, "Save portfolio").attributes("disabled"),
+			buttonWithText(wrapper, "Save settings").attributes("disabled"),
 		).toBeUndefined();
 	});
 

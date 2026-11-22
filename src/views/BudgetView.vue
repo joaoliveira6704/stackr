@@ -7,6 +7,7 @@ import AutoSaveStatus from "../components/AutoSaveStatus.vue";
 import BudgetCategoryCard from "../components/BudgetCategoryCard.vue";
 import BudgetCategoryDialog from "../components/BudgetCategoryDialog.vue";
 import BudgetRuleCheck from "../components/BudgetRuleCheck.vue";
+import FundsFlowChart from "../components/FundsFlowChart.vue";
 import LessonBadges from "../components/LessonBadges.vue";
 import NumberField from "../components/NumberField.vue";
 import StatCard from "../components/StatCard.vue";
@@ -14,6 +15,7 @@ import StatRow from "../components/StatRow.vue";
 import {
 	type BudgetCategory,
 	checkRule,
+	dateFromKey,
 	dateKey,
 	estimateYear,
 	MAX_CATEGORIES,
@@ -22,22 +24,34 @@ import {
 	paidByCategory,
 	planMonth,
 	type RuleCheck,
-	sumMoney,
 	type YearlyEstimate,
 } from "../lib/budget";
 import { type ErrorCode, errorCode } from "../lib/errors";
+import {
+	buildFundsFlow,
+	type FlowPeriod,
+} from "../lib/funds-flow";
+import { sumMoney } from "../lib/money";
+import { depositedIn, recordName, registeredTotals } from "../lib/portfolio";
 import { useConfirm } from "../lib/use-confirm";
 import { useSavedPlan } from "../lib/use-saved-plan";
 import { useBudgetStore } from "../stores/budget";
+import { usePortfolioStore } from "../stores/portfolio";
 
 const store = useBudgetStore();
+const portfolioStore = usePortfolioStore();
 const { budget, hasUnsavedChanges, isFull } = storeToRefs(store);
 const { confirm } = useConfirm();
-const { t, n } = useI18n();
+const { t, n, d } = useI18n();
+
+// The savings in the plan come from the register, so both are needed.
+async function loadBudgetAndRegister() {
+	await Promise.all([store.load(), portfolioStore.load()]);
+}
 
 const { loading, loadError, saving, saveError, justSaved, load, saveLatest } =
 	useSavedPlan(
-		store,
+		{ load: loadBudgetAndRegister, save: store.save },
 		hasUnsavedChanges,
 		() => ({
 			title: t("budget.confirmLeave.title"),
@@ -56,18 +70,53 @@ const month = monthKey(now);
 // Null while the dialog is closed, "new" to add a category, or the one being edited.
 const categoryInDialog = ref<BudgetCategory | "new" | null>(null);
 
+const registered = computed(() =>
+	registeredTotals(portfolioStore.portfolio, today),
+);
+
 type Outcome =
-	| { plan: MonthlyPlan; rule: RuleCheck[] | null; year: YearlyEstimate; error: null }
+	| {
+			plan: MonthlyPlan;
+			rule: RuleCheck[] | null;
+			year: YearlyEstimate;
+			error: null;
+	  }
 	| { error: ErrorCode };
+
 
 const outcome = computed<Outcome>(() => {
 	try {
-		const plan = planMonth(budget.value, month);
-		return { plan, rule: checkRule(plan), year: estimateYear(plan), error: null };
+		const plan = planMonth(budget.value, month, registered.value.depositedThisMonth);
+		return {
+			plan,
+			rule: checkRule(plan),
+			year: estimateYear(plan),
+			error: null,
+		};
 	} catch (cause) {
 		return { error: errorCode(cause) };
 	}
 });
+
+const FLOW_PERIODS: FlowPeriod[] = ["month", "year"];
+const flowPeriod = ref<FlowPeriod>("month");
+const depositsInPeriod = computed(() => {
+	const { holdings, savings } = portfolioStore.portfolio;
+	const period = flowPeriod.value === "year" ? month.slice(0, 4) : month;
+	return [...holdings, ...savings].map((entry) => ({
+		id: entry.id,
+		name: recordName(entry),
+		amount: depositedIn(entry, period),
+	}));
+});
+const depositedInPeriod = computed(() =>
+	sumMoney(depositsInPeriod.value.map((item) => item.amount)),
+);
+const flow = computed(() =>
+	outcome.value.error
+		? null
+		: buildFundsFlow(budget.value, month, depositsInPeriod.value, flowPeriod.value),
+);
 
 const spent = computed(() => paidByCategory(budget.value, today));
 const paidTotal = computed(() => sumMoney([...spent.value.values()]));
@@ -236,6 +285,44 @@ async function removeCategory(category: BudgetCategory) {
 			</p>
 			<template v-else>
 				<section class="flex flex-col gap-4">
+					<div class="flex flex-wrap items-end justify-between gap-3">
+						<div>
+							<h2 class="text-heading">{{ t("budget.flow.title") }}</h2>
+							<p class="text-sm text-ink-muted">{{ t(`budget.flow.subtitle.${flowPeriod}`) }}</p>
+						</div>
+						<div class="flex flex-wrap items-center gap-2">
+							<div class="flex gap-2" role="group" :aria-label="t('budget.flow.periodLabel')">
+								<button
+									v-for="period in FLOW_PERIODS"
+									:key="period"
+									type="button"
+									class="btn-secondary btn-toggle btn-sm"
+									:aria-pressed="flowPeriod === period"
+									@click="flowPeriod = period"
+								>
+									{{ t(`budget.flow.periods.${period}`) }}
+								</button>
+							</div>
+							<RouterLink to="/register" class="btn-secondary btn-sm">
+								<AppIcon name="register" :size="16" />
+								{{ t("budget.flow.openRegister") }}
+							</RouterLink>
+						</div>
+					</div>
+					<div class="card flex flex-col gap-4">
+						<StatRow
+							icon="savings"
+							tone="brand"
+							:title="t(`budget.flow.registeredTitle.${flowPeriod}`)"
+							:detail="t('budget.flow.registeredDetail', { value: n(registered.value, 'currency') })"
+							:value="n(depositedInPeriod, 'currency')"
+						/>
+						<FundsFlowChart v-if="flow?.nodes.length" :flow="flow" />
+						<p v-else class="text-sm text-ink-muted">{{ t("budget.flow.empty") }}</p>
+					</div>
+				</section>
+
+				<section class="flex flex-col gap-4">
 					<div>
 						<h2 class="text-heading">{{ t("budget.rule.title") }}</h2>
 						<p class="text-sm text-ink-muted">{{ t("budget.rule.subtitle") }}</p>
@@ -268,20 +355,11 @@ async function removeCategory(category: BudgetCategory) {
 							:detail="t('budget.year.spendingDetail')"
 						/>
 						<StatCard
-							v-if="outcome.year.shortfall === 0"
 							icon="savings"
 							tone="brand"
 							:label="t('budget.year.saving')"
-							:value="n(outcome.year.saving, 'currency')"
-							:detail="t('budget.year.savingDetail')"
-						/>
-						<StatCard
-							v-else
-							icon="alert"
-							tone="tangerine"
-							:label="t('budget.year.deficit')"
-							:value="n(outcome.year.shortfall, 'currency')"
-							:detail="t('budget.year.deficitDetail')"
+							:value="n(registered.depositedThisYear, 'currency')"
+							:detail="t('budget.year.savingDetail', { date: d(dateFromKey(today), 'dayMonthYear') })"
 						/>
 					</div>
 				</section>

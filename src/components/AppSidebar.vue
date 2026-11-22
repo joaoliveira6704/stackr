@@ -84,6 +84,7 @@ onUnmounted(() => window.removeEventListener("keydown", closeOnEscape));
 
 		<SidebarItem to="/dashboard" icon="dashboard" :label="t('nav.dashboard')" />
 		<SidebarItem to="/budget" icon="budget" :label="t('nav.budget')" />
+		<SidebarItem to="/register" icon="register" :label="t('nav.register')" />
 		<SidebarItem to="/simulator" icon="simulator" :label="t('nav.simulator')" />
 		<SidebarItem to="/profile" icon="user" :label="t('nav.profile')" />
 

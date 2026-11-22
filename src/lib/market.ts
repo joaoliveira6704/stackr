@@ -62,6 +62,10 @@ interface ChartResult {
 		shortName?: string;
 		/** Seconds between the exchange clock and UTC. */
 		gmtoffset?: number;
+		/** The latest real price, with no adjustment for dividends. */
+		regularMarketPrice?: number;
+		/** When that price was set, in seconds. */
+		regularMarketTime?: number;
 	};
 	timestamp?: number[];
 	indicators?: {
@@ -153,6 +157,55 @@ export async function fetchPriceHistory(symbol: string): Promise<PriceHistory> {
 	const params = new URLSearchParams({ range: HISTORY_RANGE, interval: "1mo" });
 	const path = `/v8/finance/chart/${encodeURIComponent(symbol)}?${params}`;
 	return parseHistory(await requestMarket(path));
+}
+
+/** The latest price of a ticker, with what it takes to turn it into euros. */
+export interface MarketQuote {
+	price: number;
+	currency: string;
+	/** Euros for one unit of the currency, 1 for euros. */
+	rateToEur: number;
+	/** When the price was set, in milliseconds. */
+	time: number;
+}
+
+// Some exchanges quote in hundredths of a currency, such as pence in London.
+const MINOR_CURRENCIES: Record<string, { major: string; divisor: number }> = {
+	GBp: { major: "GBP", divisor: 100 },
+	GBX: { major: "GBP", divisor: 100 },
+	ZAc: { major: "ZAR", divisor: 100 },
+	ILA: { major: "ILS", divisor: 100 },
+};
+
+export function parseQuote(body: unknown): Omit<MarketQuote, "rateToEur"> {
+	const meta = (body as { chart?: { result?: ChartResult[] | null } })?.chart
+		?.result?.[0]?.meta;
+	const { regularMarketPrice: price, regularMarketTime: seconds } = meta ?? {};
+	if (!meta?.currency || !price || price <= 0 || !seconds) {
+		throw new AppError("marketUnavailable");
+	}
+	const minor = MINOR_CURRENCIES[meta.currency];
+	return {
+		price: minor ? price / minor.divisor : price,
+		currency: minor?.major ?? meta.currency,
+		time: seconds * 1000,
+	};
+}
+
+async function requestQuote(
+	symbol: string,
+): Promise<Omit<MarketQuote, "rateToEur">> {
+	const params = new URLSearchParams({ range: "1d", interval: "1d" });
+	const path = `/v8/finance/chart/${encodeURIComponent(symbol)}?${params}`;
+	return parseQuote(await requestMarket(path));
+}
+
+/** The latest price. Throws rather than guess when the rate is missing. */
+export async function fetchQuote(symbol: string): Promise<MarketQuote> {
+	const quote = await requestQuote(symbol);
+	if (quote.currency === "EUR") return { ...quote, rateToEur: 1 };
+	const rate = await requestQuote(`${quote.currency}EUR=X`);
+	return { ...quote, rateToEur: rate.price };
 }
 
 function lastPriceByYear(points: PricePoint[]): Map<number, number> {

@@ -64,27 +64,160 @@
       "onboardingDone": true,
       "track": "arena",
       "budget": {
-        "salary": 670,
+        "salary": 2000,
         "categories": [
           {
-            "id": "acb4a0fe-ba67-458a-9b7b-ef22ea055788",
-            "name": "Renda",
-            "description": "Casa Povoa",
+            "id": "a107614a-70a7-4c95-83ac-59214f4bb283",
+            "name": "renda",
+            "description": "porto",
             "group": "needs",
-            "planned": 250,
-            "recurrence": "quarterly",
+            "planned": 800,
+            "recurrence": "monthly",
             "dueDate": "2026-12-10"
+          },
+          {
+            "id": "dcbdff35-60ac-4c36-9ef7-d94130c1a6b6",
+            "name": "net",
+            "description": "meo",
+            "group": "needs",
+            "planned": 70,
+            "recurrence": "monthly",
+            "dueDate": "2026-12-03"
           }
         ],
         "expenses": [
           {
-            "id": "ccb39d4f-a489-4cec-a281-f51d489d92d4",
-            "categoryId": "acb4a0fe-ba67-458a-9b7b-ef22ea055788",
-            "amount": 250,
+            "id": "b7b67761-f779-431e-a9de-a05d4799a3af",
+            "categoryId": "a107614a-70a7-4c95-83ac-59214f4bb283",
+            "amount": 800,
+            "description": "",
+            "date": "2026-11-22"
+          },
+          {
+            "id": "98ffe8dc-cc4c-44d1-9288-a1a2b00c5bf5",
+            "categoryId": "dcbdff35-60ac-4c36-9ef7-d94130c1a6b6",
+            "amount": 70,
             "description": "",
             "date": "2026-11-22"
           }
         ]
+      },
+      "portfolio": {
+        "years": 20,
+        "inflationPercent": 2,
+        "holdings": [
+          {
+            "id": "dbc4b384-04b5-49b9-995f-70d3a23df6a5",
+            "symbol": "VWCE.DE",
+            "name": "Vanguard FTSE All-World",
+            "kind": "etf",
+            "initial": 1200,
+            "shares": 6,
+            "quote": {
+              "price": 159.34,
+              "currency": "EUR",
+              "time": 1795192549000,
+              "rateToEur": 1
+            },
+            "manualValue": null,
+            "startDate": "2026-11-19",
+            "monthly": 0,
+            "annualReturnPercent": 11.9,
+            "deposits": [],
+            "nametag": "",
+            "icon": null,
+            "returnSource": "history",
+            "yearlyReturns": [
+              {
+                "year": 2020,
+                "percent": 5.4
+              },
+              {
+                "year": 2021,
+                "percent": 28.6
+              },
+              {
+                "year": 2022,
+                "percent": -13.5
+              },
+              {
+                "year": 2023,
+                "percent": 18.2
+              },
+              {
+                "year": 2024,
+                "percent": 24.4
+              },
+              {
+                "year": 2025,
+                "percent": 9.2
+              }
+            ],
+            "historyYears": 7
+          },
+          {
+            "id": "d1dba117-be5e-4001-9241-e121ded6a38e",
+            "symbol": "IWDA.AS",
+            "kind": "etf",
+            "initial": 1200,
+            "shares": 4,
+            "quote": {
+              "price": 122.71,
+              "currency": "EUR",
+              "time": 1795192505000,
+              "rateToEur": 1
+            },
+            "manualValue": null,
+            "startDate": "2026-11-20",
+            "monthly": 0,
+            "annualReturnPercent": 11.3,
+            "deposits": [],
+            "nametag": "",
+            "icon": null,
+            "returnSource": "history",
+            "yearlyReturns": [
+              {
+                "year": 2017,
+                "percent": 7.5
+              },
+              {
+                "year": 2018,
+                "percent": -4.2
+              },
+              {
+                "year": 2019,
+                "percent": 29.6
+              },
+              {
+                "year": 2020,
+                "percent": 6.2
+              },
+              {
+                "year": 2021,
+                "percent": 32.5
+              },
+              {
+                "year": 2022,
+                "percent": -13.5
+              },
+              {
+                "year": 2023,
+                "percent": 19.9
+              },
+              {
+                "year": 2024,
+                "percent": 27.2
+              },
+              {
+                "year": 2025,
+                "percent": 7.1
+              }
+            ],
+            "historyYears": 9,
+            "name": "iShares Core MSCI World"
+          }
+        ],
+        "savings": []
       }
     },
     {

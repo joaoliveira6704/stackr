@@ -195,6 +195,15 @@
 	}
 }
 
+/* A secondary button that turns green while aria-pressed is true. */
+@utility btn-toggle {
+	&[aria-pressed="true"] {
+		border-color: var(--color-brand);
+		background-color: var(--color-brand);
+		color: var(--color-on-brand);
+	}
+}
+
 /* A quiet text button, used for navigation links. */
 @utility btn-ghost {
 	@apply btn;
@@ -365,6 +374,11 @@
 	&:focus {
 		border-color: var(--color-brand);
 		background-color: var(--glass-strong);
+	}
+	/* A see-through list would leave its options unreadable in some browsers. */
+	& option {
+		background-color: var(--surface);
+		color: var(--ink);
 	}
 }
 
