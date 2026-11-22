@@ -1,16 +1,11 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-const props = withDefaults(
-	defineProps<{
-		value: number;
-		max: number;
-		label: string;
-		/** The background class of the filled part, written out in full for Tailwind. */
-		fillClass?: string;
-	}>(),
-	{ fillClass: "bg-brand" },
-);
+const props = defineProps<{
+	value: number;
+	max: number;
+	label: string;
+}>();
 
 // Anything above a goal of zero has already passed it, so the bar is full.
 const percent = computed(() => {
@@ -29,8 +24,7 @@ const percent = computed(() => {
 		class="h-1.5 w-full overflow-hidden rounded-full bg-ink/10"
 	>
 		<div
-			class="h-full rounded-full transition-[width,background-color] duration-500 ease-out"
-			:class="fillClass"
+			class="h-full rounded-full bg-brand transition-[width,background-color] duration-500 ease-out"
 			:style="{ width: `${percent}%` }"
 		/>
 	</div>

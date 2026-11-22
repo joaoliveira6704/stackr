@@ -1,8 +1,13 @@
-import { flushPromises, type VueWrapper } from "@vue/test-utils";
+import {
+	enableAutoUnmount,
+	flushPromises,
+	type VueWrapper,
+} from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, h } from "vue";
 import { RouterView } from "vue-router";
 import { dateKey } from "../lib/budget";
+import { AUTO_SAVE_DELAY_MS } from "../lib/use-saved-plan";
 import {
 	demoUser,
 	fakeAppApi,
@@ -17,8 +22,24 @@ const today = dateKey(new Date());
 const savedBudget = {
 	salary: 1500,
 	categories: [
-		{ id: "home", name: "Home", description: "", group: "needs", planned: 600 },
-		{ id: "fun", name: "Fun", description: "", group: "wants", planned: 200 },
+		{
+			id: "home",
+			name: "Home",
+			description: "",
+			group: "needs",
+			planned: 600,
+			recurrence: "monthly",
+			dueDate: today,
+		},
+		{
+			id: "fun",
+			name: "Fun",
+			description: "",
+			group: "wants",
+			planned: 200,
+			recurrence: "monthly",
+			dueDate: today,
+		},
 	],
 	expenses: [
 		{
@@ -31,12 +52,16 @@ const savedBudget = {
 	],
 };
 
+// An open page keeps its auto save timer, which must not fire into the next test.
+enableAutoUnmount(afterEach);
+
 beforeEach(() => {
 	storeSessionFor(demoUser);
 });
 
 afterEach(() => {
 	localStorage.clear();
+	vi.useRealTimers();
 	vi.unstubAllGlobals();
 });
 
@@ -71,15 +96,32 @@ async function pressLabelled(wrapper: VueWrapper, label: string) {
 	await flushPromises();
 }
 
-async function logExpense(
-	wrapper: VueWrapper,
-	amount: string,
-	description = "",
-) {
-	const form = wrapper.get("form");
-	await form.get('input[type="number"]').setValue(amount);
-	await form.get('input[type="text"]').setValue(description);
-	await form.trigger("submit");
+function card(wrapper: VueWrapper, name: string) {
+	const found = wrapper
+		.findAll("article")
+		.find((article) => article.get("h3").text() === name);
+	if (!found) throw new Error(`No card called "${name}"`);
+	return found;
+}
+
+async function typePaid(wrapper: VueWrapper, name: string, amount: string) {
+	await card(wrapper, name)
+		.get('button[aria-label^="Edit the amount paid"]')
+		.trigger("click");
+	await flushPromises();
+	const input = card(wrapper, name).get('input[type="number"]');
+	await input.setValue(amount);
+	await input.trigger("keydown", { key: "Enter" });
+	await flushPromises();
+}
+
+// Only the timers are faked, so promises and flushPromises keep working.
+function holdAutoSave() {
+	vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+}
+
+async function waitForAutoSave() {
+	await vi.advanceTimersByTimeAsync(AUTO_SAVE_DELAY_MS);
 	await flushPromises();
 }
 
@@ -93,7 +135,13 @@ function categoryDialog(wrapper: VueWrapper) {
 
 async function fillCategoryDialog(
 	wrapper: VueWrapper,
-	fields: { name?: string; description?: string; planned?: string },
+	fields: {
+		name?: string;
+		description?: string;
+		planned?: string;
+		recurrence?: string;
+		dueDate?: string;
+	},
 ) {
 	const dialog = categoryDialog(wrapper);
 	const [name, description] = dialog.findAll('input[type="text"]');
@@ -104,19 +152,18 @@ async function fillCategoryDialog(
 	if (fields.planned !== undefined) {
 		await dialog.get('input[type="number"]').setValue(fields.planned);
 	}
+	if (fields.recurrence !== undefined) {
+		await dialog.findAll("select")[1].setValue(fields.recurrence);
+	}
+	await dialog
+		.get('input[type="date"]')
+		.setValue(fields.dueDate ?? "2030-01-15");
 	await dialog.get("form").trigger("submit");
 	await flushPromises();
 }
 
 function spendingStatus(wrapper: VueWrapper, name: string) {
-	const card = wrapper
-		.findAll("article")
-		.find((article) => article.get("h3").text() === name);
-	if (!card) throw new Error(`No card called "${name}"`);
-	return {
-		text: card.get("span.font-semibold").text(),
-		bar: card.get('[role="progressbar"] > div').classes(),
-	};
+	return card(wrapper, name).get("span.font-semibold").text();
 }
 
 describe("BudgetView", () => {
@@ -127,9 +174,6 @@ describe("BudgetView", () => {
 		expect(categoryTitles(wrapper)).toEqual([]);
 		expect(wrapper.text()).toContain("You have no expenses yet.");
 		expect(wrapper.text()).toContain(
-			"Add an expense first to log what you spend.",
-		);
-		expect(wrapper.text()).toContain(
 			"Type in your salary to compare your plan",
 		);
 	});
@@ -138,8 +182,8 @@ describe("BudgetView", () => {
 		fakeAppApi();
 		const { wrapper } = await mountBudget();
 
-		await click(wrapper, "Add expense");
-		expect(categoryDialog(wrapper).text()).toContain("New expense");
+		await click(wrapper, "New record");
+		expect(categoryDialog(wrapper).text()).toContain("New record");
 
 		await fillCategoryDialog(wrapper, {
 			name: "Gym",
@@ -150,14 +194,16 @@ describe("BudgetView", () => {
 		expect(categoryDialog(wrapper).exists()).toBe(false);
 		expect(categoryTitles(wrapper)).toEqual(["Gym"]);
 		expect(wrapper.text()).toContain("Monthly fee at the club");
-		expect(wrapper.text()).toContain("Needs · €35.00 a month");
+		expect(wrapper.text()).toContain("Needs");
+		expect(wrapper.text()).toContain("€35.00 · Monthly");
+		expect(wrapper.text()).toContain("Due Jan 15, 2030");
 	});
 
 	it("keeps the dialog open and explains a missing name", async () => {
 		fakeAppApi();
 		const { wrapper } = await mountBudget();
 
-		await click(wrapper, "Add expense");
+		await click(wrapper, "New record");
 		await fillCategoryDialog(wrapper, { name: "  ", planned: "35" });
 
 		expect(categoryDialog(wrapper).text()).toContain(
@@ -170,7 +216,7 @@ describe("BudgetView", () => {
 		fakeAppApi();
 		const { wrapper } = await mountBudget();
 
-		await click(wrapper, "Add expense");
+		await click(wrapper, "New record");
 		await categoryDialog(wrapper).get('input[type="text"]').setValue("Gym");
 		await click(wrapper, "Cancel");
 
@@ -182,7 +228,7 @@ describe("BudgetView", () => {
 		fakeAppApi();
 		const { wrapper } = await mountBudget();
 
-		await click(wrapper, "Add expense");
+		await click(wrapper, "New record");
 		await categoryDialog(wrapper).trigger("keydown", { key: "Escape" });
 
 		expect(categoryDialog(wrapper).exists()).toBe(false);
@@ -217,38 +263,184 @@ describe("BudgetView", () => {
 		expect(categoryTitles(wrapper)).toEqual(["Home", "Fun"]);
 	});
 
-	it("keeps the bar and its text green while there is room left", async () => {
+	it("has no separate form to log spending", async () => {
 		fakeAppApi({ budget: savedBudget });
 		const { wrapper } = await mountBudget();
 
-		expect(spendingStatus(wrapper, "Home")).toEqual({
-			text: "€550.00 left",
-			bar: expect.arrayContaining(["bg-brand"]),
+		expect(wrapper.text()).not.toContain("Log spending");
+		expect(wrapper.findAll("form")).toHaveLength(0);
+	});
+
+	it("shows what is already paid inside the card", async () => {
+		fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountBudget();
+
+		const slider = card(wrapper, "Home").get('input[type="range"]');
+		expect((slider.element as HTMLInputElement).value).toBe("50");
+		expect(card(wrapper, "Home").text()).toContain("€50.00");
+		expect(spendingStatus(wrapper, "Home")).toBe("€550.00 to pay");
+	});
+
+	it("updates the amount when the slider is dragged", async () => {
+		fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountBudget();
+
+		await card(wrapper, "Fun").get('input[type="range"]').setValue("120");
+
+		expect(spendingStatus(wrapper, "Fun")).toBe("€80.00 to pay");
+	});
+
+	it("keeps the amount when typing is cancelled with Escape", async () => {
+		fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountBudget();
+
+		await card(wrapper, "Home")
+			.get('button[aria-label^="Edit the amount paid"]')
+			.trigger("click");
+		await flushPromises();
+		const input = card(wrapper, "Home").get('input[type="number"]');
+		await input.setValue("400");
+		await input.trigger("keydown", { key: "Escape" });
+		await flushPromises();
+
+		expect(spendingStatus(wrapper, "Home")).toBe("€550.00 to pay");
+	});
+
+	it("asks for a date on a recurring expense and adds nothing", async () => {
+		fakeAppApi();
+		const { wrapper } = await mountBudget();
+
+		await click(wrapper, "New record");
+		await fillCategoryDialog(wrapper, {
+			name: "Gym",
+			planned: "35",
+			dueDate: "",
 		});
-	});
 
-	it("turns the bar and its text orange close to the end of the plan", async () => {
-		fakeAppApi({ budget: savedBudget });
-		const { wrapper } = await mountBudget();
-
-		await logExpense(wrapper, "400");
-
-		const status = spendingStatus(wrapper, "Home");
-		expect(status.bar).toContain("bg-tangerine");
-		expect(wrapper.find("article .text-tangerine-strong").text()).toBe(
-			"€150.00 left",
+		expect(categoryDialog(wrapper).text()).toContain(
+			"Pick the due date for this expense.",
 		);
+		expect(categoryTitles(wrapper)).toEqual([]);
 	});
 
-	it("says paid off in red once the whole plan is spent", async () => {
+	it("lets a one time expense go without a date", async () => {
+		fakeAppApi();
+		const { wrapper } = await mountBudget();
+
+		await click(wrapper, "New record");
+		await fillCategoryDialog(wrapper, {
+			name: "Repair",
+			planned: "35",
+			recurrence: "once",
+			dueDate: "",
+		});
+
+		expect(categoryTitles(wrapper)).toEqual(["Repair"]);
+		expect(wrapper.text()).toContain("€35.00 · One time");
+	});
+
+	it("offers a small tile to add the first record", async () => {
+		fakeAppApi();
+		const { wrapper } = await mountBudget();
+
+		const add = buttonWithText(wrapper, "New record");
+		expect(add.classes()).toContain("glass");
+		expect(add.classes()).not.toContain("btn-primary");
+	});
+
+	it("moves the add button next to the title once there is a card", async () => {
 		fakeAppApi({ budget: savedBudget });
 		const { wrapper } = await mountBudget();
 
-		await logExpense(wrapper, "550");
+		const add = buttonWithText(wrapper, "New record");
+		expect(add.classes()).toContain("btn-primary");
+		expect(add.element.parentElement?.querySelector("h2")?.textContent).toBe(
+			"Spending this month",
+		);
+		expect(
+			wrapper.findAll("button").filter((b) => b.text().includes("New record")),
+		).toHaveLength(1);
+	});
 
-		expect(spendingStatus(wrapper, "Home").text).toBe("Paid off");
-		expect(spendingStatus(wrapper, "Home").bar).toContain("bg-cherry");
-		expect(wrapper.find("article .text-cherry-strong").text()).toBe("Paid off");
+	it("does not offer savings as a type of expense", async () => {
+		fakeAppApi();
+		const { wrapper } = await mountBudget();
+
+		await click(wrapper, "New record");
+
+		const types = categoryDialog(wrapper).findAll("select")[0];
+		expect(types.text()).toContain("Needs");
+		expect(types.text()).not.toContain("Savings");
+	});
+
+	it("moves the progress as a bill is paid little by little", async () => {
+		fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountBudget();
+
+		await typePaid(wrapper, "Home", "150");
+		expect(spendingStatus(wrapper, "Home")).toBe("€450.00 to pay");
+
+		await typePaid(wrapper, "Home", "400.5");
+		expect(spendingStatus(wrapper, "Home")).toBe("€199.50 to pay");
+		expect(wrapper.text()).toContain("Out of €800.00 planned€400.50");
+	});
+
+	it("says paid off once the whole bill is paid", async () => {
+		fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountBudget();
+
+		await typePaid(wrapper, "Home", "600");
+
+		expect(spendingStatus(wrapper, "Home")).toBe("Paid off");
+	});
+
+	it("says by how much a bill was paid above its plan", async () => {
+		fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountBudget();
+
+		await typePaid(wrapper, "Home", "650");
+
+		expect(spendingStatus(wrapper, "Home")).toBe("Over by €50.00");
+	});
+
+	it("counts a cleared field as nothing paid", async () => {
+		fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountBudget();
+
+		await typePaid(wrapper, "Home", "");
+
+		expect(spendingStatus(wrapper, "Home")).toBe("€600.00 to pay");
+		expect(wrapper.text()).not.toContain("Total paid");
+	});
+
+	it("explains a negative amount and keeps what was paid", async () => {
+		fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountBudget();
+
+		await typePaid(wrapper, "Home", "-10");
+
+		expect(card(wrapper, "Home").get('[role="alert"]').text()).toBe(
+			"The amount paid cannot be negative.",
+		);
+		expect(spendingStatus(wrapper, "Home")).toBe("€550.00 to pay");
+	});
+
+	it("saves the amount paid on the user", async () => {
+		const { saved } = fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountBudget();
+		holdAutoSave();
+
+		await typePaid(wrapper, "Home", "300");
+		await waitForAutoSave();
+
+		expect(saved).toEqual([
+			{
+				budget: {
+					...savedBudget,
+					expenses: [{ ...savedBudget.expenses[0], amount: 300 }],
+				},
+			},
+		]);
 	});
 
 	it("turns the monthly plan into a yearly estimate", async () => {
@@ -324,41 +516,6 @@ describe("BudgetView", () => {
 		expect(wrapper.text()).not.toContain("Yearly income");
 	});
 
-	it("logs an expense and counts it against its category", async () => {
-		fakeAppApi({ budget: savedBudget });
-		const { wrapper } = await mountBudget();
-
-		await logExpense(wrapper, "25.5", "Groceries run");
-
-		expect(wrapper.text()).toContain("Groceries run");
-		expect(wrapper.text()).toContain("€75.50 of €600.00 this month");
-		expect(wrapper.text()).toContain("Out of €800.00 planned€75.50");
-	});
-
-	it("explains an expense without an amount and logs nothing", async () => {
-		fakeAppApi({ budget: savedBudget });
-		const { wrapper } = await mountBudget();
-
-		await logExpense(wrapper, "0");
-
-		expect(wrapper.text()).toContain(
-			"Type an amount above zero for what you spent.",
-		);
-		expect(wrapper.text()).toContain("Out of €800.00 planned€50.00");
-	});
-
-	it("says in red by how much a card went over its plan", async () => {
-		fakeAppApi({ budget: savedBudget });
-		const { wrapper } = await mountBudget();
-
-		await logExpense(wrapper, "600", "Repairs");
-
-		expect(spendingStatus(wrapper, "Home")).toEqual({
-			text: "Over by €50.00",
-			bar: expect.arrayContaining(["bg-cherry"]),
-		});
-	});
-
 	it("says liquidada and excedida in Portuguese", async () => {
 		fakeAppApi({
 			budget: {
@@ -383,40 +540,9 @@ describe("BudgetView", () => {
 		});
 		const { wrapper } = await mountBudget("pt-PT");
 
-		expect(spendingStatus(wrapper, "Home").text).toBe("Liquidada");
+		expect(spendingStatus(wrapper, "Home")).toBe("Liquidada");
 		// The Portuguese format puts a no break space before the euro sign.
-		expect(spendingStatus(wrapper, "Fun").text).toMatch(
-			/^Excedida em 300,00\s€$/,
-		);
-	});
-
-	it("keeps an expense when the user cancels deleting it", async () => {
-		fakeAppApi({ budget: savedBudget });
-		const { wrapper } = await mountBudget();
-
-		await pressLabelled(wrapper, "Delete Rent of €50.00");
-		expect(wrapper.text()).toContain("Delete this spending?");
-		expect(wrapper.text()).toContain(
-			"Rent of €50.00 stops counting in your budget.",
-		);
-
-		await answerConfirmDialog(wrapper, "cancel");
-
-		expect(wrapper.text()).toContain("Out of €800.00 planned€50.00");
-	});
-
-	it("deletes an expense only once confirmed", async () => {
-		fakeAppApi({ budget: savedBudget });
-		const { wrapper } = await mountBudget();
-
-		await pressLabelled(wrapper, "Delete Rent of €50.00");
-		expect(wrapper.text()).toContain("Out of €800.00 planned€50.00");
-
-		await answerConfirmDialog(wrapper, "confirm");
-
-		expect(wrapper.text()).toContain(
-			"You have not logged any spending this month.",
-		);
+		expect(spendingStatus(wrapper, "Fun")).toMatch(/^Excedida em 300,00\s€$/);
 	});
 
 	it("keeps a category when the user cancels removing it", async () => {
@@ -431,7 +557,7 @@ describe("BudgetView", () => {
 		await answerConfirmDialog(wrapper, "cancel");
 
 		expect(categoryTitles(wrapper)).toEqual(["Home", "Fun"]);
-		expect(wrapper.text()).toContain("Rent");
+		expect(wrapper.text()).toContain("Total paid");
 	});
 
 	it("removes a category and its expenses only once confirmed", async () => {
@@ -444,20 +570,100 @@ describe("BudgetView", () => {
 		await answerConfirmDialog(wrapper, "confirm");
 
 		expect(categoryTitles(wrapper)).toEqual(["Fun"]);
-		expect(wrapper.text()).toContain(
-			"You have not logged any spending this month.",
-		);
+		expect(wrapper.text()).not.toContain("Total paid");
 	});
 
-	it("saves the budget on the user", async () => {
+	it("saves a change by itself and says so", async () => {
 		const { saved } = fakeAppApi({ budget: savedBudget });
 		const { wrapper } = await mountBudget();
+		holdAutoSave();
 
 		await wrapper.get('input[type="number"]').setValue("1800");
-		await click(wrapper, "Save budget");
+		expect(wrapper.text()).toContain("Saving...");
+		await waitForAutoSave();
 
 		expect(saved).toEqual([{ budget: { ...savedBudget, salary: 1800 } }]);
 		expect(wrapper.text()).toContain("Budget saved.");
+	});
+
+	it("saves a new record without a save button", async () => {
+		const { saved } = fakeAppApi();
+		const { wrapper } = await mountBudget();
+		holdAutoSave();
+
+		await click(wrapper, "New record");
+		await fillCategoryDialog(wrapper, { name: "Gym", planned: "35" });
+		await waitForAutoSave();
+
+		expect(wrapper.text()).not.toContain("Save budget");
+		expect(saved).toHaveLength(1);
+		expect(saved[0]).toMatchObject({
+			budget: { categories: [{ name: "Gym", planned: 35 }] },
+		});
+	});
+
+	it("sends one save for a burst of quick changes", async () => {
+		const { saved } = fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountBudget();
+		holdAutoSave();
+		const slider = card(wrapper, "Home").get('input[type="range"]');
+
+		await slider.setValue("100");
+		await slider.setValue("200");
+		await slider.setValue("300");
+		await waitForAutoSave();
+
+		expect(saved).toHaveLength(1);
+	});
+
+	it("saves nothing right after loading", async () => {
+		const { saved } = fakeAppApi({ budget: savedBudget });
+		holdAutoSave();
+		await mountBudget();
+		await waitForAutoSave();
+
+		expect(saved).toEqual([]);
+	});
+
+	it("does not store an invalid salary", async () => {
+		const { saved } = fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountBudget();
+		holdAutoSave();
+
+		await wrapper.get('input[type="number"]').setValue("");
+		await waitForAutoSave();
+
+		expect(saved).toEqual([]);
+		expect(wrapper.text()).toContain("You have unsaved changes");
+	});
+
+	it("explains a failed save and saves again on retry", async () => {
+		const { fetchMock, saved } = fakeAppApi({ budget: savedBudget });
+		const { wrapper } = await mountBudget();
+		holdAutoSave();
+		fetchMock.mockImplementationOnce(async () => jsonResponse({}, 500));
+
+		await wrapper.get('input[type="number"]').setValue("1800");
+		await waitForAutoSave();
+		expect(wrapper.text()).toContain("Could not save your budget");
+
+		await click(wrapper, "Try again");
+
+		expect(saved).toEqual([{ budget: { ...savedBudget, salary: 1800 } }]);
+		expect(wrapper.text()).toContain("Budget saved.");
+	});
+
+	it("saves a pending change when leaving, without asking", async () => {
+		const { saved } = fakeAppApi({ budget: savedBudget });
+		const { wrapper, router } = await mountBudget("en", true);
+		holdAutoSave();
+
+		await wrapper.get('input[type="number"]').setValue("1800");
+		await router.push("/dashboard");
+		await flushPromises();
+
+		expect(saved).toEqual([{ budget: { ...savedBudget, salary: 1800 } }]);
+		expect(router.currentRoute.value.path).toBe("/dashboard");
 	});
 
 	it("explains a failed load and loads again on retry", async () => {
@@ -472,11 +678,11 @@ describe("BudgetView", () => {
 		expect(categoryTitles(wrapper)).toEqual(["Home", "Fun"]);
 	});
 
-	it("asks before leaving with unsaved changes and stays when cancelled", async () => {
+	it("asks before leaving with a value it cannot save and stays when cancelled", async () => {
 		fakeAppApi({ budget: savedBudget });
 		const { wrapper, router } = await mountBudget("en", true);
 
-		await wrapper.get('input[type="number"]').setValue("1800");
+		await wrapper.get('input[type="number"]').setValue("");
 		void router.push("/dashboard");
 		await flushPromises();
 		expect(wrapper.text()).toContain("Leave without saving?");
@@ -502,6 +708,7 @@ describe("BudgetView", () => {
 		expect(wrapper.text()).toContain("Regra 50/30/20");
 		expect(wrapper.text()).toContain("Poupança estimada");
 		expect(wrapper.text()).toContain("Gastos deste mês");
-		expect(wrapper.text()).toContain("Despesas");
+		expect(wrapper.text()).toContain("Já pago");
+		expect(wrapper.text()).toContain("Faltam");
 	});
 });

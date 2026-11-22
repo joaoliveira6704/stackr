@@ -4,12 +4,11 @@ import {
 	type Budget,
 	type BudgetCategory,
 	checkedCategory,
-	checkedExpense,
-	type Expense,
 	emptyBudget,
 	loadBudget,
 	MAX_CATEGORIES,
 	saveBudget,
+	withPaidAmount,
 } from "../lib/budget";
 import { AppError } from "../lib/errors";
 import { useSavedSnapshot } from "../lib/saved-snapshot";
@@ -29,8 +28,10 @@ export const useBudgetStore = defineStore("budget", () => {
 	}
 
 	async function save(): Promise<void> {
-		await saveBudget(budget.value);
-		markSaved();
+		// The user can keep editing during the request, and those edits are not saved yet.
+		const sent = JSON.stringify(budget.value);
+		await saveBudget(JSON.parse(sent));
+		markSaved(sent);
 	}
 
 	function addCategory(category: NewCategory): BudgetCategory {
@@ -56,18 +57,17 @@ export const useBudgetStore = defineStore("budget", () => {
 		);
 	}
 
-	function addExpense(expense: Omit<Expense, "id">): Expense {
-		if (!budget.value.categories.some(({ id }) => id === expense.categoryId)) {
-			throw new AppError("categoryMissing");
-		}
-		const logged = { id: crypto.randomUUID(), ...checkedExpense(expense) };
-		budget.value.expenses.push(logged);
-		return logged;
-	}
-
-	function removeExpense(id: string): void {
-		budget.value.expenses = budget.value.expenses.filter(
-			(expense) => expense.id !== id,
+	/** Sets how much of a bill is paid in its cycle around `today`. */
+	function setPaid(categoryId: string, paid: number, today: string): void {
+		const category = budget.value.categories.find(
+			({ id }) => id === categoryId,
+		);
+		if (!category) throw new AppError("categoryMissing");
+		budget.value.expenses = withPaidAmount(
+			budget.value.expenses,
+			category,
+			paid,
+			today,
 		);
 	}
 
@@ -80,7 +80,6 @@ export const useBudgetStore = defineStore("budget", () => {
 		addCategory,
 		updateCategory,
 		removeCategory,
-		addExpense,
-		removeExpense,
+		setPaid,
 	};
 });

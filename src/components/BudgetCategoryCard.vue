@@ -1,37 +1,64 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { type BudgetCategory, spendingProgress } from "../lib/budget";
+import {
+	type BudgetCategory,
+	billCycle,
+	dateFromKey,
+	spendingProgress,
+} from "../lib/budget";
+import { type ErrorCode, errorCode } from "../lib/errors";
+import { useBudgetStore } from "../stores/budget";
 import AppIcon from "./AppIcon.vue";
 import { BUDGET_GROUP_ICONS } from "./icons";
-import ProgressBar from "./ProgressBar.vue";
-import { BUDGET_GROUP_TONES, SPENDING_LEVEL_CLASSES, TONE_CLASSES } from "./tones";
+import PaymentSlider from "./PaymentSlider.vue";
+import { BUDGET_GROUP_TONES, paymentColours, TONE_CLASSES } from "./tones";
 
-const props = defineProps<{ category: BudgetCategory; spent: number }>();
+const props = defineProps<{
+	category: BudgetCategory;
+	spent: number;
+	/** The current day as YYYY-MM-DD, which decides the cycle being paid. */
+	today: string;
+}>();
 defineEmits<{ edit: []; remove: [] }>();
-const { t, n } = useI18n();
+const store = useBudgetStore();
+const { t, n, d } = useI18n();
+
+const paidError = ref<ErrorCode | null>(null);
 
 const progress = computed(() => spendingProgress(props.spent, props.category.planned));
-const colours = computed(() => SPENDING_LEVEL_CLASSES[progress.value.level]);
+const colours = computed(() => paymentColours(progress.value));
 const status = computed(() =>
 	t(`budget.category.status.${progress.value.state}`, {
 		amount: n(Math.abs(progress.value.remaining), "currency"),
 	}),
 );
+const dueDate = computed(() => billCycle(props.category, props.today).dueDate);
+const isOverdue = computed(
+	() => progress.value.state === "left" && !!dueDate.value && dueDate.value < props.today,
+);
+const dueLabel = computed(() =>
+	t(`budget.category.${isOverdue.value ? "overdue" : "due"}`, {
+		date: d(dateFromKey(dueDate.value), "dayMonthYear"),
+	}),
+);
+
+function updatePaid(amount: number) {
+	paidError.value = null;
+	try {
+		store.setPaid(props.category.id, amount, props.today);
+	} catch (cause) {
+		paidError.value = errorCode(cause);
+	}
+}
 </script>
 
 <template>
 	<article class="card flex flex-col gap-4">
-		<header class="flex items-start gap-3">
+		<header class="flex items-start justify-between gap-2">
 			<span class="icon-tile" :class="TONE_CLASSES[BUDGET_GROUP_TONES[category.group]]">
 				<AppIcon :name="BUDGET_GROUP_ICONS[category.group]" />
 			</span>
-			<div class="min-w-0 flex-1">
-				<h3 class="truncate text-subheading">{{ category.name }}</h3>
-				<p class="text-sm text-ink-muted">
-					{{ t("budget.category.summary", { group: t(`budget.groups.${category.group}`), planned: n(category.planned, "currency") }) }}
-				</p>
-			</div>
 			<div class="flex gap-2">
 				<button
 					type="button"
@@ -52,21 +79,36 @@ const status = computed(() =>
 			</div>
 		</header>
 
-		<p v-if="category.description" class="text-ink-muted">{{ category.description }}</p>
+		<div class="flex min-w-0 flex-col gap-1">
+			<h3 class="truncate text-subheading">{{ category.name }}</h3>
+			<p class="text-sm text-ink-muted">{{ t(`budget.groups.${category.group}`) }}</p>
+			<p class="text-sm font-semibold tabular-nums">
+				{{ t("budget.category.summary", { planned: n(category.planned, "currency"), recurrence: t(`budget.category.recurrences.${category.recurrence}`) }) }}
+			</p>
+			<p
+				v-if="dueDate"
+				class="flex items-center gap-1 text-sm"
+				:class="isOverdue ? 'font-semibold text-cherry-strong' : 'text-ink-muted'"
+			>
+				<AppIcon name="calendar" :size="14" />
+				{{ dueLabel }}
+			</p>
+		</div>
+
+		<p v-if="category.description" class="text-sm text-ink-muted">{{ category.description }}</p>
 
 		<div class="mt-auto flex flex-col gap-2">
-			<div class="flex flex-wrap items-baseline justify-between gap-2 text-sm">
-				<span class="text-ink-muted tabular-nums">
-					{{ t("budget.category.spent", { spent: n(spent, "currency"), planned: n(category.planned, "currency") }) }}
-				</span>
-				<span class="font-semibold tabular-nums" :class="colours.text">{{ status }}</span>
-			</div>
-			<ProgressBar
-				:value="spent"
-				:max="category.planned"
-				:fill-class="colours.bar"
-				:label="t('budget.category.spentLabel', { name: category.name })"
+			<PaymentSlider
+				:name="category.name"
+				:paid="spent"
+				:planned="category.planned"
+				:colours="colours"
+				:status="status"
+				@change="updatePaid"
 			/>
+			<p v-if="paidError" class="text-sm font-semibold text-tangerine-strong" role="alert">
+				{{ t(`errors.${paidError}`) }}
+			</p>
 		</div>
 	</article>
 </template>

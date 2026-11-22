@@ -52,6 +52,7 @@ export type NumberFormatKey = keyof typeof NUMBER_FORMATS;
 // Dates go through d(), such as d(date, "dayMonth"), so they follow the language.
 const DATETIME_FORMATS = {
 	dayMonth: { day: "numeric", month: "short" },
+	dayMonthYear: { day: "numeric", month: "short", year: "numeric" },
 } as const;
 
 export function createAppI18n(locale: Locale = getSavedLocale()) {

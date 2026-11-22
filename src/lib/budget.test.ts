@@ -3,24 +3,24 @@ import { demoUser, fakeAppApi, storeSessionFor } from "../test/fake-api";
 import {
 	type Budget,
 	type BudgetCategory,
+	billCycle,
 	checkedCategory,
-	checkedExpense,
 	checkRule,
 	dateFromKey,
 	dateKey,
 	type Expense,
 	emptyBudget,
 	estimateYear,
-	expensesInMonth,
 	loadBudget,
 	MAX_CATEGORIES,
 	monthKey,
+	paidByCategory,
 	parseBudget,
+	paymentStep,
 	planMonth,
 	saveBudget,
 	spendingProgress,
-	spentByCategory,
-	totalSpent,
+	withPaidAmount,
 } from "./budget";
 import { AppError } from "./errors";
 
@@ -34,7 +34,15 @@ function category(
 	group: BudgetCategory["group"],
 	planned: number,
 ): BudgetCategory {
-	return { id, name: id, description: "", group, planned };
+	return {
+		id,
+		name: id,
+		description: "",
+		group,
+		planned,
+		recurrence: "monthly",
+		dueDate: "",
+	};
 }
 
 function expense(
@@ -100,7 +108,15 @@ describe("parseBudget", () => {
 		});
 		expect(parsed.salary).toBe(0);
 		expect(parsed.categories).toEqual([
-			{ id: "home", name: "Home", description: "", group: "needs", planned: 0 },
+			{
+				id: "home",
+				name: "Home",
+				description: "",
+				group: "needs",
+				planned: 0,
+				recurrence: "monthly",
+				dueDate: "",
+			},
 		]);
 		expect(parsed.expenses).toEqual([]);
 	});
@@ -116,6 +132,16 @@ describe("parseBudget", () => {
 			"Mensalidade",
 			"",
 		]);
+	});
+
+	it("keeps an old bill without a date as monthly", () => {
+		const parsed = parseBudget({
+			categories: [{ id: "old", name: "Old", group: "needs", planned: 10 }],
+		});
+		expect(parsed.categories[0]).toMatchObject({
+			recurrence: "monthly",
+			dueDate: "",
+		});
 	});
 
 	it("keeps no more than the maximum number of categories", () => {
@@ -320,60 +346,198 @@ describe("checkRule", () => {
 	});
 });
 
-describe("checkedExpense", () => {
-	const valid = {
-		categoryId: "home",
-		amount: 12.345,
-		description: "  Bread  ",
-		date: "2026-11-19",
-	};
+describe("withPaidAmount", () => {
+	const today = "2026-11-22";
+	const home = category("home", "needs", 500);
 
-	it("rounds the amount to whole cents and trims the description", () => {
-		expect(checkedExpense(valid)).toEqual({
-			...valid,
-			amount: 12.35,
-			description: "Bread",
+	it("creates the first payment of the month", () => {
+		const [paid] = withPaidAmount([], home, 100, today);
+
+		expect(paid).toMatchObject({
+			categoryId: "home",
+			amount: 100,
+			date: today,
 		});
 	});
 
-	it("refuses zero, negative and missing amounts", () => {
-		for (const amount of [0, 0.001, -5, Number.NaN]) {
-			expect(codeOf(() => checkedExpense({ ...valid, amount }))).toBe(
-				"invalidExpenseAmount",
+	it("updates the total and keeps the same payment", () => {
+		const saved = [expense("e1", "home", 100, "2026-11-02")];
+
+		expect(withPaidAmount(saved, home, 250, today)).toEqual([
+			{ ...saved[0], amount: 250 },
+		]);
+	});
+
+	it("joins several payments of the month into one total", () => {
+		const saved = [
+			expense("e1", "home", 100, "2026-11-02"),
+			expense("e2", "home", 50, "2026-11-10"),
+		];
+
+		expect(withPaidAmount(saved, home, 175, today)).toEqual([
+			{ ...saved[0], amount: 175 },
+		]);
+	});
+
+	it("leaves other categories and other months alone", () => {
+		const food = expense("food", "food", 20, "2026-11-03");
+		const october = expense("old", "home", 99, "2026-10-31");
+
+		const result = withPaidAmount([food, october], home, 10, today);
+
+		expect(result.slice(0, 2)).toEqual([food, october]);
+	});
+
+	it("clears the month when the total is zero", () => {
+		const october = expense("old", "home", 99, "2026-10-31");
+		const saved = [october, expense("e1", "home", 100, "2026-11-02")];
+
+		expect(withPaidAmount(saved, home, 0, today)).toEqual([october]);
+	});
+
+	it("treats less than half a cent as nothing paid", () => {
+		expect(withPaidAmount([], home, 0.004, today)).toEqual([]);
+	});
+
+	it("rounds the total to whole cents", () => {
+		expect(withPaidAmount([], home, 12.345, today)[0].amount).toBe(12.35);
+	});
+
+	it("keeps a large total exact to the cent", () => {
+		expect(withPaidAmount([], home, 12_345_678.91, today)[0].amount).toBe(
+			12_345_678.91,
+		);
+	});
+
+	it("refuses negative and missing totals", () => {
+		for (const paid of [-0.01, Number.NaN, Number.POSITIVE_INFINITY]) {
+			expect(codeOf(() => withPaidAmount([], home, paid, today))).toBe(
+				"invalidPaidAmount",
 			);
 		}
 	});
+});
 
-	it("refuses an empty date", () => {
-		expect(codeOf(() => checkedExpense({ ...valid, date: "" }))).toBe(
-			"invalidExpenseDate",
+function bill(
+	recurrence: BudgetCategory["recurrence"],
+	dueDate: string,
+): BudgetCategory {
+	return { ...category("home", "needs", 100), recurrence, dueDate };
+}
+
+describe("billCycle", () => {
+	it("moves a monthly bill to its next deadline", () => {
+		expect(billCycle(bill("monthly", "2026-11-08"), "2026-11-22")).toEqual({
+			from: "2026-11-09",
+			to: "2026-12-08",
+			dueDate: "2026-12-08",
+		});
+	});
+
+	it("keeps the deadline day inside the cycle", () => {
+		const cycle = billCycle(bill("monthly", "2026-11-08"), "2026-12-08");
+		expect(cycle.dueDate).toBe("2026-12-08");
+	});
+
+	it("starts a new cycle on the day after the deadline", () => {
+		const cycle = billCycle(bill("monthly", "2026-11-08"), "2026-12-09");
+		expect(cycle.from).toBe("2026-12-09");
+		expect(cycle.dueDate).toBe("2027-01-08");
+	});
+
+	it("jumps three months for a quarterly bill", () => {
+		const cycle = billCycle(bill("quarterly", "2026-12-15"), "2027-01-02");
+		expect(cycle.dueDate).toBe("2027-03-15");
+	});
+
+	it("jumps a year for a yearly bill", () => {
+		const cycle = billCycle(bill("yearly", "2026-12-01"), "2027-06-10");
+		expect(cycle.dueDate).toBe("2027-12-01");
+	});
+
+	it("uses the last day of a shorter month", () => {
+		const monthly = bill("monthly", "2026-01-31");
+		expect(billCycle(monthly, "2026-02-10").dueDate).toBe("2026-02-28");
+		expect(billCycle(monthly, "2026-03-01").dueDate).toBe("2026-03-31");
+	});
+
+	it("waits for a first deadline in the future", () => {
+		expect(billCycle(bill("yearly", "2028-03-01"), "2026-11-22")).toMatchObject(
+			{ from: "0000-01-01", dueDate: "2028-03-01" },
 		);
+	});
+
+	it("keeps a one off bill on its own date after it passes", () => {
+		const cycle = billCycle(bill("once", "2026-11-01"), "2027-05-01");
+		expect(cycle.dueDate).toBe("2026-11-01");
 	});
 });
 
-describe("expenses in a month", () => {
-	const expenses = [
-		expense("a", "home", 10.1, "2026-11-02"),
-		expense("b", "home", 0.2, "2026-11-20"),
-		expense("c", "food", 5, "2026-11-05"),
-		expense("old", "home", 99, "2026-10-31"),
-	];
+describe("paidByCategory", () => {
+	const paidOn = (date: string, amount = 100) =>
+		expense("e1", "home", amount, date);
 
-	it("keeps only the month asked for, newest first", () => {
-		expect(
-			expensesInMonth(expenses, "2026-11").map((entry) => entry.id),
-		).toEqual(["b", "c", "a"]);
+	it("resets a recurring bill the day after its deadline", () => {
+		const budget = {
+			...budgetWith(0, [bill("monthly", "2026-11-08")]),
+			expenses: [paidOn("2026-11-05")],
+		};
+		expect(paidByCategory(budget, "2026-11-08").get("home")).toBe(100);
+		expect(paidByCategory(budget, "2026-11-09").get("home")).toBe(0);
 	});
 
-	it("adds up each category to whole cents", () => {
-		const spent = spentByCategory(expenses, "2026-11");
-		expect(spent.get("home")).toBe(10.3);
-		expect(spent.get("food")).toBe(5);
+	it("keeps a yearly payment across the months before its deadline", () => {
+		const budget = {
+			...budgetWith(0, [bill("yearly", "2026-12-01")]),
+			expenses: [paidOn("2026-03-10")],
+		};
+		expect(paidByCategory(budget, "2026-11-30").get("home")).toBe(100);
 	});
 
-	it("adds up the whole month", () => {
-		expect(totalSpent(expenses, "2026-11")).toBe(15.3);
-		expect(totalSpent(expenses, "2026-12")).toBe(0);
+	it("never resets a one off bill", () => {
+		const budget = {
+			...budgetWith(0, [bill("once", "2026-11-01")]),
+			expenses: [paidOn("2026-10-10")],
+		};
+		expect(paidByCategory(budget, "2027-05-01").get("home")).toBe(100);
+	});
+
+	it("adds up payments to whole cents", () => {
+		const budget = {
+			...budgetWith(0, [bill("once", "")]),
+			expenses: [paidOn("2026-11-01", 0.1), paidOn("2026-11-02", 0.2)],
+		};
+		expect(paidByCategory(budget, "2026-11-22").get("home")).toBe(0.3);
+	});
+});
+
+describe("recurring costs in the plan", () => {
+	const withBills = (...bills: BudgetCategory[]) =>
+		planMonth(budgetWith(1000, bills), "2026-11");
+
+	it("spreads a yearly bill over twelve months", () => {
+		expect(withBills(bill("yearly", "2026-12-01")).totalPlanned).toBe(8.33);
+	});
+
+	it("counts a yearly bill once in the year, without rounding drift", () => {
+		const plan = withBills(bill("yearly", "2026-12-01"));
+		expect(estimateYear(plan).spending).toBe(100);
+	});
+
+	it("counts a quarterly bill four times in the year", () => {
+		const plan = withBills(bill("quarterly", "2026-12-01"));
+		expect(estimateYear(plan).spending).toBe(400);
+	});
+
+	it("counts a one off bill only in the month it is due", () => {
+		expect(withBills(bill("once", "2026-11-20")).totalPlanned).toBe(100);
+		expect(withBills(bill("once", "2026-12-20")).totalPlanned).toBe(0);
+	});
+});
+
+describe("paymentStep", () => {
+	it("uses finer notches on small bills and larger ones on big bills", () => {
+		expect([20, 200, 1000, 1001].map(paymentStep)).toEqual([0.5, 1, 5, 10]);
 	});
 });
 
@@ -395,6 +559,8 @@ describe("checkedCategory", () => {
 		description: " Monthly fee ",
 		group: "wants" as const,
 		planned: 29.999,
+		recurrence: "monthly" as const,
+		dueDate: "2026-12-08",
 	};
 
 	it("trims the text and rounds the planned amount to cents", () => {
@@ -403,6 +569,8 @@ describe("checkedCategory", () => {
 			description: "Monthly fee",
 			group: "wants",
 			planned: 30,
+			recurrence: "monthly",
+			dueDate: "2026-12-08",
 		});
 	});
 
@@ -414,6 +582,23 @@ describe("checkedCategory", () => {
 		expect(checkedCategory({ ...gym, planned: 12_345_678.905 }).planned).toBe(
 			12_345_678.91,
 		);
+	});
+
+	it("requires a date on every recurring bill", () => {
+		for (const recurrence of ["monthly", "quarterly", "yearly"] as const) {
+			expect(
+				codeOf(() => checkedCategory({ ...gym, recurrence, dueDate: "" })),
+			).toBe("dueDateMissing");
+		}
+	});
+
+	it("lets a one off bill go without a date", () => {
+		const checked = checkedCategory({
+			...gym,
+			recurrence: "once",
+			dueDate: "",
+		});
+		expect(checked.dueDate).toBe("");
 	});
 
 	it("refuses a category without a name", () => {
@@ -433,32 +618,26 @@ describe("checkedCategory", () => {
 });
 
 describe("spendingProgress", () => {
-	it("stays green with plenty of room left", () => {
+	it("says how much is left and which share is paid", () => {
 		expect(spendingProgress(100, 500)).toEqual({
 			remaining: 400,
-			level: "calm",
+			share: 0.2,
 			state: "left",
 		});
 	});
 
-	it("turns orange from 70% of the plan", () => {
-		expect(spendingProgress(69.99, 100).level).toBe("calm");
-		expect(spendingProgress(70, 100).level).toBe("close");
-	});
-
-	it("turns red from 90% of the plan", () => {
-		expect(spendingProgress(89.99, 100).level).toBe("close");
-		expect(spendingProgress(90, 100)).toEqual({
-			remaining: 10,
-			level: "limit",
+	it("starts at a share of zero", () => {
+		expect(spendingProgress(0, 500)).toEqual({
+			remaining: 500,
+			share: 0,
 			state: "left",
 		});
 	});
 
-	it("is paid off when exactly the plan is spent", () => {
+	it("is paid off when exactly the plan is paid", () => {
 		expect(spendingProgress(550, 550)).toEqual({
 			remaining: 0,
-			level: "limit",
+			share: 1,
 			state: "paidOff",
 		});
 	});
@@ -468,25 +647,24 @@ describe("spendingProgress", () => {
 	});
 
 	it("says how much is over the plan, as a negative remainder", () => {
-		expect(spendingProgress(850, 550)).toEqual({
+		expect(spendingProgress(850, 550)).toMatchObject({
 			remaining: -300,
-			level: "limit",
 			state: "over",
 		});
 	});
 
-	it("counts any spending as over when nothing was planned", () => {
+	it("counts any payment as over when nothing was planned", () => {
 		expect(spendingProgress(5, 0)).toEqual({
 			remaining: -5,
-			level: "limit",
+			share: 0,
 			state: "over",
 		});
 	});
 
-	it("says nothing is planned when there is no plan and no spending", () => {
+	it("says nothing is planned when there is no plan and no payment", () => {
 		expect(spendingProgress(0, 0)).toEqual({
 			remaining: 0,
-			level: "calm",
+			share: 0,
 			state: "unplanned",
 		});
 	});

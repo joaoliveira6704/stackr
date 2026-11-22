@@ -20,6 +20,8 @@ const HOME = {
 	description: "",
 	group: "needs" as const,
 	planned: 500,
+	recurrence: "monthly" as const,
+	dueDate: "2026-12-01",
 };
 
 function storeWithHome() {
@@ -28,7 +30,7 @@ function storeWithHome() {
 	return { store, homeId: store.budget.categories[0].id };
 }
 
-const RENT = { amount: 500, description: "Rent", date: "2026-11-01" };
+const TODAY = "2026-11-22";
 
 describe("budget store", () => {
 	it("has nothing to save right after loading", async () => {
@@ -53,6 +55,19 @@ describe("budget store", () => {
 		expect(store.hasUnsavedChanges).toBe(false);
 	});
 
+	it("still has something to save after an edit made during a save", async () => {
+		fakeAppApi();
+		const store = useBudgetStore();
+		await store.load();
+		store.budget.salary = 1200;
+
+		const saving = store.save();
+		store.budget.salary = 1300;
+		await saving;
+
+		expect(store.hasUnsavedChanges).toBe(true);
+	});
+
 	it("adds a category checked and tidied, with its description", () => {
 		const store = useBudgetStore();
 
@@ -61,6 +76,8 @@ describe("budget store", () => {
 			description: " Monthly fee ",
 			group: "wants",
 			planned: 29.999,
+			recurrence: "monthly" as const,
+			dueDate: "2026-12-01",
 		});
 
 		expect(store.budget.categories).toEqual([
@@ -70,6 +87,8 @@ describe("budget store", () => {
 				description: "Monthly fee",
 				group: "wants",
 				planned: 30,
+				recurrence: "monthly" as const,
+				dueDate: "2026-12-01",
 			},
 		]);
 	});
@@ -102,6 +121,8 @@ describe("budget store", () => {
 			description: "Flat in Lisbon",
 			group: "needs",
 			planned: 650,
+			recurrence: "monthly" as const,
+			dueDate: "2026-12-01",
 		});
 
 		expect(store.budget.categories).toEqual([
@@ -111,6 +132,8 @@ describe("budget store", () => {
 				description: "Flat in Lisbon",
 				group: "needs",
 				planned: 650,
+				recurrence: "monthly" as const,
+				dueDate: "2026-12-01",
 			},
 		]);
 	});
@@ -132,43 +155,50 @@ describe("budget store", () => {
 		);
 	});
 
-	it("logs an expense on a category, rounded to cents", () => {
+	it("sets what is paid on a category, rounded to cents", () => {
 		const { store, homeId } = storeWithHome();
 
-		const logged = store.addExpense({
-			...RENT,
-			amount: 9.999,
-			categoryId: homeId,
-		});
+		store.setPaid(homeId, 9.999, TODAY);
 
-		expect(logged.amount).toBe(10);
-		expect(store.budget.expenses).toEqual([logged]);
+		expect(store.budget.expenses).toMatchObject([
+			{ categoryId: homeId, amount: 10, date: TODAY },
+		]);
 	});
 
-	it("refuses an expense for a category that does not exist", () => {
+	it("keeps one total as a bill is paid little by little", () => {
+		const { store, homeId } = storeWithHome();
+
+		store.setPaid(homeId, 100, TODAY);
+		store.setPaid(homeId, 250, TODAY);
+
+		expect(store.budget.expenses.map((entry) => entry.amount)).toEqual([250]);
+	});
+
+	it("refuses a payment on a category that does not exist", () => {
 		const { store } = storeWithHome();
 
-		expect(() => store.addExpense({ ...RENT, categoryId: "gone" })).toThrow(
+		expect(() => store.setPaid("gone", 10, TODAY)).toThrow(
 			new AppError("categoryMissing"),
 		);
 		expect(store.budget.expenses).toEqual([]);
 	});
 
-	it("refuses an expense without a valid amount", () => {
+	it("keeps what was paid when the new total is negative", () => {
 		const { store, homeId } = storeWithHome();
+		store.setPaid(homeId, 100, TODAY);
 
-		expect(() =>
-			store.addExpense({ ...RENT, amount: -3, categoryId: homeId }),
-		).toThrow(new AppError("invalidExpenseAmount"));
-		expect(store.budget.expenses).toEqual([]);
+		expect(() => store.setPaid(homeId, -3, TODAY)).toThrow(
+			new AppError("invalidPaidAmount"),
+		);
+		expect(store.budget.expenses[0].amount).toBe(100);
 	});
 
 	it("removes a category together with its expenses", () => {
 		const { store, homeId } = storeWithHome();
 		store.addCategory({ ...HOME, name: "Fun", group: "wants", planned: 100 });
 		const funId = store.budget.categories[1].id;
-		store.addExpense({ ...RENT, categoryId: homeId });
-		store.addExpense({ ...RENT, amount: 20, categoryId: funId });
+		store.setPaid(homeId, 500, TODAY);
+		store.setPaid(funId, 20, TODAY);
 
 		store.removeCategory(homeId);
 
@@ -176,15 +206,5 @@ describe("budget store", () => {
 		expect(store.budget.expenses.map((entry) => entry.categoryId)).toEqual([
 			funId,
 		]);
-	});
-
-	it("removes a single expense", () => {
-		const { store, homeId } = storeWithHome();
-		const rent = store.addExpense({ ...RENT, categoryId: homeId });
-		store.addExpense({ ...RENT, amount: 30, categoryId: homeId });
-
-		store.removeExpense(rent.id);
-
-		expect(store.budget.expenses.map((entry) => entry.amount)).toEqual([30]);
 	});
 });

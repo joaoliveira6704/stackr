@@ -52,15 +52,15 @@ The palette is the logo green plus three supporting colours. Use the plain colou
 | Grape | `bg-grape` | `text-grape-strong` | XP, Strategist |
 | Tangerine | `bg-tangerine` | `text-tangerine-strong` | Streaks, risk, errors, Arena |
 | Sun | `bg-sun` | `text-sun-strong` | Stacks and rewards |
-| Cherry | `bg-cherry` | `text-cherry-strong` | A limit reached or passed, such as a budget bar at its end |
+| Cherry | `bg-cherry` | `text-cherry-strong` | Something that needs attention, such as an unpaid bill or one paid above its plan |
 
-Cherry is a warning colour, not part of the brand. Keep it for the moment something runs out, never for decoration, icon tiles or tones.
+Cherry is a warning colour, not part of the brand. Keep it for those warnings, never for decoration, icon tiles or tones.
 
 `text-on-brand` is the near black used on top of a green fill.
 
 ## Tones
 
-A tone is a soft tinted background with matching strong text, which is what icon tiles, chips and highlighted cards need. Use `tone-brand`, `tone-grape`, `tone-tangerine`, `tone-sun` or `tone-neutral`. When the tone comes from data, use the maps in `src/components/tones.ts`, `TONE_CLASSES` to turn a tone name into its class, `TRACK_TONES` to get the colour of a track and `BUDGET_GROUP_TONES` for the budget groups, needs in grape, wants in tangerine and savings in brand green. `SPENDING_LEVEL_CLASSES` gives the bar fill and the text colour for how much of a budget line is spent, green while there is room, tangerine from 70% and cherry from 90% or once it is over. Write the class out in full rather than building it from a string, because Tailwind only ships classes it can find in the source.
+A tone is a soft tinted background with matching strong text, which is what icon tiles, chips and highlighted cards need. Use `tone-brand`, `tone-grape`, `tone-tangerine`, `tone-sun` or `tone-neutral`. When the tone comes from data, use the maps in `src/components/tones.ts`, `TONE_CLASSES` to turn a tone name into its class, `TRACK_TONES` to get the colour of a track and `BUDGET_GROUP_TONES` for the budget groups, needs in grape, wants in tangerine and savings in brand green. `paymentColours` gives the bar and text colour for how much of a bill is paid. It starts in cherry at 0%, reaches tangerine at 10%, blends gradually towards sun, turns green only from 95%, and goes back to cherry when more than the plan was paid. It blends the theme tokens with `color-mix`, so it works in both themes. Write the class out in full rather than building it from a string, because Tailwind only ships classes it can find in the source.
 
 ## Type
 
@@ -108,7 +108,7 @@ Buttons already handle hover, press and disabled states. To hide a button on sma
 
 ## Small pieces
 
-`chip` is a pill label and always takes a tone, like `chip tone-brand`. `icon-tile` is the square that holds an icon and also takes a tone, with `icon-tile-sm`, `icon-tile-lg` and `icon-tile-xl` for other sizes. List rows use the `StatRow` component, which already combines an icon tile, a title, a muted detail and a right aligned value. A row that stands for a chart series fills its `leading` slot with the series colour instead of an icon, so the list and the chart read as one. Its `trailing` slot, after the value, holds a status chip or a small action that belongs to the row, such as the round remove button on an expense.
+`chip` is a pill label and always takes a tone, like `chip tone-brand`. `icon-tile` is the square that holds an icon and also takes a tone, with `icon-tile-sm`, `icon-tile-lg` and `icon-tile-xl` for other sizes. List rows use the `StatRow` component, which already combines an icon tile, a title, a muted detail and a right aligned value. A row that stands for a chart series fills its `leading` slot with the series colour instead of an icon, so the list and the chart read as one. Its `trailing` slot, after the value, holds a status chip or a small action that belongs to the row, such as a small remove button.
 
 `LessonBadges` sits under the heading of every screen inside the app that puts lessons into practice, such as the budget and the simulator. It lists the badges of the lessons behind that screen from `LESSON_BADGES` in `src/lib/badges.ts`. A badge the user has earned shows its own icon in its tone from `BADGE_ICONS` and `BADGE_TONES`, and one still to earn shows a lock in `tone-neutral` with the lesson that earns it. The locked state lives in `data-locked` on the row, so the text mutes itself with `group-data-locked:`. To give a new screen its badges, add the screen to the badges it belongs to and render `<LessonBadges screen="..." />`.
 
@@ -130,9 +130,11 @@ Statistics on the dashboard use the `StatCard` component, a card with a toned ic
 
 Inputs use `field`, which is what the `TextField` component renders. Selectable answers use `choice`, a label that wraps a hidden radio or checkbox and turns green on its own when the input is checked. Inside it, `choice-key` is the letter badge and `choice-mark` is the round mark at the end. No class binding is needed for the selected state.
 
-A choice from a short list, such as the category of an expense, uses `SelectField`, a labelled `field` around a native select. `TextField` fields are required unless they pass `optional`.
+An amount moved along a known total, such as what is paid of a bill, uses `PaymentSlider`: a large amount that can be tapped to type an exact value, above a `slider`, the range input whose thumb takes its colour from `--slider-colour`. An empty grid starts with a compact `glass` tile with an `icon-tile-sm` to add the first record. Once it has an item, that action moves to a `btn-primary btn-sm` on the right of the section title.
 
-Screens that edit a plan saved on the user, such as the budget and the simulator, put `SaveControl` in their header, the `btn-primary` save button with a short line under it saying whether the changes are saved. The loading, saving and the question before leaving with unsaved changes come from `useSavedPlan` in `src/lib/use-saved-plan.ts`, so every such screen behaves the same.
+A choice from a short list, such as the type of an expense, uses `SelectField`, a labelled `field` around a native select, with our own `dropdown` icon in place of the browser arrow so it keeps the same inner margin as the unit in `NumberField`. `TextField` fields are required unless they pass `optional`.
+
+Screens that edit a plan saved on the user, such as the budget and the simulator, put `SaveControl` in their header, the `btn-primary` save button with a short line under it saying whether the changes are saved. The loading, saving and the question before leaving with unsaved changes come from `useSavedPlan` in `src/lib/use-saved-plan.ts`, so every such screen behaves the same. The budget saves by itself shortly after each valid change, so it shows `AutoSaveStatus` in the same place instead, a small chip saying it is saving or saved, with a retry button when a save fails.
 
 Numbers use `NumberField`, a `field` with a unit such as "€" or "%" shown inside it and read out to screen readers. An empty or half typed field gives `NaN` rather than zero, so the screen can say the value is missing instead of quietly using zero. A value with a few common choices, such as the period in the simulator, uses `DurationPicker`: `btn-secondary btn-sm` presets that turn green through `aria-pressed:bg-brand`, above a range slider coloured with `accent-brand` for anything in between.
 

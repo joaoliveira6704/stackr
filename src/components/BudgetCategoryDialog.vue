@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { BUDGET_GROUPS, type BudgetCategory } from "../lib/budget";
+import { type BudgetCategory, EXPENSE_GROUPS, RECURRENCES } from "../lib/budget";
 import { type ErrorCode, errorCode } from "../lib/errors";
 import { type NewCategory, useBudgetStore } from "../stores/budget";
 import AppIcon from "./AppIcon.vue";
@@ -22,13 +22,28 @@ const draft = ref<NewCategory>({
 	description: props.category?.description ?? "",
 	group: props.category?.group ?? "needs",
 	planned: props.category?.planned ?? Number.NaN,
+	recurrence: props.category?.recurrence ?? "monthly",
+	dueDate: props.category?.dueDate ?? "",
 });
 const error = ref<ErrorCode | null>(null);
 const mode = computed(() => (props.category ? "edit" : "add"));
 
-const groupOptions = computed(() =>
-	BUDGET_GROUPS.map((group) => ({ value: group, label: t(`budget.groups.${group}`) })),
+// Savings are not created here, but an older savings entry keeps its type.
+const groups = computed(() =>
+	props.category?.group === "savings"
+		? [...EXPENSE_GROUPS, props.category.group]
+		: EXPENSE_GROUPS,
 );
+const groupOptions = computed(() =>
+	groups.value.map((group) => ({ value: group, label: t(`budget.groups.${group}`) })),
+);
+const recurrenceOptions = computed(() =>
+	RECURRENCES.map((recurrence) => ({
+		value: recurrence,
+		label: t(`budget.category.recurrences.${recurrence}`),
+	})),
+);
+const isDueDateOptional = computed(() => draft.value.recurrence === "once");
 
 function save() {
 	error.value = null;
@@ -62,12 +77,23 @@ function save() {
 					:label="t('budget.category.group')"
 					:options="groupOptions"
 				/>
+				<SelectField
+					v-model="draft.recurrence"
+					:label="t('budget.category.recurrence')"
+					:options="recurrenceOptions"
+				/>
 				<NumberField
 					v-model="draft.planned"
 					:label="t('budget.category.planned')"
 					unit="€"
 					:min="0"
 					:step="10"
+				/>
+				<TextField
+					v-model="draft.dueDate"
+					type="date"
+					:label="t(isDueDateOptional ? 'budget.category.dueDateOptional' : 'budget.category.dueDate')"
+					:optional="isDueDateOptional"
 				/>
 			</div>
 			<p v-if="error" class="text-sm font-semibold text-tangerine-strong" role="alert">

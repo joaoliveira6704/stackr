@@ -10,8 +10,9 @@ export function useSavedSnapshot<T>(state: Ref<T>) {
 		() => JSON.stringify(state.value) !== snapshot.value,
 	);
 
-	function markSaved(): void {
-		snapshot.value = JSON.stringify(state.value);
+	/** Pass what was really sent when the plan may change during a save. */
+	function markSaved(saved: string = JSON.stringify(state.value)): void {
+		snapshot.value = saved;
 	}
 
 	return { hasUnsavedChanges, markSaved };

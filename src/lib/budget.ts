@@ -15,6 +15,18 @@ export const RULE_SHARES: Record<BudgetGroup, number> = {
 	savings: 0.2,
 };
 
+/** The types a user can pick. Savings will come from the investments log. */
+export const EXPENSE_GROUPS = ["needs", "wants"] as const;
+
+export const RECURRENCES = ["once", "monthly", "quarterly", "yearly"] as const;
+export type Recurrence = (typeof RECURRENCES)[number];
+
+const CYCLE_MONTHS: Record<Exclude<Recurrence, "once">, number> = {
+	monthly: 1,
+	quarterly: 3,
+	yearly: 12,
+};
+
 export const MAX_CATEGORIES = 20;
 const MONTHS_PER_YEAR = 12;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -25,8 +37,11 @@ export interface BudgetCategory {
 	/** A short note the user writes about it, empty when there is none. */
 	description: string;
 	group: BudgetGroup;
-	/** What the user plans to spend on it each month, in euros. */
+	/** What each payment of this bill costs, in euros. */
 	planned: number;
+	recurrence: Recurrence;
+	/** The deadline as YYYY-MM-DD. Only a one off bill may go without one. */
+	dueDate: string;
 }
 
 export interface Expense {
@@ -53,15 +68,29 @@ function isBudgetGroup(value: unknown): value is BudgetGroup {
 	return BUDGET_GROUPS.includes(value as BudgetGroup);
 }
 
+function parseDueDate(value: unknown): string {
+	return typeof value === "string" && DATE_PATTERN.test(value) ? value : "";
+}
+
+// Monthly bills saved before deadlines existed stay monthly without a date.
+function parseRecurrence(value: unknown, dueDate: string): Recurrence {
+	if (value === "once") return "once";
+	const isKnown = RECURRENCES.includes(value as Recurrence);
+	return isKnown && dueDate ? (value as Recurrence) : "monthly";
+}
+
 function parseCategory(value: unknown): BudgetCategory | null {
 	if (!isRecord(value) || typeof value.id !== "string") return null;
 	if (typeof value.name !== "string") return null;
+	const dueDate = parseDueDate(value.dueDate);
 	return {
 		id: value.id,
 		name: value.name,
 		description: typeof value.description === "string" ? value.description : "",
 		group: isBudgetGroup(value.group) ? value.group : "needs",
 		planned: Math.max(numberOr(value.planned, 0), 0),
+		recurrence: parseRecurrence(value.recurrence, dueDate),
+		dueDate,
 	};
 }
 
@@ -146,32 +175,21 @@ export function checkedCategory(
 	const name = category.name.trim();
 	if (!name) throw new AppError("categoryNameMissing");
 	assertAmount(category.planned, "invalidPlannedAmount");
+	const dueDate = parseDueDate(category.dueDate);
+	if (category.recurrence !== "once" && !dueDate) {
+		throw new AppError("dueDateMissing");
+	}
 	return {
 		name,
 		description: category.description.trim(),
 		group: category.group,
 		planned: roundCents(category.planned),
+		recurrence: category.recurrence,
+		dueDate,
 	};
 }
 
-/** Checks an expense before it is logged and rounds it to whole cents. */
-export function checkedExpense(
-	expense: Omit<Expense, "id">,
-): Omit<Expense, "id"> {
-	if (!Number.isFinite(expense.amount) || roundCents(expense.amount) <= 0) {
-		throw new AppError("invalidExpenseAmount");
-	}
-	if (!DATE_PATTERN.test(expense.date)) {
-		throw new AppError("invalidExpenseDate");
-	}
-	return {
-		...expense,
-		amount: roundCents(expense.amount),
-		description: expense.description.trim(),
-	};
-}
-
-function sumMoney(amounts: number[]): number {
+export function sumMoney(amounts: number[]): number {
 	return roundCents(amounts.reduce((sum, amount) => sum + amount, 0));
 }
 
@@ -185,10 +203,34 @@ export interface MonthlyPlan {
 	spending: number;
 	/** Salary not given to any category yet, negative when over planned. */
 	unassigned: number;
+	/** Needs and wants over the calendar year, counting each real payment. */
+	yearlySpending: number;
+	/** What is planned as savings over the calendar year. */
+	yearlySaving: number;
+}
+
+/** What a bill weighs on one month. A one off counts in the month it is due. */
+function monthlyCost(category: BudgetCategory, month: string): number {
+	if (category.recurrence === "once") {
+		return category.dueDate.startsWith(`${month}-`) ? category.planned : 0;
+	}
+	return category.planned / CYCLE_MONTHS[category.recurrence];
+}
+
+function yearlyCost(category: BudgetCategory, year: string): number {
+	if (category.recurrence === "once") {
+		return category.dueDate.startsWith(`${year}-`) ? category.planned : 0;
+	}
+	return (
+		(category.planned * MONTHS_PER_YEAR) / CYCLE_MONTHS[category.recurrence]
+	);
 }
 
 /** Totals of the monthly plan. Throws when the salary or a planned amount is not valid. */
-export function planMonth(budget: Budget): MonthlyPlan {
+export function planMonth(
+	budget: Budget,
+	month: string = monthKey(new Date()),
+): MonthlyPlan {
 	assertAmount(budget.salary, "invalidSalary");
 	for (const category of budget.categories) {
 		assertAmount(category.planned, "invalidPlannedAmount");
@@ -199,19 +241,28 @@ export function planMonth(budget: Budget): MonthlyPlan {
 			sumMoney(
 				budget.categories
 					.filter((category) => category.group === group)
-					.map((category) => category.planned),
+					.map((category) => monthlyCost(category, month)),
 			),
 		]),
 	) as Record<BudgetGroup, number>;
 	const salary = roundCents(budget.salary);
 	const spending = roundCents(planned.needs + planned.wants);
 	const totalPlanned = roundCents(spending + planned.savings);
+	const year = month.slice(0, 4);
+	const yearlyFor = (isCounted: (group: BudgetGroup) => boolean) =>
+		sumMoney(
+			budget.categories
+				.filter((category) => isCounted(category.group))
+				.map((category) => yearlyCost(category, year)),
+		);
 	return {
 		salary,
 		planned,
 		totalPlanned,
 		spending,
 		unassigned: roundCents(salary - totalPlanned),
+		yearlySpending: yearlyFor((group) => group !== "savings"),
+		yearlySaving: yearlyFor((group) => group === "savings"),
 	};
 }
 
@@ -224,14 +275,15 @@ export interface YearlyEstimate {
 	shortfall: number;
 }
 
-/** What the monthly plan adds up to over twelve months. */
+/** What the plan adds up to over the calendar year. */
 export function estimateYear(plan: MonthlyPlan): YearlyEstimate {
-	const yearly = (monthly: number) => roundCents(monthly * MONTHS_PER_YEAR);
+	const income = roundCents(plan.salary * MONTHS_PER_YEAR);
+	const costs = roundCents(plan.yearlySpending + plan.yearlySaving);
 	return {
-		income: yearly(plan.salary),
-		spending: yearly(plan.spending),
-		saving: yearly(plan.planned.savings),
-		shortfall: yearly(Math.max(-plan.unassigned, 0)),
+		income,
+		spending: plan.yearlySpending,
+		saving: plan.yearlySaving,
+		shortfall: Math.max(roundCents(costs - income), 0),
 	};
 }
 
@@ -265,45 +317,140 @@ export function checkRule(plan: MonthlyPlan): RuleCheck[] | null {
 	});
 }
 
-export function expensesInMonth(expenses: Expense[], month: string): Expense[] {
-	return expenses
-		.filter((expense) => expense.date.startsWith(`${month}-`))
-		.sort((a, b) => b.date.localeCompare(a.date));
+function monthIndex(key: string): number {
+	const [year, month] = key.split("-").map(Number);
+	return year * MONTHS_PER_YEAR + month - 1;
 }
 
-/** What was spent on each category in the given month, by category id. */
-export function spentByCategory(
-	expenses: Expense[],
-	month: string,
-): Map<string, number> {
-	const spent = new Map<string, number>();
-	for (const expense of expensesInMonth(expenses, month)) {
-		const sum = (spent.get(expense.categoryId) ?? 0) + expense.amount;
-		spent.set(expense.categoryId, roundCents(sum));
+/** The deadline's day in another month, or that month's last day if shorter. */
+function dueDateInMonth(dueDate: string, index: number): string {
+	const year = Math.floor(index / MONTHS_PER_YEAR);
+	const month = index % MONTHS_PER_YEAR;
+	const lastDay = new Date(year, month + 1, 0).getDate();
+	const day = Math.min(Number(dueDate.slice(8)), lastDay);
+	return dateKey(new Date(year, month, day));
+}
+
+export interface BillCycle {
+	/** First and last day whose payments count, as YYYY-MM-DD. */
+	from: string;
+	to: string;
+	/** The deadline of this cycle, empty when the bill has none. */
+	dueDate: string;
+}
+
+const FIRST_DAY = "0000-01-01";
+const LAST_DAY = "9999-12-31";
+
+function dayAfter(key: string): string {
+	const date = dateFromKey(key);
+	date.setDate(date.getDate() + 1);
+	return dateKey(date);
+}
+
+function recurringCycle(
+	dueDate: string,
+	length: number,
+	today: string,
+): BillCycle {
+	const firstDue = monthIndex(dueDate);
+	const occurrence = (count: number) =>
+		dueDateInMonth(dueDate, firstDue + count * length);
+	const monthsPassed = monthIndex(today) - firstDue;
+	let count = Math.max(Math.ceil(monthsPassed / length), 0);
+	if (occurrence(count) < today) count++;
+	return {
+		from: count > 0 ? dayAfter(occurrence(count - 1)) : FIRST_DAY,
+		to: occurrence(count),
+		dueDate: occurrence(count),
+	};
+}
+
+/**
+ * The days a payment counts towards. The deadline is the last day to pay, and
+ * a recurring bill starts again at zero on the day after it.
+ */
+export function billCycle(category: BudgetCategory, today: string): BillCycle {
+	const { recurrence, dueDate } = category;
+	if (recurrence === "once") {
+		return { from: FIRST_DAY, to: LAST_DAY, dueDate };
 	}
-	return spent;
+	if (!dueDate) {
+		const month = today.slice(0, 7);
+		return { from: `${month}-01`, to: `${month}-31`, dueDate };
+	}
+	return recurringCycle(dueDate, CYCLE_MONTHS[recurrence], today);
 }
 
-export function totalSpent(expenses: Expense[], month: string): number {
-	return sumMoney(
-		expensesInMonth(expenses, month).map((expense) => expense.amount),
+function isInCycle(expense: Expense, cycle: BillCycle): boolean {
+	return expense.date >= cycle.from && expense.date <= cycle.to;
+}
+
+/**
+ * Sets the total paid on a bill in its current cycle. The first payment of the
+ * cycle holds the new total, so typing the same value again leaves nothing to
+ * save, and a total of zero clears the cycle.
+ */
+export function withPaidAmount(
+	expenses: Expense[],
+	category: BudgetCategory,
+	paid: number,
+	today: string,
+): Expense[] {
+	if (!Number.isFinite(paid) || paid < 0) {
+		throw new AppError("invalidPaidAmount");
+	}
+	const amount = roundCents(paid);
+	const cycle = billCycle(category, today);
+	const isThisPayment = (expense: Expense) =>
+		expense.categoryId === category.id && isInCycle(expense, cycle);
+	const first = expenses.find(isThisPayment);
+	if (amount > 0 && !first) {
+		const id = crypto.randomUUID();
+		return [
+			...expenses,
+			{ id, categoryId: category.id, amount, description: "", date: today },
+		];
+	}
+	return expenses
+		.filter(
+			(expense) => !isThisPayment(expense) || (amount > 0 && expense === first),
+		)
+		.map((expense) => (expense === first ? { ...expense, amount } : expense));
+}
+
+/** What is paid on each bill in its current cycle, by category id. */
+export function paidByCategory(
+	budget: Budget,
+	today: string,
+): Map<string, number> {
+	return new Map(
+		budget.categories.map((category) => {
+			const cycle = billCycle(category, today);
+			const payments = budget.expenses.filter(
+				(expense) =>
+					expense.categoryId === category.id && isInCycle(expense, cycle),
+			);
+			return [category.id, sumMoney(payments.map(({ amount }) => amount))];
+		}),
 	);
 }
 
-/** How close spending is to the plan, which picks the colour of its bar. */
-export type SpendingLevel = "calm" | "close" | "limit";
+/** How far one notch of the slider moves, so dragging lands on round amounts. */
+export function paymentStep(planned: number): number {
+	if (planned <= 20) return 0.5;
+	if (planned <= 200) return 1;
+	return planned <= 1000 ? 5 : 10;
+}
+
 /** What the line under the bar says. */
 export type SpendingState = "left" | "paidOff" | "over" | "unplanned";
-
-/** From this share of the plan on, the bar turns orange. */
-export const CLOSE_SHARE = 0.7;
-/** From this share of the plan on, the bar turns red. */
-export const LIMIT_SHARE = 0.9;
 
 export interface SpendingProgress {
 	/** Planned minus spent, negative when more was spent than planned. */
 	remaining: number;
-	level: SpendingLevel;
+	/** Paid as a share of the plan, 0.25 for 25%. Zero when nothing is planned. */
+	share: number;
 	state: SpendingState;
 }
 
@@ -313,19 +460,15 @@ function spendingState(planned: number, remaining: number): SpendingState {
 	return remaining === 0 ? "paidOff" : "left";
 }
 
-function spendingLevel(share: number): SpendingLevel {
-	if (share >= LIMIT_SHARE) return "limit";
-	return share >= CLOSE_SHARE ? "close" : "calm";
-}
-
 /** Where a category stands this month, compared in whole cents. */
 export function spendingProgress(
 	spent: number,
 	planned: number,
 ): SpendingProgress {
 	const remaining = roundCents(planned - spent);
-	const state = spendingState(planned, remaining);
-	if (state === "over") return { remaining, level: "limit", state };
-	const share = planned > 0 ? spent / planned : 0;
-	return { remaining, level: spendingLevel(share), state };
+	return {
+		remaining,
+		share: planned > 0 ? spent / planned : 0,
+		state: spendingState(planned, remaining),
+	};
 }

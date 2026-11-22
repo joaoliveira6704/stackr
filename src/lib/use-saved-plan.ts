@@ -1,4 +1,4 @@
-import { onMounted, type Ref, ref } from "vue";
+import { onMounted, onUnmounted, type Ref, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { type ErrorCode, errorCode } from "./errors";
 import { type ConfirmOptions, useConfirm } from "./use-confirm";
@@ -6,6 +6,15 @@ import { type ConfirmOptions, useConfirm } from "./use-confirm";
 interface SavedPlan {
 	load: () => Promise<void>;
 	save: () => Promise<void>;
+}
+
+export const AUTO_SAVE_DELAY_MS = 400;
+
+interface AutoSave {
+	/** The state to watch for changes. */
+	source: Ref<unknown>;
+	/** False while the plan holds a value that must not be stored. */
+	canSave: () => boolean;
 }
 
 /**
@@ -17,6 +26,7 @@ export function useSavedPlan(
 	plan: SavedPlan,
 	hasUnsavedChanges: Ref<boolean>,
 	leaveQuestion: () => ConfirmOptions,
+	autoSave?: AutoSave,
 ) {
 	const { confirm } = useConfirm();
 	const loading = ref(true);
@@ -37,7 +47,17 @@ export function useSavedPlan(
 		}
 	}
 
-	async function save() {
+	let saveInFlight: Promise<void> | null = null;
+	let autoSaveTimer: ReturnType<typeof setTimeout> | undefined;
+
+	function save(): Promise<void> {
+		saveInFlight ??= sendSave().finally(() => {
+			saveInFlight = null;
+		});
+		return saveInFlight;
+	}
+
+	async function sendSave() {
 		saving.value = true;
 		saveError.value = null;
 		try {
@@ -50,13 +70,46 @@ export function useSavedPlan(
 		}
 	}
 
+	/** Saves until nothing is left, since edits can land during a request. */
+	async function saveLatest() {
+		clearTimeout(autoSaveTimer);
+		if (saveInFlight) await saveInFlight;
+		while (hasUnsavedChanges.value && autoSave?.canSave()) {
+			await save();
+			if (saveError.value) return;
+		}
+	}
+
+	if (autoSave) {
+		watch(
+			autoSave.source,
+			() => {
+				clearTimeout(autoSaveTimer);
+				if (!hasUnsavedChanges.value || !autoSave.canSave()) return;
+				autoSaveTimer = setTimeout(saveLatest, AUTO_SAVE_DELAY_MS);
+			},
+			{ deep: true },
+		);
+		onUnmounted(() => clearTimeout(autoSaveTimer));
+	}
+
 	onMounted(load);
 
 	// Leaving with unsaved changes would throw the plan away, so ask first.
 	onBeforeRouteLeave(async () => {
+		if (autoSave) await saveLatest();
 		if (!hasUnsavedChanges.value) return true;
 		return confirm({ ...leaveQuestion(), destructive: true });
 	});
 
-	return { loading, loadError, saving, saveError, justSaved, load, save };
+	return {
+		loading,
+		loadError,
+		saving,
+		saveError,
+		justSaved,
+		load,
+		save,
+		saveLatest,
+	};
 }
