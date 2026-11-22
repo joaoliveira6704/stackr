@@ -14,10 +14,23 @@
           {
             "id": "ce71eca6-1202-45bc-8bc1-5bf524e2d891",
             "symbol": "VWCE.DE",
+            "name": "Vanguard FTSE All-World",
             "kind": "etf",
             "initial": 1000,
+            "shares": 0,
+            "quote": {
+              "price": 159.34,
+              "currency": "EUR",
+              "time": 1795192549000,
+              "rateToEur": 1
+            },
+            "manualValue": null,
+            "startDate": "",
             "monthly": 300,
             "annualReturnPercent": 9.9,
+            "deposits": [],
+            "nametag": "",
+            "icon": null,
             "returnSource": "history",
             "yearlyReturns": [
               {
@@ -45,10 +58,10 @@
                 "percent": 9.2
               }
             ],
-            "historyYears": 7,
-            "name": "Vanguard FTSE All-World"
+            "historyYears": 7
           }
-        ]
+        ],
+        "savings": []
       },
       "budget": {
         "salary": 1400,
@@ -83,6 +96,15 @@
             "planned": 70,
             "recurrence": "monthly",
             "dueDate": "2026-12-03"
+          },
+          {
+            "id": "14c6b4ad-4d7f-4f43-b63a-f636a453a511",
+            "name": "Ginasio",
+            "description": "Ginasio Povoa",
+            "group": "needs",
+            "planned": 25,
+            "recurrence": "monthly",
+            "dueDate": "2026-10-12"
           }
         ],
         "expenses": [
@@ -97,6 +119,13 @@
             "id": "98ffe8dc-cc4c-44d1-9288-a1a2b00c5bf5",
             "categoryId": "dcbdff35-60ac-4c36-9ef7-d94130c1a6b6",
             "amount": 70,
+            "description": "",
+            "date": "2026-11-22"
+          },
+          {
+            "id": "9114e3c2-8d68-4c75-af7e-b6f8aa8add51",
+            "categoryId": "14c6b4ad-4d7f-4f43-b63a-f636a453a511",
+            "amount": 25,
             "description": "",
             "date": "2026-11-22"
           }
@@ -199,7 +228,7 @@
               "price": 52.47,
               "currency": "GBP",
               "time": 1795192500000,
-              "rateToEur": 1.1926
+              "rateToEur": 1.1928
             },
             "manualValue": null,
             "startDate": "2026-11-22",

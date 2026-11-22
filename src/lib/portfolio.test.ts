@@ -341,6 +341,26 @@ describe("depositedIn", () => {
 	it("is zero for a period without deposits", () => {
 		expect(depositedIn(entry, "2024")).toBe(0);
 	});
+
+	it("leaves out the starting amount, even in the month it started", () => {
+		const started = savingEntry({
+			initial: 1000,
+			startDate: "2026-11-16",
+			deposits: [],
+		});
+
+		expect(depositedIn(started, "2026-11")).toBe(0);
+	});
+
+	it("counts only the purchase made on a card that also has a start", () => {
+		const started = savingEntry({
+			initial: 1250.5,
+			startDate: "2026-11-16",
+			deposits: [{ id: "a", amount: 250.5, date: "2026-11-20" }],
+		});
+
+		expect(depositedIn(started, "2026-11")).toBe(250.5);
+	});
 });
 
 describe("registeredTotals", () => {

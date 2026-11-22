@@ -635,7 +635,7 @@ export const en: MessageSchema = {
 			above: "Above the aim",
 			below: "Below the aim",
 			savingsNote:
-				"Savings count what you added this month in your register. Money not assigned yet does not count.",
+				"Savings count the purchases and deposits you made on your cards this month. The starting amount and money not assigned yet do not count.",
 		},
 		year: {
 			title: "Your year",
@@ -673,7 +673,8 @@ export const en: MessageSchema = {
 			value: "Recorded value",
 			valueDetail: "Your investments and savings today",
 			monthly: "Added this month",
-			monthlyDetail: "This is the amount that goes into the budget",
+			monthlyDetail:
+				"Purchases and deposits on your cards, the amount that goes into the budget",
 		},
 		investments: {
 			title: "Your investments",

@@ -506,7 +506,11 @@ export function investmentStats(holdings: Holding[]): InvestmentStats {
 	};
 }
 
-/** What was added in a period, given as "2026-11" for a month or "2026" for a year. */
+/**
+ * What the user put in through purchases and deposits in a period, given as
+ * "2026-11" for a month or "2026" for a year. The starting amount stays out,
+ * because it can be money the user already had before that period.
+ */
 export function depositedIn(
 	entry: Pick<Holding, "deposits">,
 	period: string,

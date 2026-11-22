@@ -640,7 +640,7 @@ export const pt = {
 			above: "Acima do ideal",
 			below: "Abaixo do ideal",
 			savingsNote:
-				"A poupança conta o que adicionaste este mês no teu registo. O dinheiro por atribuir não entra.",
+				"A poupança conta as compras e os depósitos que fizeste este mês nos teus cards. O valor inicial e o dinheiro por atribuir não entram.",
 		},
 		year: {
 			title: "O teu ano",
@@ -678,7 +678,8 @@ export const pt = {
 			value: "Valor registado",
 			valueDetail: "Investimentos e poupanças de hoje",
 			monthly: "Adicionado este mês",
-			monthlyDetail: "É este o valor que entra no orçamento",
+			monthlyDetail:
+				"Compras e depósitos nos cards, o valor que entra no orçamento",
 		},
 		investments: {
 			title: "Os teus investimentos",
