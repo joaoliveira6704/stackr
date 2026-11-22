@@ -107,11 +107,11 @@
         "inflationPercent": 2,
         "holdings": [
           {
-            "id": "dbc4b384-04b5-49b9-995f-70d3a23df6a5",
+            "id": "170cf34f-3f6e-4d7e-8d18-e9765e64a23f",
             "symbol": "VWCE.DE",
-            "name": "Vanguard FTSE All-World",
+            "name": "Vanguard FTSE All-World UCITS ETF USD Accumulation",
             "kind": "etf",
-            "initial": 1200,
+            "initial": 1016.14,
             "shares": 6,
             "quote": {
               "price": 159.34,
@@ -120,7 +120,7 @@
               "rateToEur": 1
             },
             "manualValue": null,
-            "startDate": "2026-11-19",
+            "startDate": "2026-11-16",
             "monthly": 0,
             "annualReturnPercent": 11.9,
             "deposits": [],
@@ -156,21 +156,55 @@
             "historyYears": 7
           },
           {
-            "id": "d1dba117-be5e-4001-9241-e121ded6a38e",
-            "symbol": "IWDA.AS",
+            "id": "771d38fc-da87-43d1-b411-124d20d7d188",
+            "symbol": "NUKL.DE",
+            "name": "VanEck Uranium and Nuclear Technologies UCITS ETF A USD Acc",
             "kind": "etf",
-            "initial": 1200,
-            "shares": 4,
+            "initial": 120,
+            "shares": 3.21027287,
             "quote": {
-              "price": 122.71,
+              "price": 31.98,
               "currency": "EUR",
-              "time": 1795192505000,
+              "time": 1795192710000,
               "rateToEur": 1
             },
             "manualValue": null,
-            "startDate": "2026-11-20",
+            "startDate": "2026-11-12",
             "monthly": 0,
-            "annualReturnPercent": 11.3,
+            "annualReturnPercent": 19,
+            "deposits": [],
+            "nametag": "",
+            "icon": null,
+            "returnSource": "history",
+            "yearlyReturns": [
+              {
+                "year": 2024,
+                "percent": 38
+              },
+              {
+                "year": 2025,
+                "percent": 51.5
+              }
+            ],
+            "historyYears": 3
+          },
+          {
+            "id": "cd17cf24-4435-4c96-866b-4ef36ef06faa",
+            "symbol": "SGLN.L",
+            "name": "iShares Physical Gold ETC",
+            "kind": "stock",
+            "initial": 150,
+            "shares": 2.20396574,
+            "quote": {
+              "price": 52.47,
+              "currency": "GBP",
+              "time": 1795192500000,
+              "rateToEur": 1.1926
+            },
+            "manualValue": null,
+            "startDate": "2026-11-22",
+            "monthly": 0,
+            "annualReturnPercent": 11,
             "deposits": [],
             "nametag": "",
             "icon": null,
@@ -178,43 +212,66 @@
             "yearlyReturns": [
               {
                 "year": 2017,
-                "percent": 7.5
+                "percent": 1.7
               },
               {
                 "year": 2018,
-                "percent": -4.2
+                "percent": 4.4
               },
               {
                 "year": 2019,
-                "percent": 29.6
+                "percent": 14.6
               },
               {
                 "year": 2020,
-                "percent": 6.2
-              },
-              {
-                "year": 2021,
-                "percent": 32.5
-              },
-              {
-                "year": 2022,
-                "percent": -13.5
-              },
-              {
-                "year": 2023,
                 "percent": 19.9
               },
               {
+                "year": 2021,
+                "percent": -2.8
+              },
+              {
+                "year": 2022,
+                "percent": 11.8
+              },
+              {
+                "year": 2023,
+                "percent": 7.2
+              },
+              {
                 "year": 2024,
-                "percent": 27.2
+                "percent": 28.2
               },
               {
                 "year": 2025,
-                "percent": 7.1
+                "percent": 53.7
               }
             ],
-            "historyYears": 9,
-            "name": "iShares Core MSCI World"
+            "historyYears": 9
+          },
+          {
+            "id": "86538841-aa1f-4c4d-93df-be0072ea561d",
+            "symbol": "EUDF.DE",
+            "name": "WisdomTree Europe Defence UCITS ETF - EUR Acc",
+            "kind": "etf",
+            "initial": 120,
+            "shares": 3.98208063,
+            "quote": {
+              "price": 28.335,
+              "currency": "EUR",
+              "time": 1795192560000,
+              "rateToEur": 1
+            },
+            "manualValue": null,
+            "startDate": "2026-11-22",
+            "monthly": 0,
+            "annualReturnPercent": 3.3,
+            "deposits": [],
+            "nametag": "",
+            "icon": null,
+            "returnSource": "history",
+            "yearlyReturns": [],
+            "historyYears": 1
           }
         ],
         "savings": []
