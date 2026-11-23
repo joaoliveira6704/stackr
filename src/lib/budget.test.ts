@@ -246,7 +246,7 @@ describe("planMonth", () => {
 });
 
 describe("estimateYear", () => {
-	it("multiplies the monthly plan by twelve", () => {
+	it("multiplies the salary and the spending by twelve", () => {
 		const plan = planMonth(
 			budgetWith(1500, [
 				category("home", "needs", 600),
@@ -254,49 +254,24 @@ describe("estimateYear", () => {
 				category("save", "savings", 300),
 			]),
 		);
-		expect(estimateYear(plan)).toEqual({
-			income: 18000,
-			spending: 9600,
-			saving: 3600,
-			shortfall: 0,
-		});
-	});
-
-	it("does not count unassigned salary as savings", () => {
-		const plan = planMonth(budgetWith(1000, [category("home", "needs", 400)]));
-		expect(estimateYear(plan).saving).toBe(0);
+		expect(estimateYear(plan)).toEqual({ income: 18000, spending: 9600 });
 	});
 
 	it("rounds the yearly amounts to whole cents", () => {
-		const plan = planMonth(
-			budgetWith(1000.01, [
-				category("a", "wants", 0.07),
-				category("b", "savings", 0.33),
-			]),
-		);
-		expect(estimateYear(plan)).toEqual({
-			income: 12000.12,
-			spending: 0.84,
-			saving: 3.96,
-			shortfall: 0,
+		const plan = planMonth(budgetWith(1000.01, [category("a", "wants", 0.07)]));
+		expect(estimateYear(plan)).toEqual({ income: 12000.12, spending: 0.84 });
+	});
+
+	it("is zero for an empty budget", () => {
+		expect(estimateYear(planMonth(emptyBudget()))).toEqual({
+			income: 0,
+			spending: 0,
 		});
 	});
 
-	it("gives the yearly shortfall when the plan asks for more than the salary", () => {
-		const plan = planMonth(
-			budgetWith(500, [
-				category("a", "needs", 450),
-				category("b", "savings", 150),
-			]),
-		);
-		expect(estimateYear(plan)).toMatchObject({ saving: 1800, shortfall: 1200 });
-	});
-
-	it("handles a large plan without losing cents", () => {
-		const plan = planMonth(
-			budgetWith(10_000_000, [category("a", "savings", 1_000_000.01)]),
-		);
-		expect(estimateYear(plan).saving).toBe(12_000_000.12);
+	it("handles a large salary without losing cents", () => {
+		const plan = planMonth(budgetWith(10_000_000.01, []));
+		expect(estimateYear(plan).income).toBe(120_000_000.12);
 	});
 });
 
@@ -671,5 +646,49 @@ describe("spendingProgress", () => {
 
 	it("handles large amounts to the cent", () => {
 		expect(spendingProgress(1_000_000.01, 1_000_000).remaining).toBe(-0.01);
+	});
+});
+
+describe("savings from the register", () => {
+	it("counts the monthly amount as savings", () => {
+		const plan = planMonth(budgetWith(2000, []), "2026-11", 150.25);
+
+		expect(plan.planned.savings).toBe(150.25);
+		expect(plan.unassigned).toBe(1849.75);
+	});
+
+	it("adds to savings already planned in the budget", () => {
+		const plan = planMonth(
+			budgetWith(2000, [category("old", "savings", 100)]),
+			"2026-11",
+			50,
+		);
+
+		expect(plan.planned.savings).toBe(150);
+	});
+
+	it("changes nothing when the register has no monthly amount", () => {
+		const plan = planMonth(budgetWith(2000, []), "2026-11", 0);
+
+		expect(plan.planned.savings).toBe(0);
+		expect(plan.unassigned).toBe(2000);
+	});
+
+	it("shows the salary as over planned when savings exceed it", () => {
+		expect(planMonth(budgetWith(100, []), "2026-11", 150).unassigned).toBe(-50);
+	});
+
+	it("keeps large amounts exact", () => {
+		const plan = planMonth(budgetWith(10_000_000, []), "2026-11", 1_000_000.01);
+
+		expect(plan.planned.savings).toBe(1_000_000.01);
+	});
+
+	it("refuses a negative or broken amount", () => {
+		for (const amount of [-1, Number.NaN]) {
+			expect(() => planMonth(budgetWith(100, []), "2026-11", amount)).toThrow(
+				new AppError("invalidAmount"),
+			);
+		}
 	});
 });

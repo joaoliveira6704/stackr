@@ -14,10 +14,23 @@
           {
             "id": "ce71eca6-1202-45bc-8bc1-5bf524e2d891",
             "symbol": "VWCE.DE",
+            "name": "Vanguard FTSE All-World",
             "kind": "etf",
             "initial": 1000,
+            "shares": 0,
+            "quote": {
+              "price": 159.34,
+              "currency": "EUR",
+              "time": 1795192549000,
+              "rateToEur": 1
+            },
+            "manualValue": null,
+            "startDate": "",
             "monthly": 300,
             "annualReturnPercent": 9.9,
+            "deposits": [],
+            "nametag": "",
+            "icon": null,
             "returnSource": "history",
             "yearlyReturns": [
               {
@@ -45,10 +58,10 @@
                 "percent": 9.2
               }
             ],
-            "historyYears": 7,
-            "name": "Vanguard FTSE All-World"
+            "historyYears": 7
           }
-        ]
+        ],
+        "savings": []
       },
       "budget": {
         "salary": 1400,
@@ -79,27 +92,233 @@
       "onboardingDone": true,
       "track": "arena",
       "budget": {
-        "salary": 670,
+        "salary": 2000,
         "categories": [
           {
-            "id": "acb4a0fe-ba67-458a-9b7b-ef22ea055788",
-            "name": "Renda",
-            "description": "Casa Povoa",
+            "id": "a107614a-70a7-4c95-83ac-59214f4bb283",
+            "name": "renda",
+            "description": "porto",
             "group": "needs",
-            "planned": 250,
-            "recurrence": "quarterly",
+            "planned": 800,
+            "recurrence": "monthly",
             "dueDate": "2026-12-10"
+          },
+          {
+            "id": "dcbdff35-60ac-4c36-9ef7-d94130c1a6b6",
+            "name": "net",
+            "description": "meo",
+            "group": "needs",
+            "planned": 70,
+            "recurrence": "monthly",
+            "dueDate": "2026-12-03"
+          },
+          {
+            "id": "14c6b4ad-4d7f-4f43-b63a-f636a453a511",
+            "name": "Ginasio",
+            "description": "Ginasio Povoa",
+            "group": "needs",
+            "planned": 25,
+            "recurrence": "monthly",
+            "dueDate": "2026-10-12"
           }
         ],
         "expenses": [
           {
-            "id": "ccb39d4f-a489-4cec-a281-f51d489d92d4",
-            "categoryId": "acb4a0fe-ba67-458a-9b7b-ef22ea055788",
-            "amount": 250,
+            "id": "b7b67761-f779-431e-a9de-a05d4799a3af",
+            "categoryId": "a107614a-70a7-4c95-83ac-59214f4bb283",
+            "amount": 800,
+            "description": "",
+            "date": "2026-11-22"
+          },
+          {
+            "id": "98ffe8dc-cc4c-44d1-9288-a1a2b00c5bf5",
+            "categoryId": "dcbdff35-60ac-4c36-9ef7-d94130c1a6b6",
+            "amount": 70,
+            "description": "",
+            "date": "2026-11-22"
+          },
+          {
+            "id": "9114e3c2-8d68-4c75-af7e-b6f8aa8add51",
+            "categoryId": "14c6b4ad-4d7f-4f43-b63a-f636a453a511",
+            "amount": 25,
             "description": "",
             "date": "2026-11-22"
           }
         ]
+      },
+      "portfolio": {
+        "years": 20,
+        "inflationPercent": 2,
+        "holdings": [
+          {
+            "id": "170cf34f-3f6e-4d7e-8d18-e9765e64a23f",
+            "symbol": "VWCE.DE",
+            "name": "Vanguard FTSE All-World UCITS ETF USD Accumulation",
+            "kind": "etf",
+            "initial": 1016.14,
+            "shares": 6,
+            "quote": {
+              "price": 159.34,
+              "currency": "EUR",
+              "time": 1795192549000,
+              "rateToEur": 1
+            },
+            "manualValue": null,
+            "startDate": "2026-11-16",
+            "monthly": 0,
+            "annualReturnPercent": 11.9,
+            "deposits": [],
+            "nametag": "",
+            "icon": null,
+            "returnSource": "history",
+            "yearlyReturns": [
+              {
+                "year": 2020,
+                "percent": 5.4
+              },
+              {
+                "year": 2021,
+                "percent": 28.6
+              },
+              {
+                "year": 2022,
+                "percent": -13.5
+              },
+              {
+                "year": 2023,
+                "percent": 18.2
+              },
+              {
+                "year": 2024,
+                "percent": 24.4
+              },
+              {
+                "year": 2025,
+                "percent": 9.2
+              }
+            ],
+            "historyYears": 7
+          },
+          {
+            "id": "771d38fc-da87-43d1-b411-124d20d7d188",
+            "symbol": "NUKL.DE",
+            "name": "VanEck Uranium and Nuclear Technologies UCITS ETF A USD Acc",
+            "kind": "etf",
+            "initial": 120,
+            "shares": 3.21027287,
+            "quote": {
+              "price": 31.98,
+              "currency": "EUR",
+              "time": 1795192710000,
+              "rateToEur": 1
+            },
+            "manualValue": null,
+            "startDate": "2026-11-12",
+            "monthly": 0,
+            "annualReturnPercent": 19,
+            "deposits": [],
+            "nametag": "",
+            "icon": null,
+            "returnSource": "history",
+            "yearlyReturns": [
+              {
+                "year": 2024,
+                "percent": 38
+              },
+              {
+                "year": 2025,
+                "percent": 51.5
+              }
+            ],
+            "historyYears": 3
+          },
+          {
+            "id": "cd17cf24-4435-4c96-866b-4ef36ef06faa",
+            "symbol": "SGLN.L",
+            "name": "iShares Physical Gold ETC",
+            "kind": "stock",
+            "initial": 150,
+            "shares": 2.20396574,
+            "quote": {
+              "price": 52.47,
+              "currency": "GBP",
+              "time": 1795192500000,
+              "rateToEur": 1.1928
+            },
+            "manualValue": null,
+            "startDate": "2026-11-22",
+            "monthly": 0,
+            "annualReturnPercent": 11,
+            "deposits": [],
+            "nametag": "",
+            "icon": null,
+            "returnSource": "history",
+            "yearlyReturns": [
+              {
+                "year": 2017,
+                "percent": 1.7
+              },
+              {
+                "year": 2018,
+                "percent": 4.4
+              },
+              {
+                "year": 2019,
+                "percent": 14.6
+              },
+              {
+                "year": 2020,
+                "percent": 19.9
+              },
+              {
+                "year": 2021,
+                "percent": -2.8
+              },
+              {
+                "year": 2022,
+                "percent": 11.8
+              },
+              {
+                "year": 2023,
+                "percent": 7.2
+              },
+              {
+                "year": 2024,
+                "percent": 28.2
+              },
+              {
+                "year": 2025,
+                "percent": 53.7
+              }
+            ],
+            "historyYears": 9
+          },
+          {
+            "id": "86538841-aa1f-4c4d-93df-be0072ea561d",
+            "symbol": "EUDF.DE",
+            "name": "WisdomTree Europe Defence UCITS ETF - EUR Acc",
+            "kind": "etf",
+            "initial": 120,
+            "shares": 3.98208063,
+            "quote": {
+              "price": 28.335,
+              "currency": "EUR",
+              "time": 1795192560000,
+              "rateToEur": 1
+            },
+            "manualValue": null,
+            "startDate": "2026-11-22",
+            "monthly": 0,
+            "annualReturnPercent": 3.3,
+            "deposits": [],
+            "nametag": "",
+            "icon": null,
+            "returnSource": "history",
+            "yearlyReturns": [],
+            "historyYears": 1
+          }
+        ],
+        "savings": []
       }
     },
     {

@@ -1,5 +1,5 @@
 import { AppError, type ErrorCode } from "./errors";
-import { roundCents } from "./money";
+import { roundCents, sumMoney } from "./money";
 import { isRecord, loadUserField, numberOr, saveUserField } from "./user-data";
 
 export const BUDGET_GROUPS = ["needs", "wants", "savings"] as const;
@@ -15,7 +15,7 @@ export const RULE_SHARES: Record<BudgetGroup, number> = {
 	savings: 0.2,
 };
 
-/** The types a user can pick. Savings will come from the investments log. */
+/** The types a user can pick. Savings come from the register. */
 export const EXPENSE_GROUPS = ["needs", "wants"] as const;
 
 export const RECURRENCES = ["once", "monthly", "quarterly", "yearly"] as const;
@@ -189,10 +189,6 @@ export function checkedCategory(
 	};
 }
 
-export function sumMoney(amounts: number[]): number {
-	return roundCents(amounts.reduce((sum, amount) => sum + amount, 0));
-}
-
 export interface MonthlyPlan {
 	salary: number;
 	/** What is planned for each group, in euros a month. */
@@ -205,19 +201,17 @@ export interface MonthlyPlan {
 	unassigned: number;
 	/** Needs and wants over the calendar year, counting each real payment. */
 	yearlySpending: number;
-	/** What is planned as savings over the calendar year. */
-	yearlySaving: number;
 }
 
 /** What a bill weighs on one month. A one off counts in the month it is due. */
-function monthlyCost(category: BudgetCategory, month: string): number {
+export function monthlyCost(category: BudgetCategory, month: string): number {
 	if (category.recurrence === "once") {
 		return category.dueDate.startsWith(`${month}-`) ? category.planned : 0;
 	}
 	return category.planned / CYCLE_MONTHS[category.recurrence];
 }
 
-function yearlyCost(category: BudgetCategory, year: string): number {
+export function yearlyCost(category: BudgetCategory, year: string): number {
 	if (category.recurrence === "once") {
 		return category.dueDate.startsWith(`${year}-`) ? category.planned : 0;
 	}
@@ -226,12 +220,17 @@ function yearlyCost(category: BudgetCategory, year: string): number {
 	);
 }
 
-/** Totals of the monthly plan. Throws when the salary or a planned amount is not valid. */
+/**
+ * Totals of the monthly plan, with what the register puts aside each month
+ * counted as savings. Throws when the salary or a planned amount is not valid.
+ */
 export function planMonth(
 	budget: Budget,
 	month: string = monthKey(new Date()),
+	registeredMonthlySavings = 0,
 ): MonthlyPlan {
 	assertAmount(budget.salary, "invalidSalary");
+	assertAmount(registeredMonthlySavings, "invalidAmount");
 	for (const category of budget.categories) {
 		assertAmount(category.planned, "invalidPlannedAmount");
 	}
@@ -245,45 +244,36 @@ export function planMonth(
 			),
 		]),
 	) as Record<BudgetGroup, number>;
+	planned.savings = roundCents(planned.savings + registeredMonthlySavings);
 	const salary = roundCents(budget.salary);
 	const spending = roundCents(planned.needs + planned.wants);
 	const totalPlanned = roundCents(spending + planned.savings);
 	const year = month.slice(0, 4);
-	const yearlyFor = (isCounted: (group: BudgetGroup) => boolean) =>
-		sumMoney(
-			budget.categories
-				.filter((category) => isCounted(category.group))
-				.map((category) => yearlyCost(category, year)),
-		);
+	const yearlySpending = sumMoney(
+		budget.categories
+			.filter((category) => category.group !== "savings")
+			.map((category) => yearlyCost(category, year)),
+	);
 	return {
 		salary,
 		planned,
 		totalPlanned,
 		spending,
 		unassigned: roundCents(salary - totalPlanned),
-		yearlySpending: yearlyFor((group) => group !== "savings"),
-		yearlySaving: yearlyFor((group) => group === "savings"),
+		yearlySpending,
 	};
 }
 
 export interface YearlyEstimate {
 	income: number;
 	spending: number;
-	/** Only what is planned as savings, never the salary left unassigned. */
-	saving: number;
-	/** How much the plan asks for above the salary, zero when it fits. */
-	shortfall: number;
 }
 
 /** What the plan adds up to over the calendar year. */
 export function estimateYear(plan: MonthlyPlan): YearlyEstimate {
-	const income = roundCents(plan.salary * MONTHS_PER_YEAR);
-	const costs = roundCents(plan.yearlySpending + plan.yearlySaving);
 	return {
-		income,
+		income: roundCents(plan.salary * MONTHS_PER_YEAR),
 		spending: plan.yearlySpending,
-		saving: plan.yearlySaving,
-		shortfall: Math.max(roundCents(costs - income), 0),
 	};
 }
 

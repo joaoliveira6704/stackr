@@ -152,6 +152,29 @@ export function chartBody(
 	};
 }
 
+/** A Yahoo chart answer with only the latest price of a ticker. */
+export function quoteBody(
+	symbol: string,
+	price: number,
+	currency = "EUR",
+	seconds = 1_790_000_000,
+) {
+	return {
+		chart: {
+			result: [
+				{
+					meta: {
+						symbol,
+						currency,
+						regularMarketPrice: price,
+						regularMarketTime: seconds,
+					},
+				},
+			],
+		},
+	};
+}
+
 export function searchBody(
 	quotes: { symbol: string; longname: string; quoteType: string }[],
 ) {

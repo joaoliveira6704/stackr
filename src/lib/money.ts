@@ -7,6 +7,10 @@ export function roundCents(amount: number): number {
 	return (Math.sign(amount) * cents) / 100 || 0;
 }
 
+export function sumMoney(amounts: number[]): number {
+	return roundCents(amounts.reduce((sum, amount) => sum + amount, 0));
+}
+
 /** Turns a percentage typed by the user, such as 7.5, into a rate of 0.075. */
 export function percentToRate(percent: number): number {
 	return percent / 100;

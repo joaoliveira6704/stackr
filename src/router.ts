@@ -16,6 +16,7 @@ import LoginView from "./views/LoginView.vue";
 import NotFoundView from "./views/NotFoundView.vue";
 import OnboardingView from "./views/OnboardingView.vue";
 import ProfileView from "./views/ProfileView.vue";
+import RegisterView from "./views/RegisterView.vue";
 import QuizView from "./views/QuizView.vue";
 import SignupView from "./views/SignupView.vue";
 import SimulatorView from "./views/SimulatorView.vue";
@@ -66,6 +67,11 @@ const routes: RouteRecordRaw[] = [
 		props: true,
 		path: "/budget",
 		component: BudgetView,
+		meta: { requiresAuth: true, layout: "app" },
+	},
+	{
+		path: "/register",
+		component: RegisterView,
 		meta: { requiresAuth: true, layout: "app" },
 	},
 	{

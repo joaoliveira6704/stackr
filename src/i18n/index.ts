@@ -40,6 +40,17 @@ const NUMBER_FORMATS = {
 		maximumFractionDigits: 1,
 	},
 	percent: { style: "percent", maximumFractionDigits: 1 },
+	signedCurrency: {
+		style: "currency",
+		currency: "EUR",
+		signDisplay: "exceptZero",
+	},
+	shares: { maximumFractionDigits: 8 },
+	ratePercent: {
+		style: "percent",
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	},
 	signedPercent: {
 		style: "percent",
 		maximumFractionDigits: 1,
@@ -53,6 +64,12 @@ export type NumberFormatKey = keyof typeof NUMBER_FORMATS;
 const DATETIME_FORMATS = {
 	dayMonth: { day: "numeric", month: "short" },
 	dayMonthYear: { day: "numeric", month: "short", year: "numeric" },
+	dayMonthTime: {
+		day: "numeric",
+		month: "short",
+		hour: "2-digit",
+		minute: "2-digit",
+	},
 } as const;
 
 export function createAppI18n(locale: Locale = getSavedLocale()) {
