@@ -3,6 +3,8 @@ import type { MessageSchema } from "./pt";
 export const en: MessageSchema = {
 	nav: {
 		dashboard: "Dashboard",
+		budget: "Budget",
+		simulator: "Simulator",
 		login: "Log in",
 		signup: "Sign up",
 		logout: "Log out",
@@ -36,6 +38,8 @@ export const en: MessageSchema = {
 		back: "Back",
 		next: "Next",
 		cancel: "Cancel",
+		saving: "Saving...",
+		unsaved: "You have unsaved changes.",
 	},
 	logoutConfirm: {
 		title: "Log out?",
@@ -55,6 +59,28 @@ export const en: MessageSchema = {
 		contentNotFound: "We could not find this content.",
 		progressNotSaved:
 			"Your progress could not be saved. We will try again on the next change.",
+		invalidYears: "Pick a period between 1 and 50 years.",
+		invalidInflation: "Inflation has to be a number above -100%.",
+		invalidAmount: "Amounts invested have to be numbers of zero or more.",
+		invalidReturn: "The return has to be a number above -100%.",
+		marketUnavailable:
+			"We could not reach the market data right now. Try again in a moment.",
+		tickerNotFound: "We could not find that ticker.",
+		portfolioNotLoaded: "Could not load your portfolio.",
+		portfolioNotSaved: "Could not save your portfolio. Try again.",
+		tooManyHoldings:
+			"Your portfolio already has the most investments it can hold.",
+		holdingExists: "That investment is already in your portfolio.",
+		budgetNotLoaded: "Could not load your budget.",
+		budgetNotSaved: "Could not save your budget. Try again.",
+		invalidSalary: "Your salary must be a number of zero or more.",
+		invalidPlannedAmount:
+			"The planned amount of each expense must be a number of zero or more.",
+		invalidPaidAmount: "The amount paid cannot be negative.",
+		tooManyCategories: "Your budget already has the most expenses it can hold.",
+		categoryMissing: "Pick the expense this spending belongs to.",
+		categoryNameMissing: "Give the expense a name.",
+		dueDateMissing: "Pick the due date for this expense.",
 		unknown: "Something went wrong.",
 	},
 	levels: {
@@ -275,6 +301,12 @@ export const en: MessageSchema = {
 		risk: "Risk",
 		seeResult: "See result",
 		saving: "Saving...",
+		explanation: {
+			title: "Detailed explanation",
+			showHint: "For when you want to know more",
+			hideHint: "Press again to hide it",
+			reveal: "Show explanation",
+		},
 		result: {
 			eyebrow: "Your track",
 			why: "Why this track",
@@ -288,6 +320,8 @@ export const en: MessageSchema = {
 		questions: {
 			budgetRule: {
 				prompt: "What does the 50/30/20 rule split?",
+				explanation:
+					"The 50/30/20 rule is a simple way to split what you earn each month. About 50% goes to needs, like rent, bills and food. Up to 30% is for wants, like dinners out or subscriptions. At least 20% goes to savings or to paying off debt. It is not a law, just a starting point you can adjust to your life.",
 				options: {
 					needsWantsSavings: "Needs, wants and savings",
 					taxesRentFood: "Taxes, rent and food",
@@ -298,6 +332,8 @@ export const en: MessageSchema = {
 			inflation: {
 				prompt:
 					"Your savings earn 1% a year and inflation is at 3%. What happens to your buying power?",
+				explanation:
+					"Inflation measures how fast prices go up over time. If your savings earn 1% and prices rise 3%, your money grows more slowly than the cost of things. After a year you have more euros, but they buy less, so your buying power shrinks. That is why it pays to look for ways to make your money grow faster than inflation.",
 				options: {
 					grows: "It grows",
 					staysTheSame: "It stays the same",
@@ -307,6 +343,8 @@ export const en: MessageSchema = {
 			},
 			etf: {
 				prompt: "What is an ETF?",
+				explanation:
+					"ETF stands for Exchange Traded Fund. It bundles dozens or hundreds of assets, like shares or bonds, into one product that you buy and sell just like a normal share. With a single purchase your money is spread across many companies, so you do not depend on any one of them doing well. Many ETFs follow a whole index and have low fees.",
 				options: {
 					singleShare: "A share in a single company",
 					basketFund:
@@ -317,6 +355,8 @@ export const en: MessageSchema = {
 			},
 			marketDrop: {
 				prompt: "Your investment drops 20% in a month. What do you do?",
+				explanation:
+					"Drops of 20% happen in markets more often than you might think, and in the past they have recovered, although nothing guarantees it. Selling in a panic turns a loss on paper into a real one. Waiting shows patience, and buying more can lower your average price, but only with money you will not need any time soon. There is no right answer, only the one that fits you.",
 				options: {
 					sellEverything: "Sell everything so I don't lose more",
 					wait: "Wait and leave it alone",
@@ -325,6 +365,8 @@ export const en: MessageSchema = {
 			},
 			betChoice: {
 				prompt: "Which of these would you pick?",
+				explanation:
+					"This question weighs certainty against risk. On average, the sure 100 € is worth 100 €, the coin flip is worth 125 € and the long shot is worth 200 €. Even so, many people prefer the sure amount, because losing hurts more than winning feels good. Seeing how you react to this choice helps you know how much risk you can take without losing sleep.",
 				options: {
 					sureAmount: "Get 100 € for sure",
 					coinFlip: "A 50% chance of getting 250 €",
@@ -334,11 +376,291 @@ export const en: MessageSchema = {
 			hotTip: {
 				prompt:
 					"A friend swears a new crypto coin will be worth ten times more this month. What do you do?",
+				explanation:
+					"Promises of huge gains in a short time are one of the most common signs of scams and bubbles. New crypto coins can shoot up, but they can also lose almost all their value overnight. Before you invest, ask who gains from the tip, research the project and never put in more than you are ready to lose.",
 				options: {
 					ignore: "Ignore it, it sounds too good to be true",
 					research: "Research first and maybe put in a little",
 					buyNow: "Buy right away before it goes up",
 				},
+			},
+		},
+	},
+	simulator: {
+		eyebrow: "Simulator",
+		title: "Project your investment.",
+		subtitle:
+			"Build your portfolio, choose how much goes into each investment and see what it could be worth, with inflation and taxes included.",
+		save: "Save portfolio",
+		saved: "Portfolio saved.",
+		loading: "Loading your portfolio...",
+		retry: "Try again",
+		settings: {
+			title: "Inflation",
+			subtitle:
+				"How much you expect prices to rise each year. The European Central Bank aims for 2%.",
+			inflation: "Inflation per year",
+		},
+		holdings: {
+			title: "Your portfolio",
+			subtitle:
+				"Search stocks, ETFs or crypto by name or ticker, up to {max} investments.",
+			addManual: "Add by hand",
+			full: "You reached the limit of {max} investments.",
+			emptyTitle: "You have no investments yet.",
+			emptyDetail:
+				"Search for a ticker above, pick one of the popular ones or add an investment by hand with your own estimate.",
+		},
+		search: {
+			label: "Search for an investment",
+			placeholder: "For example VWCE, Apple or Bitcoin",
+			searching: "Searching...",
+			noResults: "No results for this search.",
+			popular: "Popular:",
+			adding: "Fetching the history...",
+			noHistoryNotice:
+				"We could not fetch the history of {name}. Type the return you expect.",
+		},
+		kinds: {
+			stock: "Stock",
+			etf: "ETF",
+			fund: "Fund",
+			crypto: "Crypto",
+			index: "Index",
+			manual: "Added by hand",
+		},
+		holding: {
+			name: "Name",
+			initial: "Starting amount",
+			monthly: "Per month",
+			return: "Return per year",
+			remove: "Remove {name}",
+			fromHistory:
+				"Real average of the last year | Real average of the last {years} years",
+			noHistory: "No history, type your estimate",
+			manual: "Your estimate",
+			defaultName: "Investment {number}",
+			yearlyTitle: "Change in each year",
+			yearlyEntry: "{year}: {change}",
+		},
+		duration: {
+			label: "For how long?",
+			years: "{years} year | {years} years",
+			slider: "Investment period, in years",
+		},
+		confirmRemove: {
+			title: "Remove {name}?",
+			message:
+				"It leaves your portfolio with the amounts you typed. To get it back you have to add it again.",
+			confirm: "Remove",
+		},
+		confirmLeave: {
+			title: "Leave without saving?",
+			message: "The changes to your portfolio are lost if you leave now.",
+			confirm: "Leave without saving",
+		},
+		results: {
+			title: "In {years} year | In {years} years",
+			invested: "Total invested",
+			investedDetail: "{initial} at the start and {monthly} a month",
+			value: "Final value",
+			valueDetail: "{rate} on what you put in",
+			gain: "Gain",
+			gainDetail: "{net} after taxes",
+			realGain: "Above inflation",
+			realGainUp: "How much your buying power grows, in today's money",
+			realGainDown: "You lose buying power, inflation beats this plan",
+		},
+		chart: {
+			title: "How your money grows",
+			subtitle: "Hover or use the arrow keys to see each year.",
+			label: "Chart of how the portfolio grows over the years",
+			hint: "Use the left and right arrow keys to see each year.",
+			value: "Portfolio value",
+			invested: "Total invested",
+			realValue: "In today's money",
+			yearTick: "{year}y",
+			yearLabel: "Year {year}",
+			year: "Year",
+			showTable: "Show table",
+			hideTable: "Hide table",
+		},
+		allocation: {
+			title: "How it is split",
+			subtitle:
+				"The weight of each investment in what you put in over {years} year. | The weight of each investment in what you put in over {years} years.",
+			empty: "Type some amounts to see how your portfolio is split.",
+			others: "{count} others",
+		},
+		reality: {
+			title: "Inflation and taxes",
+			subtitle: "What is really left at the end.",
+			realValue: "In today's money",
+			realValueDetail: "What the final value would buy today",
+			inflationCost: "What inflation eats",
+			inflationCostDetail: "Gap between the final value and today's",
+			tax: "Tax on the gain",
+			taxDetail: "{rate} rate in Portugal, when you sell",
+			averageReturn: "Average return",
+			averageReturnDetail: "Of the whole portfolio, per year",
+		},
+		scenarios: {
+			title: "Scenarios",
+			subtitle: "Nobody knows the future, so look at the range.",
+			pessimistic: "Pessimistic",
+			expected: "Expected",
+			optimistic: "Optimistic",
+			expectedDetail: "With the returns you chose",
+			lowerDetail: "With {points} points less per year",
+			higherDetail: "With {points} points more per year",
+		},
+		breakdown: {
+			title: "By investment",
+			subtitle:
+				"What each one is worth in {years} year. | What each one is worth in {years} years.",
+			detail: "You put in {invested}, you gain {gain}",
+		},
+		disclaimer:
+			"This is an educational simulation, not financial advice. Past returns do not guarantee future ones, and the history comes in each asset's own currency, without exchange rates.",
+	},
+	budget: {
+		eyebrow: "Budget",
+		title: "Plan your month.",
+		subtitle:
+			"Type in your salary, list your expenses and mark what you have paid. We show you what your year looks like.",
+		saved: "Budget saved.",
+		loading: "Loading your budget...",
+		retry: "Try again",
+		salary: {
+			title: "Your salary",
+			subtitle: "What you get each month, after taxes.",
+			label: "Take home pay per month",
+			planned: "Planned",
+			unassigned: "Not assigned yet",
+			overAssigned: "Planned over salary",
+		},
+		groups: {
+			needs: "Needs",
+			wants: "Wants",
+			savings: "Savings",
+		},
+		categories: {
+			title: "Spending this month",
+			subtitle:
+				"Record your bills, current and upcoming. The amount paid goes back to zero after each due date. Up to {max} expenses.",
+			add: "New record",
+			full: "You reached the limit of {max} expenses.",
+			emptyTitle: "You have no expenses yet.",
+			total: "Total paid",
+			totalDetail: "Out of {planned} planned",
+		},
+		category: {
+			name: "Name",
+			description: "Description (optional)",
+			group: "Type",
+			planned: "Amount",
+			recurrence: "Repeats",
+			recurrences: {
+				once: "One time",
+				monthly: "Monthly",
+				quarterly: "Quarterly",
+				yearly: "Yearly",
+			},
+			dueDate: "Due date",
+			dueDateOptional: "Due date (optional)",
+			due: "Due {date}",
+			overdue: "Overdue since {date}",
+			summary: "{planned} · {recurrence}",
+			edit: "Edit {name}",
+			remove: "Remove {name}",
+			paid: "Paid so far",
+			editPaid: "Edit the amount paid on {name}, now {amount}",
+			paidInput: "Amount paid on {name}",
+			paidSlider: "How much of {name} you have paid",
+			status: {
+				left: "{amount} to pay",
+				paidOff: "Paid off",
+				over: "Over by {amount}",
+				unplanned: "No amount planned",
+			},
+		},
+		categoryDialog: {
+			addTitle: "New record",
+			editTitle: "Edit expense",
+			subtitle:
+				"Say what it is, how much it costs, how often it repeats and when it is due.",
+			addSubmit: "Save record",
+			editSubmit: "Save changes",
+		},
+		rule: {
+			title: "The 50/30/20 rule",
+			subtitle: "Half for needs, 30% for wants and at least 20% to save.",
+			noSalary: "Type in your salary to compare your plan with the rule.",
+			targetMax: "Aim for {target} or less",
+			targetMin: "Aim for at least {target}",
+			onTrack: "On track",
+			above: "Above the aim",
+			below: "Below the aim",
+			savingsNote:
+				"Savings will count what you record in your investments. Money not assigned yet does not count.",
+		},
+		year: {
+			title: "Your year",
+			subtitle: "What your bills really cost over the year.",
+			income: "Yearly income",
+			incomeDetail: "{monthly} a month",
+			spending: "Yearly spending",
+			spendingDetail: "Needs and wants",
+			saving: "Estimated savings",
+			savingDetail: "What you put aside over the year",
+			deficit: "Estimated shortfall",
+			deficitDetail: "Your plan asks for more than you earn",
+		},
+		confirmRemoveCategory: {
+			title: "Remove {name}?",
+			message:
+				"The expense leaves your budget. | The expense leaves your budget, with the payment logged in it. | The expense leaves your budget, with the {count} payments logged in it.",
+			confirm: "Remove expense",
+		},
+		confirmLeave: {
+			title: "Leave without saving?",
+			message: "The changes to your budget are lost if you leave now.",
+			confirm: "Leave without saving",
+		},
+	},
+	badges: {
+		title: "What you are applying here",
+		subtitle: "The badges of the lessons behind this screen.",
+		count: "{earned} of {total}",
+		earned: "Earned",
+		items: {
+			budgetOnTrack: {
+				name: "Budget on Track",
+				lesson: "Finish the budgeting module",
+			},
+			budgetRule: {
+				name: "50/30/20 Rule",
+				lesson: "Lesson on splitting your salary",
+			},
+			solidFund: {
+				name: "Solid Fund",
+				lesson: "100% on the emergency fund quiz",
+			},
+			compoundInterest: {
+				name: "Compound Interest",
+				lesson: "Lesson on compound interest",
+			},
+			inflation: {
+				name: "Inflation",
+				lesson: "Lesson on inflation",
+			},
+			diversification: {
+				name: "Diversification",
+				lesson: "Lesson on spreading your money",
+			},
+			prudentInvestor: {
+				name: "Prudent Investor",
+				lesson: "Finish the Strategist track",
 			},
 		},
 	},

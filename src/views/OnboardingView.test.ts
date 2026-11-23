@@ -71,6 +71,40 @@ describe("OnboardingView", () => {
 		expect(wrapper.text()).toContain("Question 1 of 6");
 	});
 
+	it("shows a blurred explanation of the current question", async () => {
+		const { wrapper } = await mountForNewcomer();
+		await wrapper.get("button.btn-primary").trigger("click");
+
+		const explanation = wrapper.get("[aria-controls]");
+		expect(explanation.attributes("aria-expanded")).toBe("false");
+		expect(wrapper.text()).toContain("The 50/30/20 rule is a simple way");
+	});
+
+	it("blurs the explanation again and swaps its text on the next question", async () => {
+		const { wrapper } = await mountForNewcomer();
+		await wrapper.get("button.btn-primary").trigger("click");
+		await wrapper.get("[aria-controls]").trigger("click");
+		await wrapper.findAll('input[type="radio"]')[0].setValue();
+
+		await wrapper.get("button.btn-primary").trigger("click");
+
+		expect(wrapper.get("[aria-controls]").attributes("aria-expanded")).toBe(
+			"false",
+		);
+		expect(wrapper.text()).toContain("Inflation measures how fast prices");
+		expect(wrapper.text()).not.toContain("The 50/30/20 rule is a simple way");
+	});
+
+	it("explains the question in Portuguese when the app is in Portuguese", async () => {
+		fakeUsersApi();
+		await useAuth().signIn(newcomer.email, DEMO_PASSWORD);
+		const { wrapper } = await mountAt("/onboarding", OnboardingView, "pt-PT");
+		await wrapper.get("button.btn-primary").trigger("click");
+
+		expect(wrapper.text()).toContain("Explicação detalhada");
+		expect(wrapper.text()).toContain("A regra 50/30/20 é uma forma simples");
+	});
+
 	it("keeps an answer when the user goes back to change it", async () => {
 		const { wrapper } = await mountForNewcomer();
 		await wrapper.get("button.btn-primary").trigger("click");

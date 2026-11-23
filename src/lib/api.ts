@@ -1,8 +1,7 @@
 import { AppError } from "./errors";
 
-// The dev server forwards /api to json-server, see vite.config.ts.
-const API_BASE = "/api";
-
+/** json-server, reached through the Vite proxy (see vite.config.ts). */
+export const API_BASE = "/api";
 export const JSON_HEADERS = { "Content-Type": "application/json" };
 
 export async function requestApi(

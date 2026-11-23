@@ -34,6 +34,7 @@ export interface SignUpInput {
 
 const SESSION_KEY = "stackr.session";
 const SALT_ROUNDS = 10;
+
 async function fetchUsersByEmail(email: string): Promise<User[]> {
 	const res = await requestApi(`/users?email=${encodeURIComponent(email)}`);
 	if (!res.ok) {

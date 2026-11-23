@@ -15,6 +15,7 @@
 	--grape-strong: #6a48f5;
 	--tangerine-strong: #e2541b;
 	--sun-strong: #b57b00;
+	--cherry-strong: #d61f35;
 	--glass: rgb(255 255 255 / 0.55);
 	--glass-strong: rgb(255 255 255 / 0.72);
 	--glass-popover: rgb(255 255 255 / 0.88);
@@ -23,6 +24,11 @@
 	--glass-edge: rgb(255 255 255 / 0.9);
 	--glass-shadow: 0 10px 40px -12px rgb(11 15 13 / 0.18);
 	--orb-opacity: 0.45;
+	/* Chart series, checked for colour blind safety against this surface. */
+	--chart-1: #0a7a38;
+	--chart-2: #d9a21c;
+	--chart-3: #6a48f5;
+	--chart-4: #e2541b;
 }
 
 .dark {
@@ -38,6 +44,7 @@
 	--grape-strong: #a891ff;
 	--tangerine-strong: #ff8d5f;
 	--sun-strong: #ffcb57;
+	--cherry-strong: #ff7482;
 	--glass: rgb(22 30 27 / 0.45);
 	--glass-strong: rgb(22 30 27 / 0.68);
 	--glass-popover: rgb(16 22 20 / 0.92);
@@ -46,4 +53,8 @@
 	--glass-edge: rgb(255 255 255 / 0.16);
 	--glass-shadow: 0 12px 48px -12px rgb(0 0 0 / 0.6);
 	--orb-opacity: 0.3;
+	--chart-1: #17723b;
+	--chart-2: #b88a20;
+	--chart-3: #8a6cf7;
+	--chart-4: #e2602c;
 }

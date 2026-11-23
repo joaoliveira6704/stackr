@@ -84,6 +84,8 @@ onUnmounted(() => window.removeEventListener("keydown", closeOnEscape));
 
 		<SidebarItem to="/dashboard" icon="dashboard" :label="t('nav.dashboard')" />
 		<SidebarItem to="/learn" icon="book" :label="t('nav.learn')" />
+		<SidebarItem to="/budget" icon="budget" :label="t('nav.budget')" />
+		<SidebarItem to="/simulator" icon="simulator" :label="t('nav.simulator')" />
 		<SidebarItem to="/profile" icon="user" :label="t('nav.profile')" />
 
 		<div class="contents max-md:hidden">
@@ -126,7 +128,7 @@ onUnmounted(() => window.removeEventListener("keydown", closeOnEscape));
 			:id="PREFERENCES_MENU_ID"
 			role="group"
 			:aria-label="t('nav.preferences')"
-			class="popover fixed right-3 bottom-[5.25rem] z-40 flex w-60 flex-col gap-1 md:hidden"
+			class="popover fixed right-3 bottom-21 z-40 flex w-60 flex-col gap-1 md:hidden"
 		>
 			<button
 				v-for="preference in preferences"

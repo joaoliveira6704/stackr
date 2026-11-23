@@ -29,6 +29,32 @@ export function localeShortName(locale: Locale): string {
 	return locale.slice(0, 2);
 }
 
+// Money is always in euros, whatever the language. Use these through n(),
+// such as n(amount, "currency"), so every screen formats money the same way.
+const NUMBER_FORMATS = {
+	currency: { style: "currency", currency: "EUR" },
+	compactCurrency: {
+		style: "currency",
+		currency: "EUR",
+		notation: "compact",
+		maximumFractionDigits: 1,
+	},
+	percent: { style: "percent", maximumFractionDigits: 1 },
+	signedPercent: {
+		style: "percent",
+		maximumFractionDigits: 1,
+		signDisplay: "exceptZero",
+	},
+} as const;
+
+export type NumberFormatKey = keyof typeof NUMBER_FORMATS;
+
+// Dates go through d(), such as d(date, "dayMonth"), so they follow the language.
+const DATETIME_FORMATS = {
+	dayMonth: { day: "numeric", month: "short" },
+	dayMonthYear: { day: "numeric", month: "short", year: "numeric" },
+} as const;
+
 export function createAppI18n(locale: Locale = getSavedLocale()) {
 	document.documentElement.lang = locale;
 	return createI18n<[MessageSchema], Locale, false>({
@@ -36,5 +62,7 @@ export function createAppI18n(locale: Locale = getSavedLocale()) {
 		locale,
 		fallbackLocale: DEFAULT_LOCALE,
 		messages: { "pt-PT": pt, en },
+		numberFormats: { "pt-PT": NUMBER_FORMATS, en: NUMBER_FORMATS },
+		datetimeFormats: { "pt-PT": DATETIME_FORMATS, en: DATETIME_FORMATS },
 	});
 }

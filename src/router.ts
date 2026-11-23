@@ -7,6 +7,7 @@ import {
 } from "vue-router";
 import { getSession } from "./lib/auth";
 import { ONBOARDING_PATH } from "./lib/onboarding";
+import BudgetView from "./views/BudgetView.vue";
 import DashboardView from "./views/DashboardView.vue";
 import HomeView from "./views/HomeView.vue";
 import LearnView from "./views/LearnView.vue";
@@ -17,12 +18,15 @@ import OnboardingView from "./views/OnboardingView.vue";
 import ProfileView from "./views/ProfileView.vue";
 import QuizView from "./views/QuizView.vue";
 import SignupView from "./views/SignupView.vue";
+import SimulatorView from "./views/SimulatorView.vue";
 
 declare module "vue-router" {
 	interface RouteMeta {
 		requiresAuth?: boolean;
 		/** "app" pages get the sidebar, every other page the top navbar. */
 		layout?: "app";
+		/** Public pages that need the bottom of the screen for their own content. */
+		hideFooter?: boolean;
 	}
 }
 
@@ -33,7 +37,7 @@ const routes: RouteRecordRaw[] = [
 	{
 		path: ONBOARDING_PATH,
 		component: OnboardingView,
-		meta: { requiresAuth: true },
+		meta: { requiresAuth: true, hideFooter: true },
 	},
 	{
 		path: "/dashboard",
@@ -60,6 +64,13 @@ const routes: RouteRecordRaw[] = [
 		path: "/learn/:lessonId/quiz",
 		component: QuizView,
 		props: true,
+		path: "/budget",
+		component: BudgetView,
+		meta: { requiresAuth: true, layout: "app" },
+	},
+	{
+		path: "/simulator",
+		component: SimulatorView,
 		meta: { requiresAuth: true, layout: "app" },
 	},
 	{ path: "/:pathMatch(.*)*", component: NotFoundView },

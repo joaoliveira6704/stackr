@@ -33,11 +33,13 @@ function buttonNamed(
 }
 
 describe("AppSidebar", () => {
-	it("links to the dashboard and the profile", async () => {
+	it("links to the dashboard, the budget, the simulator and the profile", async () => {
 		const { wrapper } = await mountSidebar();
 
 		const links = wrapper.findAll("a").map((link) => link.attributes("href"));
 		expect(links).toContain("/dashboard");
+		expect(links).toContain("/budget");
+		expect(links).toContain("/simulator");
 		expect(links).toContain("/profile");
 	});
 
