@@ -128,7 +128,7 @@ Statistics on the dashboard use the `StatCard` component, a card with a toned ic
 
 ## Forms
 
-Inputs use `field`, which is what the `TextField` component renders. Selectable answers use `choice`, a label that wraps a hidden radio or checkbox and turns green on its own when the input is checked. Inside it, `choice-key` is the letter badge and `choice-mark` is the round mark at the end. No class binding is needed for the selected state.
+Inputs use `field`, which is what the `TextField` component renders. Selectable answers use `choice`, a label that wraps a hidden radio or checkbox and turns green on its own when the input is checked. Inside it, `choice-key` is the letter badge and `choice-mark` is the round mark at the end. No class binding is needed for the selected state. After a quiz answer is checked, set `data-result="correct"` on the right answer and `data-result="wrong"` on a wrong one the user picked, and the choice turns green or orange.
 
 An amount moved along a known total, such as what is paid of a bill, uses `PaymentSlider`: a large amount that can be tapped to type an exact value, above a `slider`, the range input whose thumb takes its colour from `--slider-colour`. An empty grid starts with a compact `glass` tile with an `icon-tile-sm` to add the first record. Once it has an item, that action moves to a `btn-primary btn-sm` on the right of the section title.
 

@@ -1,7 +1,9 @@
 import {
+	ArrowLeft,
 	ArrowRight,
 	Award,
 	BookOpen,
+	Check,
 	CalendarDays,
 	ChartLine,
 	ChartPie,
@@ -56,9 +58,11 @@ import type { Track } from "../lib/tracks";
 export const ICONS = {
 	add: Plus,
 	alert: TriangleAlert,
+	arrowLeft: ArrowLeft,
 	arrowRight: ArrowRight,
 	badge: Award,
 	book: BookOpen,
+	check: Check,
 	budget: Wallet,
 	budgetRule: Scale,
 	calendar: CalendarDays,

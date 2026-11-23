@@ -105,12 +105,12 @@ const initials = computed(() =>
 				</section>
 
 				<section class="card-tint flex flex-col gap-3 bg-brand/12">
-					<div class="flex items-center justify-between">
-						<p class="text-sm text-ink-muted">{{ t("profile.nextStep") }}</p>
-						<span class="chip bg-brand text-on-brand">{{ t("common.comingSoon") }}</span>
-					</div>
+					<p class="text-sm text-ink-muted">{{ t("profile.nextStep") }}</p>
 					<p class="text-subheading">{{ t("profile.nextStepTitle") }}</p>
 					<p class="text-sm text-ink-muted">{{ t("profile.nextStepDetail") }}</p>
+					<RouterLink to="/learn" class="btn-primary btn-sm self-start">
+						{{ t("profile.goToLessons") }}
+					</RouterLink>
 				</section>
 			</div>
 		</div>

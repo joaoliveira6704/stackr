@@ -14,4 +14,8 @@
 @import "./styles/base.css";
 @import "./styles/components.css";
 
+/* json-server rewrites db/db.json on every save. If Tailwind scanned it for
+class names, each save would reload the page, and the app saves on load. */
+@source not "../db";
+
 @custom-variant dark (&:where(.dark, .dark *));
