@@ -1,6 +1,12 @@
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
-import { answersFor, quizzes } from "../test/content-fixtures";
+import { MODULE_REWARD, ONE_OFF_STACKS_PROFIT } from "../lib/rewards";
+import {
+	answersFor,
+	FUND_PRICE,
+	foundationTrack,
+	quizzes,
+} from "../test/content-fixtures";
 import { emptyProgress, useProgressStore } from "./progress";
 
 beforeEach(() => {
@@ -89,9 +95,7 @@ describe("Stacks", () => {
 		const progress = useProgressStore();
 		progress.addStacks(20);
 
-		expect(() => progress.spendStacks(30)).toThrow(
-			"You need 30 Stacks but only have 20.",
-		);
+		expect(() => progress.spendStacks(30)).toThrow("notEnoughStacks");
 		expect(progress.stacks).toBe(20);
 	});
 
@@ -141,9 +145,10 @@ describe("unlockContent", () => {
 		progress.addStacks(10);
 
 		expect(() => progress.unlockContent("extra-lesson-1", 50)).toThrow(
-			"You need 50 Stacks",
+			"notEnoughStacks",
 		);
 		expect(progress.unlockedContent).toEqual([]);
+		expect(progress.stacks).toBe(10);
 	});
 });
 
@@ -268,12 +273,108 @@ describe("submitQuiz", () => {
 	});
 });
 
+describe("module bonus", () => {
+	const [budgetModule] = foundationTrack.modules;
+	const ALL_RIGHT = ["a", "a", "a", "a", "a"];
+	const place = {
+		kind: "module" as const,
+		moduleId: budgetModule.id,
+		lessonIds: budgetModule.lessonIds,
+	};
+
+	function pass(lessonId: string) {
+		const quiz = quizzes.find((item) => item.lessonId === lessonId);
+		if (!quiz) throw new Error(`No quiz for ${lessonId}`);
+		return useProgressStore().submitQuiz(
+			lessonId,
+			quiz.questions,
+			answersFor(quiz, ALL_RIGHT),
+			place,
+		);
+	}
+
+	it("pays nothing extra while lessons of the module are still open", () => {
+		const outcome = pass("budget-1");
+
+		expect(outcome.moduleReward).toBeNull();
+		expect(useProgressStore().completedModules).toEqual([]);
+	});
+
+	it("pays the bonus when the last lesson of the module is passed", () => {
+		pass("budget-1");
+		const stacksBefore = useProgressStore().stacks;
+		const outcome = pass("budget-2");
+		const progress = useProgressStore();
+
+		expect(outcome.moduleReward).toEqual(MODULE_REWARD);
+		expect(progress.completedModules).toEqual([budgetModule.id]);
+		expect(progress.stacks).toBe(
+			stacksBefore + outcome.reward.stacks + MODULE_REWARD.stacks,
+		);
+	});
+
+	it("pays the bonus only once, even when the last lesson is passed again", () => {
+		pass("budget-1");
+		pass("budget-2");
+		const xpBefore = useProgressStore().xp;
+
+		const again = pass("budget-2");
+
+		expect(again.moduleReward).toBeNull();
+		expect(useProgressStore().xp).toBe(xpBefore);
+	});
+});
+
+describe("one-off lessons", () => {
+	const quiz = quizzes[0];
+	const ALL_RIGHT = ["a", "a", "a", "a", "a"];
+
+	function passOneOff(price: number) {
+		return useProgressStore().submitQuiz(
+			quiz.lessonId,
+			quiz.questions,
+			answersFor(quiz, ALL_RIGHT),
+			{ kind: "oneOff", price },
+		);
+	}
+
+	it("pays back more Stacks than the price on the first pass", () => {
+		const outcome = passOneOff(30);
+
+		expect(outcome.reward.stacks).toBe(30 + ONE_OFF_STACKS_PROFIT);
+		expect(outcome.reward.stacks).toBeGreaterThan(30);
+		expect(outcome.moduleReward).toBeNull();
+	});
+
+	it("pays the same XP as a core lesson", () => {
+		expect(passOneOff(30).reward.xp).toBe(100);
+	});
+
+	it("pays nothing when the one-off lesson is passed again", () => {
+		passOneOff(30);
+
+		expect(passOneOff(30).reward).toEqual({ xp: 0, stacks: 0 });
+	});
+
+	it("leaves the buyer with more Stacks than before after buying and passing", () => {
+		const progress = useProgressStore();
+		progress.addStacks(FUND_PRICE);
+
+		progress.unlockContent("extra-energy", FUND_PRICE);
+		passOneOff(FUND_PRICE);
+
+		expect(progress.stacks).toBe(FUND_PRICE + ONE_OFF_STACKS_PROFIT);
+	});
+});
+
 describe("snapshot, load and reset", () => {
 	it("restores exactly what was saved", () => {
 		const progress = useProgressStore();
 		progress.addXp(120);
 		progress.addStacks(30);
 		progress.completeLesson("budget-1");
+		progress.unlockContent("fund", 0);
+		progress.completedModules.push("budget");
 		const saved = progress.snapshot();
 
 		setActivePinia(createPinia());
@@ -292,6 +393,7 @@ describe("snapshot, load and reset", () => {
 		expect(progress.xp).toBe(250);
 		expect(progress.completedLessons).toEqual([]);
 		expect(progress.sectionsToReview).toEqual({});
+		expect(progress.completedModules).toEqual([]);
 	});
 
 	it("clears everything on reset, for the next person to sign in", () => {

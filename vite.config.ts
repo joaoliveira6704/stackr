@@ -25,7 +25,15 @@ export default defineConfig({
 			},
 		},
 	},
-	plugins: [tailwindcss(), vue()],
+	plugins: [
+		tailwindcss(),
+		vue({
+			// Files in public/ are served from the root as they are, so a path
+			// like "/hero-image.png" stays a plain URL instead of an import. As
+			// an import it also breaks the tests on Windows.
+			template: { transformAssetUrls: { includeAbsolute: false } },
+		}),
+	],
 	test: {
 		environment: "jsdom",
 		// Builds jsdom once per worker instead of once per test file, while

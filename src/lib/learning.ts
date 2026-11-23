@@ -1,46 +1,65 @@
-import type { TrackContent } from "../content/types";
+import type { Module, OneOff, TrackContent } from "../content/types";
 
 export type LessonStatus = "locked" | "available" | "review" | "done";
+export type ModuleStatus = "locked" | "open" | "done";
 
 export interface LearningProgress {
 	completedLessons: readonly string[];
 	lessonsToReview: readonly string[];
+	/** Ids of the modules and one-off lessons bought with Stacks. */
+	unlockedContent: readonly string[];
 }
 
-// Strategist users choose the order of the modules themselves (GDD 6.1), so
-// every module is open to them. The other tracks unlock modules in order.
-function modulesAreFree(content: TrackContent): boolean {
-	return content.id === "strategist";
+// Modules can be bought in any order. A free module, such as the first one of
+// every track, is always open.
+export function isModuleOpen(module: Module, progress: LearningProgress) {
+	return module.price === 0 || progress.unlockedContent.includes(module.id);
 }
 
-function isModuleDone(lessonIds: string[], progress: LearningProgress) {
-	return lessonIds.every((id) => progress.completedLessons.includes(id));
+export function isModuleDone(module: Module, progress: LearningProgress) {
+	return module.lessonIds.every((id) => progress.completedLessons.includes(id));
 }
 
+export function moduleStatus(
+	module: Module,
+	progress: LearningProgress,
+): ModuleStatus {
+	if (!isModuleOpen(module, progress)) return "locked";
+	return isModuleDone(module, progress) ? "done" : "open";
+}
+
+function lessonStatus(
+	lessonId: string,
+	canStart: boolean,
+	progress: LearningProgress,
+): LessonStatus {
+	if (progress.completedLessons.includes(lessonId)) return "done";
+	if (progress.lessonsToReview.includes(lessonId)) return "review";
+	return canStart ? "available" : "locked";
+}
+
+// Inside an open module the lessons still go in order, one after another.
 export function lessonStatuses(
 	content: TrackContent,
 	progress: LearningProgress,
 ): Record<string, LessonStatus> {
 	const statuses: Record<string, LessonStatus> = {};
-	let previousModuleDone = true;
 	for (const module of content.modules) {
-		const moduleOpen = modulesAreFree(content) || previousModuleDone;
-		let previousLessonDone = true;
+		let previousLessonDone = isModuleOpen(module, progress);
 		for (const lessonId of module.lessonIds) {
-			if (progress.completedLessons.includes(lessonId)) {
-				statuses[lessonId] = "done";
-			} else if (progress.lessonsToReview.includes(lessonId)) {
-				statuses[lessonId] = "review";
-			} else if (moduleOpen && previousLessonDone) {
-				statuses[lessonId] = "available";
-			} else {
-				statuses[lessonId] = "locked";
-			}
+			statuses[lessonId] = lessonStatus(lessonId, previousLessonDone, progress);
 			previousLessonDone = statuses[lessonId] === "done";
 		}
-		previousModuleDone = isModuleDone(module.lessonIds, progress);
 	}
 	return statuses;
+}
+
+export function oneOffStatus(
+	oneOff: OneOff,
+	progress: LearningProgress,
+): LessonStatus {
+	const bought = progress.unlockedContent.includes(oneOff.id);
+	return lessonStatus(oneOff.lessonId, bought, progress);
 }
 
 /** The lesson to suggest next: one waiting for review first, then a new one. */

@@ -16,7 +16,7 @@ const props = defineProps<{ lessonId: string }>();
 const progress = useProgressStore();
 const { t, n } = useI18n();
 const localized = useLocalized();
-const { data, loading, error, reload, status, nextLesson } = useLesson(
+const { data, loading, error, reload, status, nextLesson, place } = useLesson(
 	props.lessonId,
 	{ withQuiz: true },
 );
@@ -37,6 +37,9 @@ const selected = computed(() =>
 	question.value ? answers.value[question.value.id] : undefined,
 );
 const isLast = computed(() => index.value === questions.value.length - 1);
+const passMessageKey = computed(() =>
+	place.value?.kind === "oneOff" ? "quiz.passMessageOneOff" : "quiz.passMessage",
+);
 
 function choose(optionId: string) {
 	if (!question.value || checked.value) return;
@@ -51,7 +54,12 @@ function resultFor(optionId: string): "correct" | "wrong" | undefined {
 
 function goNext() {
 	if (isLast.value) {
-		outcome.value = progress.submitQuiz(props.lessonId, questions.value, answers.value);
+		outcome.value = progress.submitQuiz(
+			props.lessonId,
+			questions.value,
+			answers.value,
+			place.value,
+		);
 		return;
 	}
 	index.value += 1;
@@ -105,7 +113,7 @@ function goNext() {
 					</h1>
 					<p class="mt-2 text-ink-muted">
 						{{
-							t(outcome.score.passed ? "quiz.passMessage" : "quiz.failMessage", {
+							t(outcome.score.passed ? passMessageKey : "quiz.failMessage", {
 								correct: outcome.score.correct,
 								total: outcome.score.total,
 							})
@@ -126,6 +134,27 @@ function goNext() {
 						</span>
 					</template>
 					<p v-else class="text-sm text-ink-muted">{{ t("quiz.alreadyDone") }}</p>
+				</div>
+				<div
+					v-if="outcome.moduleReward"
+					role="status"
+					class="card-tint tone-brand flex items-start gap-3"
+				>
+					<AppIcon name="trophy" class="mt-0.5 shrink-0" />
+					<div class="flex flex-col gap-2">
+						<div>
+							<p class="font-bold">{{ t("quiz.moduleDoneTitle") }}</p>
+							<p class="mt-1 text-sm text-ink">{{ t("quiz.moduleDoneMessage") }}</p>
+						</div>
+						<div class="flex flex-wrap gap-2">
+							<span class="chip tone-grape tabular-nums">
+								{{ t("quiz.xpEarned", { amount: n(outcome.moduleReward.xp) }) }}
+							</span>
+							<span class="chip tone-sun tabular-nums">
+								{{ t("quiz.stacksEarned", { amount: n(outcome.moduleReward.stacks) }) }}
+							</span>
+						</div>
+					</div>
 				</div>
 				<div class="flex flex-col gap-3 sm:flex-row">
 					<template v-if="outcome.score.passed">

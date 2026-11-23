@@ -1,9 +1,15 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fixtureContent, lessonOne } from "../test/content-fixtures";
+import {
+	extraLesson,
+	extraOneOff,
+	fixtureContent,
+	lessonOne,
+} from "../test/content-fixtures";
 import { fakeApi, unreachableApi } from "../test/fake-api";
 import {
 	fetchLesson,
 	fetchLessons,
+	fetchOneOffLessons,
 	fetchQuiz,
 	fetchTrack,
 } from "./content-api";
@@ -27,8 +33,29 @@ describe("content API", () => {
 	it("loads only the lessons of the given track", async () => {
 		fakeApi(fixtureContent);
 
-		expect(await fetchLessons("foundation")).toHaveLength(3);
-		expect(await fetchLessons("arena")).toHaveLength(0);
+		const foundation = await fetchLessons("foundation");
+		const arena = await fetchLessons("arena");
+
+		expect(foundation).toHaveLength(3);
+		expect(foundation.every((lesson) => lesson.trackId === "foundation")).toBe(
+			true,
+		);
+		expect(arena.map((lesson) => lesson.id)).toEqual(["risk-1"]);
+		expect(await fetchLessons("strategist")).toHaveLength(0);
+	});
+
+	it("loads the one-off catalogue together with each lesson", async () => {
+		fakeApi(fixtureContent);
+
+		expect(await fetchOneOffLessons()).toEqual([
+			{ oneOff: extraOneOff, lesson: extraLesson },
+		]);
+	});
+
+	it("loads an empty one-off catalogue", async () => {
+		fakeApi({ ...fixtureContent, oneOffs: [] });
+
+		expect(await fetchOneOffLessons()).toEqual([]);
 	});
 
 	it("loads a lesson and its quiz", async () => {

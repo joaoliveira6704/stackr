@@ -7,7 +7,12 @@ import AppIcon from "./AppIcon.vue";
 import { LESSON_STATUS_LOOK } from "./lesson-status";
 import { TONE_CLASSES } from "./tones";
 
-defineProps<{ lesson: Lesson; status: LessonStatus }>();
+defineProps<{
+	lesson: Lesson;
+	status: LessonStatus;
+	/** Why the lesson is locked, when it is not the usual lesson order. */
+	lockedHint?: string;
+}>();
 
 const { t } = useI18n();
 const localized = useLocalized();
@@ -17,7 +22,7 @@ const localized = useLocalized();
 	<component
 		:is="canOpenLesson(status) ? 'RouterLink' : 'div'"
 		:to="canOpenLesson(status) ? `/learn/${lesson.id}` : undefined"
-		:title="canOpenLesson(status) ? undefined : t('learn.lockedHint')"
+		:title="canOpenLesson(status) ? undefined : (lockedHint ?? t('learn.lockedHint'))"
 		:aria-disabled="canOpenLesson(status) ? undefined : 'true'"
 		class="flex items-center gap-4 rounded-field p-3 transition-colors"
 		:class="canOpenLesson(status) ? 'hover:bg-glass-strong' : 'opacity-60'"

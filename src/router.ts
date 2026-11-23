@@ -64,6 +64,9 @@ const routes: RouteRecordRaw[] = [
 		path: "/learn/:lessonId/quiz",
 		component: QuizView,
 		props: true,
+		meta: { requiresAuth: true, layout: "app" },
+	},
+	{
 		path: "/budget",
 		component: BudgetView,
 		meta: { requiresAuth: true, layout: "app" },

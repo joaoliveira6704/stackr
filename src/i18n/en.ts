@@ -72,6 +72,8 @@ export const en: MessageSchema = {
 		portfolioNotSaved: "Could not save your portfolio. Try again.",
 		tooManyHoldings:
 			"Your portfolio already has the most investments it can hold.",
+		notEnoughStacks:
+			"You do not have enough Stacks. Pass more lessons to earn some.",
 		holdingExists: "That investment is already in your portfolio.",
 		budgetNotLoaded: "Could not load your budget.",
 		budgetNotSaved: "Could not save your budget. Try again.",
@@ -237,6 +239,8 @@ export const en: MessageSchema = {
 			"Your track, one module at a time. Every lesson ends with a five question quiz.",
 		module: "Module {number}",
 		lessonsDone: "{done} of {total} lessons done",
+		lessonsShort: "{done}/{total} lessons",
+		modulePrice: "{price} Stacks",
 		minutes: "{minutes} min",
 		status: {
 			locked: "Locked",
@@ -245,8 +249,34 @@ export const en: MessageSchema = {
 			done: "Done",
 		},
 		lockedHint: "Finish the previous lesson to unlock it.",
+		moduleLockedHint: "Unlock the module to open this lesson.",
 		loading: "Loading the lessons...",
 		retry: "Try again",
+		balance: "{amount} Stacks",
+		balanceLabel: "Your balance",
+		moduleDone: "Module done",
+		moduleBonus: "Finish the module to earn +{xp} XP and +{stacks} Stacks.",
+		unlock: {
+			button: "Unlock for {price} Stacks",
+			missing: "You need {amount} more Stacks.",
+			moduleTitle: "Unlock this module?",
+			oneOffTitle: "Unlock this lesson?",
+			message:
+				'You will spend {price} Stacks on "{title}" and keep {left}. Spent Stacks do not come back.',
+			confirm: "Unlock",
+		},
+		extras: {
+			title: "Extra lessons",
+			subtitle:
+				"Everyday topics for every track. Unlock them with Stacks and earn back a little more than you paid when you pass.",
+			reward: "+{amount} Stacks",
+			open: "Open lesson",
+			empty: "There are no extra lessons yet.",
+		},
+	},
+	scroller: {
+		previous: "Show previous",
+		next: "Show more",
 	},
 	lesson: {
 		back: "Back to lessons",
@@ -278,6 +308,11 @@ export const en: MessageSchema = {
 		stacksEarned: "+{amount} Stacks",
 		alreadyDone:
 			"You had already finished this lesson, so there is no reward this time.",
+		passMessageOneOff:
+			"You got {correct} of {total} right. You earned back the Stacks you spent and then some.",
+		moduleDoneTitle: "Module complete!",
+		moduleDoneMessage:
+			"You finished every lesson in this module. Here is your bonus.",
 		review: "Review the lesson",
 		nextLesson: "Next lesson",
 		backToLearn: "Back to lessons",

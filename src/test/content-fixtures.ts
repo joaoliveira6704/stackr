@@ -1,6 +1,7 @@
 import type {
 	Lesson,
 	Localized,
+	OneOff,
 	Quiz,
 	QuizQuestion,
 	TrackContent,
@@ -27,10 +28,10 @@ function question(id: string, sectionId: string): QuizQuestion {
 	};
 }
 
-function lesson(id: string, moduleId: string): Lesson {
+function lesson(id: string, moduleId: string | null): Lesson {
 	return {
 		id,
-		trackId: "foundation",
+		trackId: moduleId === null ? null : "foundation",
 		moduleId,
 		title: both(`Lesson ${id}`),
 		summary: both(`Summary ${id}`),
@@ -50,6 +51,23 @@ function lesson(id: string, moduleId: string): Lesson {
 export const lessonOne = lesson("budget-1", "budget");
 export const lessonTwo = lesson("budget-2", "budget");
 export const lessonThree = lesson("fund-1", "fund");
+/** A lesson from a track the demo user is not on. */
+export const otherTrackLesson: Lesson = {
+	...lesson("risk-1", "risk"),
+	trackId: "arena",
+	title: both("Arena only lesson"),
+};
+
+/** A one-off lesson, which belongs to no track. */
+export const extraLesson = lesson("extra-1", null);
+
+export const FUND_PRICE = 40;
+
+export const extraOneOff: OneOff = {
+	id: "extra-energy",
+	lessonId: extraLesson.id,
+	price: 30,
+};
 
 function quizFor(target: Lesson): Quiz {
 	return {
@@ -65,7 +83,13 @@ function quizFor(target: Lesson): Quiz {
 	};
 }
 
-export const quizzes = [lessonOne, lessonTwo, lessonThree].map(quizFor);
+export const quizzes = [
+	lessonOne,
+	lessonTwo,
+	lessonThree,
+	otherTrackLesson,
+	extraLesson,
+].map(quizFor);
 
 export const foundationTrack: TrackContent = {
 	id: "foundation",
@@ -74,12 +98,14 @@ export const foundationTrack: TrackContent = {
 			id: "budget",
 			title: both("Budget"),
 			summary: both("Budget summary"),
+			price: 0,
 			lessonIds: [lessonOne.id, lessonTwo.id],
 		},
 		{
 			id: "fund",
 			title: both("Fund"),
 			summary: both("Fund summary"),
+			price: FUND_PRICE,
 			lessonIds: [lessonThree.id],
 		},
 	],
@@ -87,8 +113,9 @@ export const foundationTrack: TrackContent = {
 
 export const fixtureContent = {
 	tracks: [foundationTrack],
-	lessons: [lessonOne, lessonTwo, lessonThree],
+	lessons: [lessonOne, lessonTwo, lessonThree, otherTrackLesson, extraLesson],
 	quizzes,
+	oneOffs: [extraOneOff],
 };
 
 /** Picks answers by option id for every question, "a" being right. */

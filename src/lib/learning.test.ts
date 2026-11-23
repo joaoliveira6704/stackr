@@ -1,12 +1,30 @@
 import { describe, expect, it } from "vitest";
-import { foundationTrack } from "../test/content-fixtures";
-import { canOpenLesson, lessonStatuses, nextLessonId } from "./learning";
+import { extraOneOff, foundationTrack } from "../test/content-fixtures";
+import {
+	canOpenLesson,
+	type LearningProgress,
+	lessonStatuses,
+	moduleStatus,
+	nextLessonId,
+	oneOffStatus,
+} from "./learning";
 
-const fresh = { completedLessons: [], lessonsToReview: [] };
+function progressWith(
+	changes: Partial<LearningProgress> = {},
+): LearningProgress {
+	return {
+		completedLessons: [],
+		lessonsToReview: [],
+		unlockedContent: [],
+		...changes,
+	};
+}
+
+const [budgetModule, fundModule] = foundationTrack.modules;
 
 describe("lessonStatuses", () => {
-	it("opens only the first lesson for a new user", () => {
-		expect(lessonStatuses(foundationTrack, fresh)).toEqual({
+	it("opens only the first lesson of the free module for a new user", () => {
+		expect(lessonStatuses(foundationTrack, progressWith())).toEqual({
 			"budget-1": "available",
 			"budget-2": "locked",
 			"fund-1": "locked",
@@ -14,63 +32,136 @@ describe("lessonStatuses", () => {
 	});
 
 	it("unlocks the next lesson once the previous one is done", () => {
-		const statuses = lessonStatuses(foundationTrack, {
-			completedLessons: ["budget-1"],
-			lessonsToReview: [],
-		});
+		const statuses = lessonStatuses(
+			foundationTrack,
+			progressWith({ completedLessons: ["budget-1"] }),
+		);
 
 		expect(statuses["budget-1"]).toBe("done");
 		expect(statuses["budget-2"]).toBe("available");
-		expect(statuses["fund-1"]).toBe("locked");
 	});
 
 	it("marks a failed lesson for review and keeps the next one locked", () => {
-		const statuses = lessonStatuses(foundationTrack, {
-			completedLessons: [],
-			lessonsToReview: ["budget-1"],
-		});
+		const statuses = lessonStatuses(
+			foundationTrack,
+			progressWith({ lessonsToReview: ["budget-1"] }),
+		);
 
 		expect(statuses["budget-1"]).toBe("review");
 		expect(statuses["budget-2"]).toBe("locked");
 	});
 
-	it("opens the next module only when the whole previous module is done", () => {
-		const statuses = lessonStatuses(foundationTrack, {
-			completedLessons: ["budget-1", "budget-2"],
-			lessonsToReview: [],
-		});
+	it("keeps a paid module locked even when the free one is finished", () => {
+		const statuses = lessonStatuses(
+			foundationTrack,
+			progressWith({ completedLessons: ["budget-1", "budget-2"] }),
+		);
 
-		expect(statuses["fund-1"]).toBe("available");
+		expect(statuses["fund-1"]).toBe("locked");
 	});
 
-	it("lets Strategist users start any module", () => {
+	it("opens a bought module straight away, without finishing the one before", () => {
+		const statuses = lessonStatuses(
+			foundationTrack,
+			progressWith({ unlockedContent: ["fund"] }),
+		);
+
+		expect(statuses["fund-1"]).toBe("available");
+		expect(statuses["budget-2"]).toBe("locked");
+	});
+
+	it("treats every track the same, with no free order for Strategist", () => {
 		const strategist = { ...foundationTrack, id: "strategist" as const };
 
-		expect(lessonStatuses(strategist, fresh)["fund-1"]).toBe("available");
-		expect(lessonStatuses(strategist, fresh)["budget-2"]).toBe("locked");
+		expect(lessonStatuses(strategist, progressWith())["fund-1"]).toBe("locked");
+	});
+});
+
+describe("moduleStatus", () => {
+	it("calls a free module open and a paid one locked for a new user", () => {
+		expect(moduleStatus(budgetModule, progressWith())).toBe("open");
+		expect(moduleStatus(fundModule, progressWith())).toBe("locked");
+	});
+
+	it("opens a paid module once it is bought", () => {
+		expect(
+			moduleStatus(fundModule, progressWith({ unlockedContent: ["fund"] })),
+		).toBe("open");
+	});
+
+	it("calls a module done when every lesson in it is done", () => {
+		expect(
+			moduleStatus(
+				budgetModule,
+				progressWith({ completedLessons: ["budget-1", "budget-2"] }),
+			),
+		).toBe("done");
+	});
+});
+
+describe("oneOffStatus", () => {
+	it("keeps a one-off lesson locked until it is bought", () => {
+		expect(oneOffStatus(extraOneOff, progressWith())).toBe("locked");
+	});
+
+	it("opens a one-off lesson once it is bought", () => {
+		expect(
+			oneOffStatus(
+				extraOneOff,
+				progressWith({ unlockedContent: [extraOneOff.id] }),
+			),
+		).toBe("available");
+	});
+
+	it("shows a passed one-off lesson as done", () => {
+		expect(
+			oneOffStatus(
+				extraOneOff,
+				progressWith({
+					unlockedContent: [extraOneOff.id],
+					completedLessons: [extraOneOff.lessonId],
+				}),
+			),
+		).toBe("done");
 	});
 });
 
 describe("nextLessonId", () => {
 	it("suggests the first lesson for a new user", () => {
-		expect(nextLessonId(foundationTrack, fresh)).toBe("budget-1");
+		expect(nextLessonId(foundationTrack, progressWith())).toBe("budget-1");
 	});
 
 	it("suggests a lesson waiting for review before a new one", () => {
 		expect(
-			nextLessonId(foundationTrack, {
-				completedLessons: ["budget-1", "budget-2"],
-				lessonsToReview: ["fund-1"],
-			}),
-		).toBe("fund-1");
+			nextLessonId(
+				foundationTrack,
+				progressWith({
+					completedLessons: ["budget-1"],
+					lessonsToReview: ["budget-2"],
+					unlockedContent: ["fund"],
+				}),
+			),
+		).toBe("budget-2");
+	});
+
+	it("never suggests a lesson from a module that is not bought", () => {
+		expect(
+			nextLessonId(
+				foundationTrack,
+				progressWith({ completedLessons: ["budget-1", "budget-2"] }),
+			),
+		).toBeNull();
 	});
 
 	it("has nothing to suggest once every lesson is done", () => {
 		expect(
-			nextLessonId(foundationTrack, {
-				completedLessons: ["budget-1", "budget-2", "fund-1"],
-				lessonsToReview: [],
-			}),
+			nextLessonId(
+				foundationTrack,
+				progressWith({
+					completedLessons: ["budget-1", "budget-2", "fund-1"],
+					unlockedContent: ["fund"],
+				}),
+			),
 		).toBeNull();
 	});
 });

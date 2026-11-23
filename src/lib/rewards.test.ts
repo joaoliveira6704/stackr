@@ -4,7 +4,10 @@ import {
 	LESSON_REWARDS,
 	levelForXp,
 	levelProgress,
+	MODULE_REWARD,
+	ONE_OFF_STACKS_PROFIT,
 	rewardForPassedLesson,
+	rewardForPassedOneOff,
 } from "./rewards";
 
 describe("levelForXp", () => {
@@ -143,5 +146,44 @@ describe("rewardForPassedLesson", () => {
 		expect(reward.xp).toBe(10_000 + 30 + 20);
 		expect(Number.isInteger(reward.xp)).toBe(true);
 		expect(Number.isInteger(reward.stacks)).toBe(true);
+	});
+});
+
+describe("MODULE_REWARD", () => {
+	it("pays both XP and Stacks in whole points", () => {
+		expect(MODULE_REWARD.xp).toBeGreaterThan(0);
+		expect(MODULE_REWARD.stacks).toBeGreaterThan(0);
+		expect(Number.isInteger(MODULE_REWARD.xp)).toBe(true);
+		expect(Number.isInteger(MODULE_REWARD.stacks)).toBe(true);
+	});
+});
+
+describe("rewardForPassedOneOff", () => {
+	const firstTry = { correctAnswers: 5, attempt: 1, afterReview: false };
+
+	it("pays the price back plus a profit, and the usual lesson XP", () => {
+		expect(rewardForPassedOneOff(firstTry, 50)).toEqual({
+			xp: rewardForPassedLesson(firstTry).xp,
+			stacks: 50 + ONE_OFF_STACKS_PROFIT,
+		});
+	});
+
+	it("still pays the profit for a free one-off", () => {
+		expect(rewardForPassedOneOff(firstTry, 0).stacks).toBe(
+			ONE_OFF_STACKS_PROFIT,
+		);
+	});
+
+	it("handles very large prices without losing precision", () => {
+		expect(rewardForPassedOneOff(firstTry, 1_000_000_000).stacks).toBe(
+			1_000_000_000 + ONE_OFF_STACKS_PROFIT,
+		);
+	});
+
+	it("refuses a negative or fractional price", () => {
+		expect(() => rewardForPassedOneOff(firstTry, -10)).toThrow("Price must be");
+		expect(() => rewardForPassedOneOff(firstTry, 12.5)).toThrow(
+			"Price must be",
+		);
 	});
 });
