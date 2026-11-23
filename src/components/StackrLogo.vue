@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import logoSource from "../../public/logo-text.svg?raw";
+import logoSource from "../assets/logo-text.svg?raw";
 
 // The file draws the wordmark in white, which disappears on the light theme.
 // Painting it with currentColor lets it follow the text colour of each theme

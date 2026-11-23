@@ -83,6 +83,7 @@ onUnmounted(() => window.removeEventListener("keydown", closeOnEscape));
 		</RouterLink>
 
 		<SidebarItem to="/dashboard" icon="dashboard" :label="t('nav.dashboard')" />
+		<SidebarItem to="/learn" icon="book" :label="t('nav.learn')" />
 		<SidebarItem to="/budget" icon="budget" :label="t('nav.budget')" />
 		<SidebarItem to="/register" icon="register" :label="t('nav.register')" />
 		<SidebarItem to="/simulator" icon="simulator" :label="t('nav.simulator')" />

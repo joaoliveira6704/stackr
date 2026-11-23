@@ -10,11 +10,14 @@ import { ONBOARDING_PATH } from "./lib/onboarding";
 import BudgetView from "./views/BudgetView.vue";
 import DashboardView from "./views/DashboardView.vue";
 import HomeView from "./views/HomeView.vue";
+import LearnView from "./views/LearnView.vue";
+import LessonView from "./views/LessonView.vue";
 import LoginView from "./views/LoginView.vue";
 import NotFoundView from "./views/NotFoundView.vue";
 import OnboardingView from "./views/OnboardingView.vue";
 import ProfileView from "./views/ProfileView.vue";
 import RegisterView from "./views/RegisterView.vue";
+import QuizView from "./views/QuizView.vue";
 import SignupView from "./views/SignupView.vue";
 import SimulatorView from "./views/SimulatorView.vue";
 
@@ -48,6 +51,20 @@ const routes: RouteRecordRaw[] = [
 		meta: { requiresAuth: true, layout: "app" },
 	},
 	{
+		path: "/learn",
+		component: LearnView,
+		meta: { requiresAuth: true, layout: "app" },
+	},
+	{
+		path: "/learn/:lessonId",
+		component: LessonView,
+		props: true,
+		meta: { requiresAuth: true, layout: "app" },
+	},
+	{
+		path: "/learn/:lessonId/quiz",
+		component: QuizView,
+		props: true,
 		path: "/budget",
 		component: BudgetView,
 		meta: { requiresAuth: true, layout: "app" },

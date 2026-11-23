@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { assertWholeAmount, levelForXp, levelProgress } from "./rewards";
+import {
+	assertWholeAmount,
+	LESSON_REWARDS,
+	levelForXp,
+	levelProgress,
+	rewardForPassedLesson,
+} from "./rewards";
 
 describe("levelForXp", () => {
 	it("starts a new user at level 1 with zero XP", () => {
@@ -83,5 +89,59 @@ describe("assertWholeAmount", () => {
 	it("rejects NaN and Infinity", () => {
 		expect(() => assertWholeAmount(Number.NaN, "XP")).toThrow();
 		expect(() => assertWholeAmount(Number.POSITIVE_INFINITY, "XP")).toThrow();
+	});
+});
+
+describe("rewardForPassedLesson", () => {
+	it("pays the full first try reward for a perfect quiz", () => {
+		expect(
+			rewardForPassedLesson({
+				correctAnswers: 5,
+				attempt: 1,
+				afterReview: false,
+			}),
+		).toEqual({ xp: 50 + 30 + 20, stacks: 10 + 5 + 10 });
+	});
+
+	it("drops the first try bonus on a later attempt", () => {
+		expect(
+			rewardForPassedLesson({
+				correctAnswers: 4,
+				attempt: 2,
+				afterReview: false,
+			}),
+		).toEqual({ xp: 40 + 30, stacks: 10 + 5 });
+	});
+
+	it("adds the review bonus when the user passes after going back to the lesson", () => {
+		expect(
+			rewardForPassedLesson({
+				correctAnswers: 5,
+				attempt: 2,
+				afterReview: true,
+			}),
+		).toEqual({ xp: 50 + 30 + 15, stacks: 15 });
+	});
+
+	it("still pays the lesson reward with zero correct answers", () => {
+		expect(
+			rewardForPassedLesson({
+				correctAnswers: 0,
+				attempt: 3,
+				afterReview: false,
+			}),
+		).toEqual({ xp: LESSON_REWARDS.xpForLesson, stacks: 15 });
+	});
+
+	it("scales with large quizzes and always gives whole numbers", () => {
+		const reward = rewardForPassedLesson({
+			correctAnswers: 1000,
+			attempt: 1,
+			afterReview: false,
+		});
+
+		expect(reward.xp).toBe(10_000 + 30 + 20);
+		expect(Number.isInteger(reward.xp)).toBe(true);
+		expect(Number.isInteger(reward.stacks)).toBe(true);
 	});
 });
