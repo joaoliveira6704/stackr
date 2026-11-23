@@ -1,4 +1,4 @@
-import { flushPromises, mount } from "@vue/test-utils";
+import { flushPromises, mount, type VueWrapper } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, h } from "vue";
@@ -7,16 +7,21 @@ import { DEMO_PASSWORD, demoUser, fakeApi, newcomer } from "../test/fake-api";
 import { useAuth } from "./use-auth";
 import { SAVE_DELAY_MS, useProgressSync } from "./use-progress-sync";
 
-function mountSync() {
+// Mounted syncs share the signed in user, so each test unmounts its own
+// before the next one signs in, otherwise an old sync keeps saving.
+const mounted: VueWrapper[] = [];
+
+function mountSync(onAccountMissing?: () => void) {
 	let sync!: ReturnType<typeof useProgressSync>;
-	mount(
+	const wrapper = mount(
 		defineComponent({
 			setup() {
-				sync = useProgressSync();
+				sync = useProgressSync(onAccountMissing);
 				return () => h("div");
 			},
 		}),
 	);
+	mounted.push(wrapper);
 	return sync;
 }
 
@@ -31,6 +36,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+	for (const wrapper of mounted.splice(0)) wrapper.unmount();
 	useAuth().signOut();
 	vi.useRealTimers();
 	vi.unstubAllGlobals();
@@ -117,5 +123,34 @@ describe("useProgressSync", () => {
 		await flushPromises();
 
 		expect(sync.syncError.value).toBe("progressNotSaved");
+	});
+
+	it("signs out and reports it when the user's record no longer exists", async () => {
+		const { db } = fakeApi();
+		await useAuth().signIn(demoUser.email, DEMO_PASSWORD);
+		db.users = db.users.filter((user) => user.id !== demoUser.id);
+		const onAccountMissing = vi.fn();
+
+		const sync = mountSync(onAccountMissing);
+		await flushPromises();
+
+		expect(useAuth().user.value).toBeNull();
+		expect(onAccountMissing).toHaveBeenCalledOnce();
+		expect(sync.syncError.value).toBe("accountNotFound");
+	});
+
+	it("does not try to save progress for a record that no longer exists", async () => {
+		const { db, fetchMock } = fakeApi();
+		await useAuth().signIn(newcomer.email, DEMO_PASSWORD);
+		db.users = db.users.filter((user) => user.id !== newcomer.id);
+		useProgressStore().addXp(50);
+
+		mountSync();
+		await flushPromises();
+
+		const patches = fetchMock.mock.calls.filter(
+			([, init]) => init?.method === "PATCH",
+		);
+		expect(patches).toHaveLength(0);
 	});
 });

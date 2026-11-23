@@ -55,6 +55,8 @@ export const en: MessageSchema = {
 		accountNotCreated: "Could not create the account.",
 		onboardingNotSaved: "Could not save your track. Please try again.",
 		notSignedIn: "Your session has ended. Please log in again.",
+		accountNotFound:
+			"Your account no longer exists. Log in with another account or create a new one.",
 		passwordsDoNotMatch: "Passwords do not match.",
 		contentNotFound: "We could not find this content.",
 		progressNotSaved:

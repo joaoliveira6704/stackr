@@ -1,5 +1,6 @@
 import type { ProgressSnapshot } from "../stores/progress";
 import { getJsonOrNull, sendJson } from "./api";
+import { AppError } from "./errors";
 
 /**
  * Progress is saved on the user's own record in db.json. A separate
@@ -16,7 +17,9 @@ export async function fetchProgress(
 	userId: string,
 ): Promise<ProgressSnapshot | null> {
 	const user = await getJsonOrNull<UserWithProgress>(userPath(userId));
-	return user?.progress ?? null;
+	// A session can outlive its record, for example after db.json is reset.
+	if (!user) throw new AppError("accountNotFound");
+	return user.progress ?? null;
 }
 
 export async function saveProgress(

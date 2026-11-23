@@ -12,9 +12,12 @@ export const SAVE_DELAY_MS = 400;
  * Keeps the progress store and the user's record in db.json in step: loads
  * it when someone signs in, saves it shortly after every change, and clears
  * it on sign out. Called once, in App.vue.
+ *
+ * When the signed in user's record is gone, every save would fail, so the
+ * stale session is ended and `onAccountMissing` lets the app leave the page.
  */
-export function useProgressSync() {
-	const { user } = useAuth();
+export function useProgressSync(onAccountMissing: () => void = () => {}) {
+	const { user, signOut } = useAuth();
 	const progress = useProgressStore();
 	const syncError = ref<ErrorCode | null>(null);
 
@@ -49,6 +52,10 @@ export function useProgressSync() {
 			if (!saved) await saveNow();
 		} catch (cause) {
 			syncError.value = errorCode(cause);
+			if (syncError.value === "accountNotFound") {
+				signOut();
+				onAccountMissing();
+			}
 		}
 	}
 

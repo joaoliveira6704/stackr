@@ -55,6 +55,8 @@ export const pt = {
 		onboardingNotSaved:
 			"Não foi possível guardar o teu trilho. Tenta outra vez.",
 		notSignedIn: "A tua sessão terminou. Entra outra vez.",
+		accountNotFound:
+			"A tua conta já não existe. Entra com outra conta ou cria uma nova.",
 		passwordsDoNotMatch: "As palavras-passe não coincidem.",
 		contentNotFound: "Não encontrámos este conteúdo.",
 		progressNotSaved:

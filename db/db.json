@@ -54,6 +54,21 @@
         "salary": 1400,
         "categories": [],
         "expenses": []
+      },
+      "progress": {
+        "xp": 0,
+        "weeklyXp": 0,
+        "stacks": 0,
+        "completedLessons": [],
+        "lessonsRead": [],
+        "quizResults": {},
+        "lessonsToReview": [],
+        "sectionsToReview": {},
+        "quizAttempts": {},
+        "streak": 0,
+        "lastActivity": null,
+        "badges": [],
+        "unlockedContent": []
       }
     },
     {
