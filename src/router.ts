@@ -7,6 +7,7 @@ import {
 } from "vue-router";
 import { getSession } from "./lib/auth";
 import { ONBOARDING_PATH } from "./lib/onboarding";
+import BudgetView from "./views/BudgetView.vue";
 import DashboardView from "./views/DashboardView.vue";
 import HomeView from "./views/HomeView.vue";
 import LoginView from "./views/LoginView.vue";
@@ -43,6 +44,11 @@ const routes: RouteRecordRaw[] = [
 	{
 		path: "/profile",
 		component: ProfileView,
+		meta: { requiresAuth: true, layout: "app" },
+	},
+	{
+		path: "/budget",
+		component: BudgetView,
 		meta: { requiresAuth: true, layout: "app" },
 	},
 	{

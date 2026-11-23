@@ -369,6 +369,48 @@
 }
 
 /*
+ * A range input with a transparent track, placed over a track drawn in the
+ * template. The thumb takes its colour from --slider-colour.
+ */
+@utility slider {
+	appearance: none;
+	width: 100%;
+	height: 1.5rem;
+	margin: 0;
+	background: transparent;
+	cursor: pointer;
+	border-radius: 9999px;
+	&::-webkit-slider-runnable-track {
+		height: 1.5rem;
+		background: transparent;
+	}
+	&::-moz-range-track {
+		background: transparent;
+	}
+	&::-webkit-slider-thumb {
+		appearance: none;
+		width: 1.25rem;
+		height: 1.25rem;
+		margin-top: 0.125rem;
+		border-radius: 9999px;
+		border: 3px solid var(--surface);
+		background-color: var(--slider-colour);
+		transition: background-color 300ms;
+	}
+	&::-moz-range-thumb {
+		width: 0.875rem;
+		height: 0.875rem;
+		border-radius: 9999px;
+		border: 3px solid var(--surface);
+		background-color: var(--slider-colour);
+	}
+	&:disabled {
+		cursor: not-allowed;
+		opacity: 0.5;
+	}
+}
+
+/*
  * A selectable answer: a label wrapping a hidden radio or checkbox. It turns
  * green when its input is checked, with no extra code in the component.
  */

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { demoUser, fakeSimulatorApi, storeSessionFor } from "../test/fake-api";
+import { demoUser, fakeAppApi, storeSessionFor } from "../test/fake-api";
 import { AppError } from "./errors";
 import {
 	DEFAULT_INFLATION_PERCENT,
@@ -85,7 +85,7 @@ describe("parsePortfolio", () => {
 describe("loadPortfolio", () => {
 	it("reads the portfolio saved on the signed in user", async () => {
 		storeSessionFor(demoUser);
-		const { fetchMock } = fakeSimulatorApi({
+		const { fetchMock } = fakeAppApi({
 			portfolio: { years: 10, inflationPercent: 3, holdings: [savedHolding] },
 		});
 
@@ -98,13 +98,13 @@ describe("loadPortfolio", () => {
 
 	it("gives an empty portfolio to a user who never saved one", async () => {
 		storeSessionFor(demoUser);
-		fakeSimulatorApi();
+		fakeAppApi();
 
 		expect(await loadPortfolio()).toEqual(emptyPortfolio());
 	});
 
 	it("needs a signed in user", async () => {
-		fakeSimulatorApi();
+		fakeAppApi();
 
 		await expect(loadPortfolio()).rejects.toThrow(new AppError("notSignedIn"));
 	});
@@ -113,7 +113,7 @@ describe("loadPortfolio", () => {
 describe("savePortfolio", () => {
 	it("saves the portfolio on the signed in user", async () => {
 		storeSessionFor(demoUser);
-		const { fetchMock, saved } = fakeSimulatorApi();
+		const { fetchMock, saved } = fakeAppApi();
 		const portfolio = { ...emptyPortfolio(), years: 30 };
 
 		await savePortfolio(portfolio);
@@ -124,7 +124,7 @@ describe("savePortfolio", () => {
 
 	it("reports a failed save", async () => {
 		storeSessionFor(demoUser);
-		fakeSimulatorApi({ saveFails: true });
+		fakeAppApi({ saveFails: true });
 
 		await expect(savePortfolio(emptyPortfolio())).rejects.toThrow(
 			new AppError("portfolioNotSaved"),

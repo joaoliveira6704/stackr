@@ -49,6 +49,11 @@
             "name": "Vanguard FTSE All-World"
           }
         ]
+      },
+      "budget": {
+        "salary": 1400,
+        "categories": [],
+        "expenses": []
       }
     },
     {
@@ -56,8 +61,31 @@
       "email": "emanuel@example.com",
       "password": "$2b$10$BmIn.MHu6SEe9YiAo1D/oeOTQdMJsjn/dHc.7/Z3QtgtDM67hctSO",
       "id": "vSeDWkrk8q4",
-      "onboardingDone": false,
-      "track": null
+      "onboardingDone": true,
+      "track": "arena",
+      "budget": {
+        "salary": 670,
+        "categories": [
+          {
+            "id": "acb4a0fe-ba67-458a-9b7b-ef22ea055788",
+            "name": "Renda",
+            "description": "Casa Povoa",
+            "group": "needs",
+            "planned": 250,
+            "recurrence": "quarterly",
+            "dueDate": "2026-12-10"
+          }
+        ],
+        "expenses": [
+          {
+            "id": "ccb39d4f-a489-4cec-a281-f51d489d92d4",
+            "categoryId": "acb4a0fe-ba67-458a-9b7b-ef22ea055788",
+            "amount": 250,
+            "description": "",
+            "date": "2026-11-22"
+          }
+        ]
+      }
     },
     {
       "name": "Miguel Neto",

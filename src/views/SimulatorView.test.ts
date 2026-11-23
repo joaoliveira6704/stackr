@@ -5,7 +5,7 @@ import { RouterView } from "vue-router";
 import {
 	chartBody,
 	demoUser,
-	fakeSimulatorApi,
+	fakeAppApi,
 	jsonResponse,
 	searchBody,
 	storeSessionFor,
@@ -71,15 +71,24 @@ async function click(wrapper: VueWrapper, text: string) {
 
 describe("SimulatorView", () => {
 	it("invites the user to add a first investment", async () => {
-		fakeSimulatorApi();
+		fakeAppApi();
 		const { wrapper } = await mountSimulator();
 
 		expect(wrapper.text()).toContain("You have no investments yet.");
 		expect(wrapper.text()).not.toContain("Final value");
 	});
 
+	it("shows the badges of the investing lessons", async () => {
+		fakeAppApi();
+		const { wrapper } = await mountSimulator();
+
+		expect(wrapper.text()).toContain("What you are applying here");
+		expect(wrapper.text()).toContain("Compound Interest");
+		expect(wrapper.text()).toContain("Prudent Investor");
+	});
+
 	it("shows the saved portfolio with its projection", async () => {
-		fakeSimulatorApi({ portfolio: savedPortfolio });
+		fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator();
 
 		expect(wrapper.text()).toContain("Savings plan");
@@ -88,7 +97,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("explains a failed load and loads again on retry", async () => {
-		const { fetchMock } = fakeSimulatorApi();
+		const { fetchMock } = fakeAppApi();
 		fetchMock.mockImplementationOnce(async () => jsonResponse({}, 500));
 		const { wrapper } = await mountSimulator();
 
@@ -100,7 +109,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("projects an investment added by hand with the default amounts", async () => {
-		fakeSimulatorApi();
+		fakeAppApi();
 		const { wrapper } = await mountSimulator();
 
 		await click(wrapper, "Add by hand");
@@ -115,7 +124,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("uses the real past growth of a popular ETF", async () => {
-		fakeSimulatorApi({
+		fakeAppApi({
 			charts: { "VWCE.DE": chartBody("VWCE.DE", STEADY_GROWTH) },
 		});
 		const { wrapper } = await mountSimulator();
@@ -131,7 +140,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("still adds a ticker and asks for a return when the market is down", async () => {
-		fakeSimulatorApi({ marketDown: true });
+		fakeAppApi({ marketDown: true });
 		const { wrapper } = await mountSimulator();
 
 		await click(wrapper, "Bitcoin");
@@ -144,7 +153,7 @@ describe("SimulatorView", () => {
 
 	it("finds a ticker by searching and adds the one picked", async () => {
 		vi.useFakeTimers();
-		fakeSimulatorApi({
+		fakeAppApi({
 			search: searchBody([
 				{ symbol: "AAPL", longname: "Apple Inc.", quoteType: "EQUITY" },
 			]),
@@ -162,8 +171,27 @@ describe("SimulatorView", () => {
 		]);
 	});
 
+	it("lists every match from a long search in a list that scrolls", async () => {
+		vi.useFakeTimers();
+		const matches = Array.from({ length: 12 }, (_, index) => ({
+			symbol: `ETF${index}`,
+			longname: `Fund number ${index}`,
+			quoteType: "ETF",
+		}));
+		fakeAppApi({ search: searchBody(matches) });
+		const { wrapper } = await mountSimulator();
+
+		await wrapper.get('input[type="search"]').setValue("fund");
+		await vi.advanceTimersByTimeAsync(400);
+		await flushPromises();
+
+		const list = wrapper.get("ul.popover");
+		expect(list.findAll("li")).toHaveLength(12);
+		expect(list.classes()).toContain("overflow-y-auto");
+	});
+
 	it("does nothing to a holding until the removal is confirmed", async () => {
-		fakeSimulatorApi({ portfolio: savedPortfolio });
+		fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator();
 
 		await wrapper
@@ -176,7 +204,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("keeps the holding when the removal is cancelled", async () => {
-		fakeSimulatorApi({ portfolio: savedPortfolio });
+		fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator();
 
 		await wrapper
@@ -189,7 +217,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("removes the holding once the removal is confirmed", async () => {
-		fakeSimulatorApi({ portfolio: savedPortfolio });
+		fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator();
 
 		await wrapper
@@ -203,7 +231,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("explains an empty amount instead of projecting it as zero", async () => {
-		fakeSimulatorApi({ portfolio: savedPortfolio });
+		fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator();
 
 		await wrapper.findAll('input[type="number"]')[1].setValue("");
@@ -215,7 +243,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("only lets the user save once something changed", async () => {
-		const { saved } = fakeSimulatorApi({ portfolio: savedPortfolio });
+		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator();
 		const saveButton = () => buttonWithText(wrapper, "Save portfolio");
 
@@ -232,7 +260,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("shows a clear error and keeps the changes when saving fails", async () => {
-		fakeSimulatorApi({ portfolio: savedPortfolio, saveFails: true });
+		fakeAppApi({ portfolio: savedPortfolio, saveFails: true });
 		const { wrapper } = await mountSimulator();
 		await click(wrapper, "30 years");
 
@@ -247,7 +275,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("leaves straight away when there is nothing to save", async () => {
-		fakeSimulatorApi({ portfolio: savedPortfolio });
+		fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper, router } = await mountSimulator("en", RoutedPage);
 
 		await router.push("/dashboard");
@@ -258,7 +286,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("stays on the page when leaving with unsaved changes is cancelled", async () => {
-		fakeSimulatorApi({ portfolio: savedPortfolio });
+		fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper, router } = await mountSimulator("en", RoutedPage);
 		await click(wrapper, "30 years");
 
@@ -272,7 +300,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("leaves without saving once the user confirms", async () => {
-		const { saved } = fakeSimulatorApi({ portfolio: savedPortfolio });
+		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper, router } = await mountSimulator("en", RoutedPage);
 		await click(wrapper, "30 years");
 
@@ -286,7 +314,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("projects again over the period the user picks", async () => {
-		fakeSimulatorApi({
+		fakeAppApi({
 			portfolio: {
 				...savedPortfolio,
 				holdings: [{ ...savedPortfolio.holdings[0], monthly: 100 }],
@@ -303,7 +331,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("shows every year in a table for readers who prefer one", async () => {
-		fakeSimulatorApi({ portfolio: savedPortfolio });
+		fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator();
 
 		await click(wrapper, "Show table");
@@ -315,7 +343,7 @@ describe("SimulatorView", () => {
 	});
 
 	it("speaks Portuguese and formats euros the Portuguese way", async () => {
-		fakeSimulatorApi({ portfolio: savedPortfolio });
+		fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator("pt-PT");
 
 		expect(wrapper.text()).toContain("Projeta o teu investimento.");

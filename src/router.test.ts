@@ -113,6 +113,24 @@ describe("router", () => {
 		expect(router.currentRoute.value.meta.layout).toBe("app");
 	});
 
+	it("opens the budget in the app layout for a signed in user", async () => {
+		signInAsDemoUser();
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/budget");
+
+		expect(router.currentRoute.value.path).toBe("/budget");
+		expect(router.currentRoute.value.meta.layout).toBe("app");
+	});
+
+	it("sends a signed out visitor from the budget to login", async () => {
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/budget");
+
+		expect(router.currentRoute.value.path).toBe("/login");
+	});
+
 	it("sends a signed out visitor from the simulator to login", async () => {
 		const router = createAppRouter(createMemoryHistory());
 

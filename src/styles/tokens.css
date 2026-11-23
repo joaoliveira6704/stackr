@@ -12,10 +12,12 @@
 	--color-grape: #8b6cff;
 	--color-tangerine: #ff7a45;
 	--color-sun: #ffc23d;
+	--color-cherry: #ff4d5e;
 	--color-brand-strong: var(--brand-strong);
 	--color-grape-strong: var(--grape-strong);
 	--color-tangerine-strong: var(--tangerine-strong);
 	--color-sun-strong: var(--sun-strong);
+	--color-cherry-strong: var(--cherry-strong);
 	--color-on-brand: #04170b;
 	--color-on-tangerine: #230b02;
 

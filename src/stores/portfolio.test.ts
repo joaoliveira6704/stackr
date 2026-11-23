@@ -5,7 +5,7 @@ import { MAX_HOLDINGS } from "../lib/portfolio";
 import {
 	chartBody,
 	demoUser,
-	fakeSimulatorApi,
+	fakeAppApi,
 	storeSessionFor,
 } from "../test/fake-api";
 import { usePortfolioStore } from "./portfolio";
@@ -25,7 +25,7 @@ afterEach(() => {
 
 describe("portfolio store", () => {
 	it("has nothing to save right after loading", async () => {
-		fakeSimulatorApi();
+		fakeAppApi();
 		const store = usePortfolioStore();
 
 		await store.load();
@@ -34,7 +34,7 @@ describe("portfolio store", () => {
 	});
 
 	it("notices any change and forgets it once saved", async () => {
-		fakeSimulatorApi();
+		fakeAppApi();
 		const store = usePortfolioStore();
 		await store.load();
 
@@ -46,7 +46,7 @@ describe("portfolio store", () => {
 	});
 
 	it("keeps the changes marked as unsaved when saving fails", async () => {
-		fakeSimulatorApi({ saveFails: true });
+		fakeAppApi({ saveFails: true });
 		const store = usePortfolioStore();
 		store.portfolio.years = 30;
 
@@ -57,7 +57,7 @@ describe("portfolio store", () => {
 	});
 
 	it("uses the past growth of a ticker as its expected return", async () => {
-		fakeSimulatorApi({
+		fakeAppApi({
 			charts: { "VWCE.DE": chartBody("VWCE.DE", STEADY_GROWTH) },
 		});
 		const store = usePortfolioStore();
@@ -73,7 +73,7 @@ describe("portfolio store", () => {
 	});
 
 	it("still adds the ticker with a typed return when the market is down", async () => {
-		fakeSimulatorApi({ marketDown: true });
+		fakeAppApi({ marketDown: true });
 		const store = usePortfolioStore();
 
 		const holding = await store.addTicker(VANGUARD);
@@ -84,7 +84,7 @@ describe("portfolio store", () => {
 	});
 
 	it("refuses the same ticker twice", async () => {
-		fakeSimulatorApi({ marketDown: true });
+		fakeAppApi({ marketDown: true });
 		const store = usePortfolioStore();
 		await store.addTicker(VANGUARD);
 
@@ -94,7 +94,7 @@ describe("portfolio store", () => {
 	});
 
 	it("holds up to ten investments", () => {
-		fakeSimulatorApi();
+		fakeAppApi();
 		const store = usePortfolioStore();
 		for (let index = 0; index < 10; index++) {
 			store.addManual(`Investment ${index}`);
@@ -105,7 +105,7 @@ describe("portfolio store", () => {
 	});
 
 	it("refuses a new holding once the portfolio is full", () => {
-		fakeSimulatorApi();
+		fakeAppApi();
 		const store = usePortfolioStore();
 		for (let index = 0; index < MAX_HOLDINGS; index++) {
 			store.addManual(`Investment ${index}`);
@@ -118,7 +118,7 @@ describe("portfolio store", () => {
 	});
 
 	it("removes only the chosen holding", () => {
-		fakeSimulatorApi();
+		fakeAppApi();
 		const store = usePortfolioStore();
 		const first = store.addManual("First");
 		store.addManual("Second");

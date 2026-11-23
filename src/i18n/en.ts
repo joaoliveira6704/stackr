@@ -3,6 +3,7 @@ import type { MessageSchema } from "./pt";
 export const en: MessageSchema = {
 	nav: {
 		dashboard: "Dashboard",
+		budget: "Budget",
 		simulator: "Simulator",
 		login: "Log in",
 		signup: "Sign up",
@@ -37,6 +38,8 @@ export const en: MessageSchema = {
 		next: "Next",
 		comingSoon: "Coming soon",
 		cancel: "Cancel",
+		saving: "Saving...",
+		unsaved: "You have unsaved changes.",
 	},
 	logoutConfirm: {
 		title: "Log out?",
@@ -65,6 +68,16 @@ export const en: MessageSchema = {
 		tooManyHoldings:
 			"Your portfolio already has the most investments it can hold.",
 		holdingExists: "That investment is already in your portfolio.",
+		budgetNotLoaded: "Could not load your budget.",
+		budgetNotSaved: "Could not save your budget. Try again.",
+		invalidSalary: "Your salary must be a number of zero or more.",
+		invalidPlannedAmount:
+			"The planned amount of each expense must be a number of zero or more.",
+		invalidPaidAmount: "The amount paid cannot be negative.",
+		tooManyCategories: "Your budget already has the most expenses it can hold.",
+		categoryMissing: "Pick the expense this spending belongs to.",
+		categoryNameMissing: "Give the expense a name.",
+		dueDateMissing: "Pick the due date for this expense.",
 		unknown: "Something went wrong.",
 	},
 	levels: {
@@ -319,9 +332,7 @@ export const en: MessageSchema = {
 		subtitle:
 			"Build your portfolio, choose how much goes into each investment and see what it could be worth, with inflation and taxes included.",
 		save: "Save portfolio",
-		saving: "Saving...",
 		saved: "Portfolio saved.",
-		unsaved: "You have unsaved changes.",
 		loading: "Loading your portfolio...",
 		retry: "Try again",
 		settings: {
@@ -451,5 +462,146 @@ export const en: MessageSchema = {
 		},
 		disclaimer:
 			"This is an educational simulation, not financial advice. Past returns do not guarantee future ones, and the history comes in each asset's own currency, without exchange rates.",
+	},
+	budget: {
+		eyebrow: "Budget",
+		title: "Plan your month.",
+		subtitle:
+			"Type in your salary, list your expenses and mark what you have paid. We show you what your year looks like.",
+		saved: "Budget saved.",
+		loading: "Loading your budget...",
+		retry: "Try again",
+		salary: {
+			title: "Your salary",
+			subtitle: "What you get each month, after taxes.",
+			label: "Take home pay per month",
+			planned: "Planned",
+			unassigned: "Not assigned yet",
+			overAssigned: "Planned over salary",
+		},
+		groups: {
+			needs: "Needs",
+			wants: "Wants",
+			savings: "Savings",
+		},
+		categories: {
+			title: "Spending this month",
+			subtitle:
+				"Record your bills, current and upcoming. The amount paid goes back to zero after each due date. Up to {max} expenses.",
+			add: "New record",
+			full: "You reached the limit of {max} expenses.",
+			emptyTitle: "You have no expenses yet.",
+			total: "Total paid",
+			totalDetail: "Out of {planned} planned",
+		},
+		category: {
+			name: "Name",
+			description: "Description (optional)",
+			group: "Type",
+			planned: "Amount",
+			recurrence: "Repeats",
+			recurrences: {
+				once: "One time",
+				monthly: "Monthly",
+				quarterly: "Quarterly",
+				yearly: "Yearly",
+			},
+			dueDate: "Due date",
+			dueDateOptional: "Due date (optional)",
+			due: "Due {date}",
+			overdue: "Overdue since {date}",
+			summary: "{planned} · {recurrence}",
+			edit: "Edit {name}",
+			remove: "Remove {name}",
+			paid: "Paid so far",
+			editPaid: "Edit the amount paid on {name}, now {amount}",
+			paidInput: "Amount paid on {name}",
+			paidSlider: "How much of {name} you have paid",
+			status: {
+				left: "{amount} to pay",
+				paidOff: "Paid off",
+				over: "Over by {amount}",
+				unplanned: "No amount planned",
+			},
+		},
+		categoryDialog: {
+			addTitle: "New record",
+			editTitle: "Edit expense",
+			subtitle:
+				"Say what it is, how much it costs, how often it repeats and when it is due.",
+			addSubmit: "Save record",
+			editSubmit: "Save changes",
+		},
+		rule: {
+			title: "The 50/30/20 rule",
+			subtitle: "Half for needs, 30% for wants and at least 20% to save.",
+			noSalary: "Type in your salary to compare your plan with the rule.",
+			targetMax: "Aim for {target} or less",
+			targetMin: "Aim for at least {target}",
+			onTrack: "On track",
+			above: "Above the aim",
+			below: "Below the aim",
+			savingsNote:
+				"Savings will count what you record in your investments. Money not assigned yet does not count.",
+		},
+		year: {
+			title: "Your year",
+			subtitle: "What your bills really cost over the year.",
+			income: "Yearly income",
+			incomeDetail: "{monthly} a month",
+			spending: "Yearly spending",
+			spendingDetail: "Needs and wants",
+			saving: "Estimated savings",
+			savingDetail: "What you put aside over the year",
+			deficit: "Estimated shortfall",
+			deficitDetail: "Your plan asks for more than you earn",
+		},
+		confirmRemoveCategory: {
+			title: "Remove {name}?",
+			message:
+				"The expense leaves your budget. | The expense leaves your budget, with the payment logged in it. | The expense leaves your budget, with the {count} payments logged in it.",
+			confirm: "Remove expense",
+		},
+		confirmLeave: {
+			title: "Leave without saving?",
+			message: "The changes to your budget are lost if you leave now.",
+			confirm: "Leave without saving",
+		},
+	},
+	badges: {
+		title: "What you are applying here",
+		subtitle: "The badges of the lessons behind this screen.",
+		count: "{earned} of {total}",
+		earned: "Earned",
+		items: {
+			budgetOnTrack: {
+				name: "Budget on Track",
+				lesson: "Finish the budgeting module",
+			},
+			budgetRule: {
+				name: "50/30/20 Rule",
+				lesson: "Lesson on splitting your salary",
+			},
+			solidFund: {
+				name: "Solid Fund",
+				lesson: "100% on the emergency fund quiz",
+			},
+			compoundInterest: {
+				name: "Compound Interest",
+				lesson: "Lesson on compound interest",
+			},
+			inflation: {
+				name: "Inflation",
+				lesson: "Lesson on inflation",
+			},
+			diversification: {
+				name: "Diversification",
+				lesson: "Lesson on spreading your money",
+			},
+			prudentInvestor: {
+				name: "Prudent Investor",
+				lesson: "Finish the Strategist track",
+			},
+		},
 	},
 };

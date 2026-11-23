@@ -91,7 +91,7 @@ function pick(choice: TickerChoice) {
 				{{ t("simulator.search.noResults") }}
 			</p>
 
-			<ul v-if="results.length" class="popover flex flex-col gap-0.5">
+			<ul v-if="results.length" class="popover flex max-h-80 flex-col gap-0.5 overflow-y-auto overscroll-contain">
 				<li v-for="result in results" :key="result.symbol">
 					<button
 						type="button"

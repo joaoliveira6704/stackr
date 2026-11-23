@@ -20,6 +20,7 @@ import {
 	type Portfolio,
 	savePortfolio,
 } from "../lib/portfolio";
+import { useSavedSnapshot } from "../lib/saved-snapshot";
 
 export interface TickerChoice {
 	symbol: string;
@@ -55,18 +56,10 @@ function historyFields(history: PriceHistory): Partial<Holding> {
 
 export const usePortfolioStore = defineStore("portfolio", () => {
 	const portfolio = ref<Portfolio>(emptyPortfolio());
-	const savedSnapshot = ref(JSON.stringify(portfolio.value));
-
-	const hasUnsavedChanges = computed(
-		() => JSON.stringify(portfolio.value) !== savedSnapshot.value,
-	);
+	const { hasUnsavedChanges, markSaved } = useSavedSnapshot(portfolio);
 	const isFull = computed(
 		() => portfolio.value.holdings.length >= MAX_HOLDINGS,
 	);
-
-	function markSaved(): void {
-		savedSnapshot.value = JSON.stringify(portfolio.value);
-	}
 
 	async function load(): Promise<void> {
 		portfolio.value = await loadPortfolio();

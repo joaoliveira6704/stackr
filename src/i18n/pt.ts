@@ -1,6 +1,7 @@
 export const pt = {
 	nav: {
 		dashboard: "Painel",
+		budget: "Orçamento",
 		simulator: "Simulador",
 		login: "Entrar",
 		signup: "Criar conta",
@@ -36,6 +37,8 @@ export const pt = {
 		next: "Seguinte",
 		comingSoon: "Em breve",
 		cancel: "Cancelar",
+		saving: "A guardar...",
+		unsaved: "Tens alterações por guardar.",
 	},
 	logoutConfirm: {
 		title: "Sair da conta?",
@@ -66,6 +69,17 @@ export const pt = {
 			"Não foi possível guardar a tua carteira. Tenta outra vez.",
 		tooManyHoldings: "A carteira já tem o máximo de investimentos.",
 		holdingExists: "Esse investimento já está na tua carteira.",
+		budgetNotLoaded: "Não foi possível carregar o teu orçamento.",
+		budgetNotSaved:
+			"Não foi possível guardar o teu orçamento. Tenta outra vez.",
+		invalidSalary: "O salário tem de ser um número igual ou acima de zero.",
+		invalidPlannedAmount:
+			"O valor planeado de cada despesa tem de ser um número igual ou acima de zero.",
+		invalidPaidAmount: "O valor pago não pode ser negativo.",
+		tooManyCategories: "O orçamento já tem o máximo de despesas.",
+		categoryMissing: "Escolhe a despesa a que este gasto pertence.",
+		categoryNameMissing: "Dá um nome à despesa.",
+		dueDateMissing: "Escolhe a data limite desta despesa.",
 		unknown: "Algo correu mal.",
 	},
 	levels: {
@@ -321,9 +335,7 @@ export const pt = {
 		subtitle:
 			"Monta a tua carteira, escolhe quanto pões em cada investimento e vê quanto pode valer no futuro, já com inflação e impostos.",
 		save: "Guardar carteira",
-		saving: "A guardar...",
 		saved: "Carteira guardada.",
-		unsaved: "Tens alterações por guardar.",
 		loading: "A carregar a tua carteira...",
 		retry: "Tentar outra vez",
 		settings: {
@@ -453,6 +465,148 @@ export const pt = {
 		},
 		disclaimer:
 			"Isto é uma simulação educativa e não é aconselhamento financeiro. Rentabilidades passadas não garantem as futuras, e o histórico vem na moeda de cada ativo, sem contar com o câmbio.",
+	},
+	budget: {
+		eyebrow: "Orçamento",
+		title: "Organiza o teu mês.",
+		subtitle:
+			"Escreve o teu salário, junta as tuas despesas e marca o que já pagaste. Nós mostramos como fica o teu ano.",
+		saved: "Orçamento guardado.",
+		loading: "A carregar o teu orçamento...",
+		retry: "Tentar outra vez",
+		salary: {
+			title: "O teu salário",
+			subtitle: "O que recebes por mês, já depois de impostos.",
+			label: "Salário líquido por mês",
+			planned: "Planeado",
+			unassigned: "Por atribuir",
+			overAssigned: "Planeado a mais",
+		},
+		groups: {
+			needs: "Necessidades",
+			wants: "Desejos",
+			savings: "Poupança",
+		},
+		categories: {
+			title: "Gastos deste mês",
+			subtitle:
+				"Regista as tuas contas, atuais e futuras. O valor pago volta a zero depois de cada data limite. Até {max} despesas.",
+			add: "Novo registo",
+			full: "Chegaste ao máximo de {max} despesas.",
+			emptyTitle: "Ainda não tens despesas.",
+			total: "Total pago",
+			totalDetail: "De {planned} planeados",
+		},
+		category: {
+			name: "Nome",
+			description: "Descrição (opcional)",
+			group: "Tipo",
+			planned: "Valor",
+			recurrence: "Recorrência",
+			recurrences: {
+				once: "Uma vez",
+				monthly: "Mensal",
+				quarterly: "Trimestral",
+				yearly: "Anual",
+			},
+			dueDate: "Data limite",
+			dueDateOptional: "Data limite (opcional)",
+			due: "Até {date}",
+			overdue: "Em atraso desde {date}",
+			summary: "{planned} · {recurrence}",
+			edit: "Editar {name}",
+			remove: "Remover {name}",
+			paid: "Já pago",
+			editPaid: "Editar o valor pago em {name}, agora {amount}",
+			paidInput: "Valor pago em {name}",
+			paidSlider: "Quanto já pagaste de {name}",
+			status: {
+				left: "Faltam {amount}",
+				paidOff: "Liquidada",
+				over: "Excedida em {amount}",
+				unplanned: "Sem valor planeado",
+			},
+		},
+		categoryDialog: {
+			addTitle: "Novo registo",
+			editTitle: "Editar despesa",
+			subtitle:
+				"Diz o que é, quanto custa, de quanto em quanto tempo se paga e até quando.",
+			addSubmit: "Registar",
+			editSubmit: "Guardar alterações",
+		},
+		rule: {
+			title: "Regra 50/30/20",
+			subtitle:
+				"Metade para necessidades, 30% para desejos e pelo menos 20% para poupar.",
+			noSalary: "Escreve o teu salário para comparar o teu plano com a regra.",
+			targetMax: "Ideal até {target}",
+			targetMin: "Ideal de pelo menos {target}",
+			onTrack: "Dentro da regra",
+			above: "Acima do ideal",
+			below: "Abaixo do ideal",
+			savingsNote:
+				"A poupança vai contar o que registares nos teus investimentos. O dinheiro por atribuir não entra.",
+		},
+		year: {
+			title: "O teu ano",
+			subtitle: "O custo real das tuas contas ao longo do ano.",
+			income: "Rendimento anual",
+			incomeDetail: "{monthly} por mês",
+			spending: "Gastos anuais",
+			spendingDetail: "Necessidades e desejos",
+			saving: "Poupança estimada",
+			savingDetail: "O que pões de lado ao longo do ano",
+			deficit: "Défice estimado",
+			deficitDetail: "O teu plano pede mais do que ganhas",
+		},
+		confirmRemoveCategory: {
+			title: "Remover {name}?",
+			message:
+				"A despesa sai do teu orçamento. | A despesa sai do teu orçamento, com o gasto registado nela. | A despesa sai do teu orçamento, com os {count} gastos registados nela.",
+			confirm: "Remover despesa",
+		},
+		confirmLeave: {
+			title: "Sair sem guardar?",
+			message: "As alterações ao teu orçamento perdem-se se saíres agora.",
+			confirm: "Sair sem guardar",
+		},
+	},
+	badges: {
+		title: "O que estás a aplicar aqui",
+		subtitle: "Os badges das aulas por trás deste ecrã.",
+		count: "{earned} de {total}",
+		earned: "Conquistado",
+		items: {
+			budgetOnTrack: {
+				name: "Orçamento em Dia",
+				lesson: "Termina o módulo de orçamento",
+			},
+			budgetRule: {
+				name: "Regra 50/30/20",
+				lesson: "Aula sobre dividir o salário",
+			},
+			solidFund: {
+				name: "Fundo Sólido",
+				lesson: "100% no quiz do fundo de emergência",
+			},
+			compoundInterest: {
+				name: "Juros Compostos",
+				lesson: "Aula sobre juros compostos",
+			},
+			inflation: {
+				name: "Inflação",
+				lesson: "Aula sobre inflação",
+			},
+			diversification: {
+				name: "Diversificação",
+				lesson: "Aula sobre diversificar",
+			},
+			prudentInvestor: {
+				name: "Investidor Prudente",
+				lesson: "Termina o trilho Strategist",
+			},
+		},
 	},
 };
 
