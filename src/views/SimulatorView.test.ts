@@ -1,7 +1,12 @@
-import { flushPromises, type VueWrapper } from "@vue/test-utils";
+import {
+	enableAutoUnmount,
+	flushPromises,
+	type VueWrapper,
+} from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type Component, defineComponent, h } from "vue";
 import { RouterView } from "vue-router";
+import { AUTO_SAVE_DELAY_MS } from "../lib/use-saved-plan";
 import {
 	demoUser,
 	fakeAppApi,
@@ -30,6 +35,9 @@ const savedPortfolio = {
 		},
 	],
 };
+
+// An open page keeps its auto save timer, which must not fire into the next test.
+enableAutoUnmount(afterEach);
 
 beforeEach(() => {
 	storeSessionFor(demoUser);
@@ -64,6 +72,22 @@ function buttonWithText(wrapper: VueWrapper, text: string) {
 async function click(wrapper: VueWrapper, text: string) {
 	await buttonWithText(wrapper, text).trigger("click");
 	await flushPromises();
+}
+
+// Only the timers are faked, so promises and flushPromises keep working.
+function holdAutoSave() {
+	vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+}
+
+async function waitForAutoSave() {
+	await vi.advanceTimersByTimeAsync(AUTO_SAVE_DELAY_MS);
+	await flushPromises();
+}
+
+function recordInput(wrapper: VueWrapper, field: "monthly" | "rate") {
+	return wrapper
+		.get("article")
+		.findAll('input[type="number"]')[field === "monthly" ? 0 : 1];
 }
 
 // The results below have sections of their own, without record cards.
@@ -139,16 +163,20 @@ describe("SimulatorView", () => {
 		expect(wrapper.text()).toContain("€2,593.74");
 	});
 
-	it("saves the simulated deposit without adding a real one", async () => {
+	it("saves the simulated deposit by itself without adding a real one", async () => {
 		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator();
+		holdAutoSave();
 
-		await wrapper.get('article input[type="number"]').setValue("100");
-		await click(wrapper, "Save settings");
+		await recordInput(wrapper, "monthly").setValue("100");
+		expect(wrapper.text()).toContain("Saving...");
+		await waitForAutoSave();
 
+		expect(saved).toHaveLength(1);
 		expect(saved[0]).toMatchObject({
 			portfolio: { holdings: [{ initial: 1000, monthly: 100, deposits: [] }] },
 		});
+		expect(wrapper.text()).toContain("Settings saved.");
 	});
 
 	it("takes a bigger simulated deposit out of what the budget leaves free", async () => {
@@ -282,14 +310,13 @@ describe("SimulatorView", () => {
 	it("tries a new investment without saving it to the register", async () => {
 		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator();
+		holdAutoSave();
 
 		await click(wrapper, "Add by hand");
 
 		expect(wrapper.text()).toContain("Is it worth it?");
 		expect(wrapper.text()).toContain("New investment");
-		expect(
-			buttonWithText(wrapper, "Save settings").attributes("disabled"),
-		).toBeDefined();
+		await waitForAutoSave();
 		expect(saved).toHaveLength(0);
 	});
 
@@ -391,36 +418,125 @@ describe("SimulatorView", () => {
 		expect(wrapper.text()).toContain("You have nothing recorded yet.");
 	});
 
-	it("only lets the user save once something changed", async () => {
+	it("sends one save for a burst of quick changes", async () => {
 		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper } = await mountSimulator();
-		const saveButton = () => buttonWithText(wrapper, "Save settings");
+		holdAutoSave();
 
-		expect(saveButton().attributes("disabled")).toBeDefined();
+		await recordInput(wrapper, "rate").setValue("1");
+		await recordInput(wrapper, "rate").setValue("12");
+		await waitForAutoSave();
+
+		expect(saved).toHaveLength(1);
+		expect(saved[0]).toMatchObject({
+			portfolio: { holdings: [{ annualReturnPercent: 12 }] },
+		});
+	});
+
+	it("saves nothing right after loading", async () => {
+		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
+		holdAutoSave();
+		await mountSimulator();
+		await waitForAutoSave();
+
+		expect(saved).toEqual([]);
+	});
+
+	it("does not store a rate while the field is empty", async () => {
+		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+		holdAutoSave();
+
+		await recordInput(wrapper, "rate").setValue("");
+		await waitForAutoSave();
+
+		expect(saved).toEqual([]);
+		expect(wrapper.text()).toContain("You have unsaved changes");
+	});
+
+	it("saves the real portfolio while the what-if investment is invalid", async () => {
+		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+		holdAutoSave();
+		await click(wrapper, "Add by hand");
+		const trialCard = wrapper
+			.findAll("article")
+			.find((article) => article.text().includes("New investment"));
+
+		await trialCard?.get('input[type="number"]').setValue("");
+		await recordInput(wrapper, "monthly").setValue("100");
+		await waitForAutoSave();
+
+		expect(saved).toHaveLength(1);
+		expect(JSON.stringify(saved[0])).not.toContain("New investment");
+	});
+
+	it("keeps the last results on the page while a rate is retyped", async () => {
+		fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+		await recordInput(wrapper, "rate").setValue("10");
+
+		await recordInput(wrapper, "rate").setValue("");
+
+		expect(wrapper.text()).toContain(
+			"The return has to be a number above -100%.",
+		);
+		expect(wrapper.text()).toContain("€2,593.74");
+	});
+
+	it("shows the new results once the rate is typed again", async () => {
+		fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+		await recordInput(wrapper, "rate").setValue("");
+
+		await recordInput(wrapper, "rate").setValue("10");
+
+		expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+		expect(wrapper.text()).toContain("€2,593.74");
+	});
+
+	it("shows a clear error and saves again on retry", async () => {
+		const { fetchMock, saved } = fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator();
+		holdAutoSave();
+		fetchMock.mockImplementationOnce(async () => jsonResponse({}, 500));
 
 		await click(wrapper, "30 years");
-		expect(saveButton().attributes("disabled")).toBeUndefined();
+		await waitForAutoSave();
+		expect(wrapper.text()).toContain(
+			"Could not save your portfolio. Try again.",
+		);
 
-		await click(wrapper, "Save settings");
+		await click(wrapper, "Try again");
 
 		expect(saved).toHaveLength(1);
 		expect(saved[0]).toMatchObject({ portfolio: { years: 30 } });
 		expect(wrapper.text()).toContain("Settings saved.");
 	});
 
-	it("shows a clear error and keeps the changes when saving fails", async () => {
-		fakeAppApi({ portfolio: savedPortfolio, saveFails: true });
-		const { wrapper } = await mountSimulator();
+	it("says the settings are saved in Portuguese", async () => {
+		fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper } = await mountSimulator("pt-PT");
+		holdAutoSave();
+
+		await recordInput(wrapper, "monthly").setValue("100");
+		await waitForAutoSave();
+
+		expect(wrapper.text()).toContain("Definições guardadas.");
+	});
+
+	it("saves a pending change when leaving, without asking", async () => {
+		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
+		const { wrapper, router } = await mountSimulator("en", RoutedPage);
+		holdAutoSave();
+
 		await click(wrapper, "30 years");
+		await router.push("/dashboard");
+		await flushPromises();
 
-		await click(wrapper, "Save settings");
-
-		expect(wrapper.text()).toContain(
-			"Could not save your portfolio. Try again.",
-		);
-		expect(
-			buttonWithText(wrapper, "Save settings").attributes("disabled"),
-		).toBeUndefined();
+		expect(saved).toHaveLength(1);
+		expect(saved[0]).toMatchObject({ portfolio: { years: 30 } });
+		expect(router.currentRoute.value.path).toBe("/dashboard");
 	});
 
 	it("leaves straight away when there is nothing to save", async () => {
@@ -434,10 +550,10 @@ describe("SimulatorView", () => {
 		expect(wrapper.text()).not.toContain("Leave without saving?");
 	});
 
-	it("stays on the page when leaving with unsaved changes is cancelled", async () => {
+	it("stays on the page when leaving with an invalid value is cancelled", async () => {
 		fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper, router } = await mountSimulator("en", RoutedPage);
-		await click(wrapper, "30 years");
+		await recordInput(wrapper, "rate").setValue("");
 
 		const leaving = router.push("/dashboard");
 		await flushPromises();
@@ -448,10 +564,10 @@ describe("SimulatorView", () => {
 		expect(router.currentRoute.value.path).toBe("/simulator");
 	});
 
-	it("leaves without saving once the user confirms", async () => {
+	it("leaves without saving an invalid value once the user confirms", async () => {
 		const { saved } = fakeAppApi({ portfolio: savedPortfolio });
 		const { wrapper, router } = await mountSimulator("en", RoutedPage);
-		await click(wrapper, "30 years");
+		await recordInput(wrapper, "rate").setValue("");
 
 		const leaving = router.push("/dashboard");
 		await flushPromises();

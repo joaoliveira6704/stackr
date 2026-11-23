@@ -143,9 +143,9 @@
             "initial": 1016.14,
             "shares": 6,
             "quote": {
-              "price": 159.34,
+              "price": 165.12,
               "currency": "EUR",
-              "time": 1795192549000,
+              "time": 1795447153000,
               "rateToEur": 1
             },
             "manualValue": null,
@@ -192,9 +192,9 @@
             "initial": 120,
             "shares": 3.21027287,
             "quote": {
-              "price": 31.98,
+              "price": 33.605,
               "currency": "EUR",
-              "time": 1795192710000,
+              "time": 1795447140000,
               "rateToEur": 1
             },
             "manualValue": null,
@@ -225,10 +225,10 @@
             "initial": 150,
             "shares": 2.20396574,
             "quote": {
-              "price": 52.47,
+              "price": 54.6,
               "currency": "GBP",
-              "time": 1795192500000,
-              "rateToEur": 1.1928
+              "time": 1795447150000,
+              "rateToEur": 1.1948
             },
             "manualValue": null,
             "startDate": "2026-11-22",
@@ -286,9 +286,9 @@
             "initial": 120,
             "shares": 3.98208063,
             "quote": {
-              "price": 28.335,
+              "price": 28.955,
               "currency": "EUR",
-              "time": 1795192560000,
+              "time": 1795447043000,
               "rateToEur": 1
             },
             "manualValue": null,

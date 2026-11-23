@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { computed, ref } from "vue";
+import { computed, ref, shallowRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import AppIcon from "../components/AppIcon.vue";
+import AutoSaveStatus from "../components/AutoSaveStatus.vue";
 import { seriesColor } from "../components/chart-colors";
 import DurationPicker from "../components/DurationPicker.vue";
 import HoldingCard from "../components/HoldingCard.vue";
 import LessonBadges from "../components/LessonBadges.vue";
 import NumberField from "../components/NumberField.vue";
-import SaveControl from "../components/SaveControl.vue";
 import SimulationEntryCard from "../components/SimulationEntryCard.vue";
 import SimulatorResults from "../components/SimulatorResults.vue";
 import TickerSearch from "../components/TickerSearch.vue";
@@ -89,7 +89,22 @@ async function loadSimulator() {
 	await loadBudget();
 }
 
-const { loading, loadError, saving, saveError, justSaved, load, save } =
+// Checked apart from the outcome, because a half typed what-if investment is
+// never saved and must not hold back the changes to the real portfolio.
+const canSavePortfolio = computed(() => {
+	const { years, inflationPercent } = portfolio.value;
+	try {
+		projectPortfolio(registeredPlans(portfolio.value, today), {
+			years,
+			inflationPercent,
+		});
+		return true;
+	} catch {
+		return false;
+	}
+});
+
+const { loading, loadError, saving, saveError, justSaved, load, saveLatest } =
 	useSavedPlan(
 		{ load: loadSimulator, save: store.save },
 		hasUnsavedChanges,
@@ -98,6 +113,7 @@ const { loading, loadError, saving, saveError, justSaved, load, save } =
 			message: t("simulator.confirmLeave.message"),
 			confirmLabel: t("simulator.confirmLeave.confirm"),
 		}),
+		{ source: portfolio, canSave: () => canSavePortfolio.value },
 	);
 
 const registeredCount = computed(
@@ -167,6 +183,32 @@ const outcome = computed<Outcome | null>(() => {
 	}
 });
 
+interface ShownResults {
+	projection: Projection;
+	scenarios: Scenarios;
+	entries: typeof simulatedEntries.value;
+	years: number;
+}
+
+// The last valid results stay on screen while a field is being retyped.
+// Removing them would shrink the page and make the scroll position jump.
+const shownResults = shallowRef<ShownResults | null>(null);
+watch(
+	outcome,
+	(current) => {
+		if (!current) shownResults.value = null;
+		else if (!current.error) {
+			shownResults.value = {
+				projection: current.projection,
+				scenarios: current.scenarios,
+				entries: simulatedEntries.value,
+				years: portfolio.value.years,
+			};
+		}
+	},
+	{ immediate: true },
+);
+
 async function addTrialTicker(choice: TickerChoice) {
 	addingTrial.value = true;
 	trialError.value = null;
@@ -207,8 +249,9 @@ async function removeTrial() {
 
 <template>
 	<div class="flex flex-col gap-8">
-		<header class="flex flex-wrap items-end justify-between gap-4">
-			<div class="flex max-w-2xl flex-col gap-3">
+		<!-- The status has its own fixed place, so its chip never moves the page. -->
+		<header class="flex flex-wrap items-end justify-between gap-4 sm:flex-nowrap">
+			<div class="flex max-w-2xl min-w-0 flex-col gap-3">
 				<span class="chip tone-brand self-start">
 					<AppIcon name="simulator" :size="14" />
 					{{ t("simulator.eyebrow") }}
@@ -216,15 +259,17 @@ async function removeTrial() {
 				<h1 class="text-title sm:text-display">{{ t("simulator.title") }}</h1>
 				<p class="text-lead text-ink-muted">{{ t("simulator.subtitle") }}</p>
 			</div>
-			<SaveControl
+			<AutoSaveStatus
 				v-if="!loading && !loadError"
-				:label="t('simulator.save')"
+				class="w-full sm:w-auto sm:shrink-0"
 				:saved-message="t('simulator.saved')"
+				:retry-label="t('simulator.retry')"
 				:has-unsaved-changes="hasUnsavedChanges"
+				:can-save="canSavePortfolio"
 				:saving="saving"
 				:just-saved="justSaved"
 				:error="saveError"
-				@save="save"
+				@retry="saveLatest"
 			/>
 		</header>
 
@@ -350,11 +395,13 @@ async function removeTrial() {
 					{{ t(`errors.${outcome.error}`) }}
 				</p>
 				<SimulatorResults
-					v-else
-					:projection="outcome.projection"
-					:scenarios="outcome.scenarios"
-					:holdings="simulatedEntries"
-					:years="portfolio.years"
+					v-if="shownResults"
+					:class="{ 'opacity-50': outcome.error }"
+					:aria-busy="Boolean(outcome.error)"
+					:projection="shownResults.projection"
+					:scenarios="shownResults.scenarios"
+					:holdings="shownResults.entries"
+					:years="shownResults.years"
 				/>
 			</section>
 		</template>

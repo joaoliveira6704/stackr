@@ -344,7 +344,6 @@ export const en: MessageSchema = {
 		title: "Project your investment.",
 		subtitle:
 			"Start from the portfolio you recorded, see what it could be worth and try a new investment before you commit to it.",
-		save: "Save settings",
 		saved: "Settings saved.",
 		loading: "Loading your portfolio...",
 		retry: "Try again",

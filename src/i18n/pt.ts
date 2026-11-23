@@ -347,7 +347,6 @@ export const pt = {
 		title: "Projeta o teu investimento.",
 		subtitle:
 			"Parte da carteira que registaste, vê quanto pode valer no futuro e experimenta um novo investimento antes de começares.",
-		save: "Guardar definições",
 		saved: "Definições guardadas.",
 		loading: "A carregar a tua carteira...",
 		retry: "Tentar outra vez",
