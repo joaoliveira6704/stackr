@@ -46,8 +46,9 @@ export function jsonResponse(body: unknown, status = 200): Response {
 interface FakeData {
 	users: User[];
 	tracks: unknown[];
-	lessons: { id: string; trackId: string }[];
+	lessons: { id: string; trackId: string | null }[];
 	quizzes: { lessonId: string }[];
+	oneOffs: unknown[];
 }
 
 function findById<T extends { id: string }>(items: T[], id?: string) {
@@ -62,6 +63,7 @@ export function fakeApi(data: Partial<FakeData> = {}) {
 		tracks: data.tracks ?? [],
 		lessons: data.lessons ?? [],
 		quizzes: data.quizzes ?? [],
+		oneOffs: data.oneOffs ?? [],
 	};
 	const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
 		const { pathname, searchParams } = new URL(url, "http://localhost");
@@ -99,6 +101,9 @@ export function fakeApi(data: Partial<FakeData> = {}) {
 			return jsonResponse(
 				db.lessons.filter((lesson) => lesson.trackId === trackId),
 			);
+		}
+		if (collection === "oneOffs") {
+			return jsonResponse(db.oneOffs);
 		}
 		if (collection === "quizzes") {
 			const lessonId = searchParams.get("lessonId");

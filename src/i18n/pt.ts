@@ -86,6 +86,8 @@ export const pt = {
 		portfolioNotSaved:
 			"Não foi possível guardar a tua carteira. Tenta outra vez.",
 		tooManyHoldings: "A carteira já tem o máximo de investimentos.",
+		notEnoughStacks:
+			"Não tens Stacks suficientes. Passa mais aulas para ganhar Stacks.",
 		holdingExists: "Esse investimento já está na tua carteira.",
 		budgetNotLoaded: "Não foi possível carregar o teu orçamento.",
 		budgetNotSaved:
@@ -253,6 +255,8 @@ export const pt = {
 			"O teu trilho, módulo a módulo. Cada aula termina com um quiz de cinco perguntas.",
 		module: "Módulo {number}",
 		lessonsDone: "{done} de {total} aulas concluídas",
+		lessonsShort: "{done}/{total} aulas",
+		modulePrice: "{price} Stacks",
 		minutes: "{minutes} min",
 		status: {
 			locked: "Bloqueada",
@@ -261,8 +265,34 @@ export const pt = {
 			done: "Concluída",
 		},
 		lockedHint: "Conclui a aula anterior para a desbloquear.",
+		moduleLockedHint: "Desbloqueia o módulo para abrir esta aula.",
 		loading: "A carregar as aulas...",
 		retry: "Tentar outra vez",
+		balance: "{amount} Stacks",
+		balanceLabel: "O teu saldo",
+		moduleDone: "Módulo concluído",
+		moduleBonus: "Conclui o módulo e ganha +{xp} XP e +{stacks} Stacks.",
+		unlock: {
+			button: "Desbloquear por {price} Stacks",
+			missing: "Faltam-te {amount} Stacks.",
+			moduleTitle: "Desbloquear este módulo?",
+			oneOffTitle: "Desbloquear esta aula?",
+			message:
+				'Vais gastar {price} Stacks em "{title}" e ficas com {left}. Os Stacks gastos não voltam.',
+			confirm: "Desbloquear",
+		},
+		extras: {
+			title: "Aulas extra",
+			subtitle:
+				"Temas do dia a dia, para todos os trilhos. Desbloqueia com Stacks e ganha um pouco mais do que pagaste ao passar.",
+			reward: "+{amount} Stacks",
+			open: "Abrir aula",
+			empty: "Ainda não há aulas extra.",
+		},
+	},
+	scroller: {
+		previous: "Ver anteriores",
+		next: "Ver mais",
 	},
 	lesson: {
 		back: "Voltar às aulas",
@@ -294,6 +324,11 @@ export const pt = {
 		stacksEarned: "+{amount} Stacks",
 		alreadyDone:
 			"Já tinhas concluído esta aula, por isso desta vez não há recompensa.",
+		passMessageOneOff:
+			"Acertaste {correct} de {total}. Recuperaste os Stacks que gastaste e ainda ganhaste mais.",
+		moduleDoneTitle: "Módulo concluído!",
+		moduleDoneMessage:
+			"Terminaste todas as aulas deste módulo. Aqui tens o teu bónus.",
 		review: "Rever a aula",
 		nextLesson: "Próxima aula",
 		backToLearn: "Voltar às aulas",

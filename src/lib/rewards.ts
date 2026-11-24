@@ -81,6 +81,24 @@ export function rewardForPassedLesson(result: PassedLesson): Reward {
 	return { xp, stacks };
 }
 
+/** Paid once, on top of the lesson reward, when a whole module is finished. */
+export const MODULE_REWARD: Reward = { xp: 50, stacks: 20 };
+
+// A one-off pays back its price and a little more, so buying one is a way to
+// save up Stacks and never a loss.
+export const ONE_OFF_STACKS_PROFIT = 15;
+
+export function rewardForPassedOneOff(
+	result: PassedLesson,
+	price: number,
+): Reward {
+	assertWholeAmount(price, "Price");
+	return {
+		xp: rewardForPassedLesson(result).xp,
+		stacks: price + ONE_OFF_STACKS_PROFIT,
+	};
+}
+
 // XP and Stacks only ever move in whole points, so a fraction or a negative
 // value is always a bug in the caller and should fail loudly.
 export function assertWholeAmount(amount: number, label: string): void {

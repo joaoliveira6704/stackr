@@ -12,7 +12,7 @@ Stackr is a small gamified finance school for young people. A short onboarding q
 
 ## Status
 
-Phase 0 and phase 1 are done. Phase 2 is under way: the first module of each track is in `db.json` with three lessons and their quizzes, and the lessons map, lesson and quiz screens, the 80% rule, the review with highlighted sections and saved progress all work. The practical cases, the remaining three modules per track and the final challenges are still to come.
+Phase 0 and phase 1 are done. Phase 2 is under way: each track has three modules in `db.json` with three lessons and their quizzes, and there are three one-off lessons. The lessons map, lesson and quiz screens, the 80% rule, the review with highlighted sections, buying modules with Stacks and saved progress all work. The practical cases, the fourth module per track and the final challenges are still to come.
 
 A few decisions were made on the way. Rewards are paid when a quiz is passed, not when a lesson is read, and only the first time, so nobody can farm XP. A quiz only opens after its lesson is read to the end, and failing closes it until the lesson is read again. Progress is saved on each user's record in `db.json` instead of a separate collection, because json-server cannot look records up by a text id that looks like a number.
 
@@ -44,7 +44,7 @@ This is the core loop and the biggest phase.
 
 The `LessonViewer` page shows one short lesson split into sections, with plain text and everyday examples, and a button to start the quiz at the end. The `LessonQuiz` page shows five questions one at a time, corrects each answer straight away with a short explanation, and computes the final percentage through `submitQuiz(lessonId, answers)`. At 80% or more the lesson counts as done and the next one unlocks. Below 80%, `requireReview(lessonId)` sends the user back to the lesson with an encouraging message and the sections tied to their wrong answers highlighted. Passing after a review calls `clearReview(lessonId)` and gives the review bonus. Every attempt goes through `registerAttempt(lessonId)`.
 
-A module map page shows the four modules and their lessons as locked, available, to review or done. Foundation and Arena follow a fixed order, while Strategist users can pick the module order themselves. The practical case at the end of each module works like a longer quiz built around one real situation, such as a sudden expense that forces the user to touch the emergency fund.
+A module map page shows the modules and their lessons as locked, available, to review or done. The first module of every track is free. Every other module has its own Stacks price in `db.json`, set higher for longer or harder modules, and the user can buy them in any order. Inside a module the lessons still go in order, and finishing every lesson of a module pays a one time bonus of XP and Stacks. Below the modules, the same page lists one-off lessons on everyday topics, such as green energy or the household budget. They are shared by every track, cost Stacks, and pay back a little more Stacks than their price the first time they are passed. The practical case at the end of each module works like a longer quiz built around one real situation, such as a sudden expense that forces the user to touch the emergency fund.
 
 Content is a big job on its own. Three tracks times four modules times three lessons gives 36 lessons, 36 quizzes of five questions, 12 practical cases and three final challenges. We suggest keeping it as typed files in `src/content`, one folder per track, so it is versioned with the code and easy to test, and starting with the first module of each track so the whole loop can be demoed early.
 
@@ -102,7 +102,7 @@ The compound interest calculation is money logic, so it lives with the other mon
 
 ## Phase 5: the Stacks shop
 
-A `StackShop` page lists extra content with its price: 30 Stacks for a bonus quiz and 50 Stacks for an extra lesson. Lessons on the main path never cost anything. Buying goes through `unlockContent(contentId, cost)`, which uses `spendStacks(amount)` and refuses the purchase with a clear message if the balance is too low. After a purchase the balance updates, the item shows as unlocked on the module map, and a short tip about spending with intention appears. Bonus quizzes and extra lessons need their own content on top of the main path.
+A `StackShop` page lists extra content with its price: 30 Stacks for a bonus quiz and 50 Stacks for an extra lesson. Buying goes through `unlockContent(contentId, cost)`, which uses `spendStacks(amount)` and refuses the purchase with a clear message if the balance is too low. After a purchase the balance updates, the item shows as unlocked on the module map, and a short tip about spending with intention appears. Bonus quizzes and extra lessons need their own content on top of the main path.
 
 ## Phase 6: weekly ranking
 

@@ -30,6 +30,17 @@ describe("router", () => {
 		expect(router.currentRoute.value.path).toBe("/dashboard");
 	});
 
+	it("opens the quiz of a lesson as its own screen inside the app", async () => {
+		signInAsDemoUser();
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/learn/budget-1/quiz");
+
+		expect(router.currentRoute.value.path).toBe("/learn/budget-1/quiz");
+		expect(router.currentRoute.value.params.lessonId).toBe("budget-1");
+		expect(router.currentRoute.value.meta.layout).toBe("app");
+	});
+
 	it("lets anyone open the public pages", async () => {
 		const router = createAppRouter(createMemoryHistory());
 

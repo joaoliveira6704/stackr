@@ -1,13 +1,17 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import type { QuizQuestion } from "../content/types";
+import { AppError } from "../lib/errors";
 import { type QuizAnswers, type QuizScore, scoreQuiz } from "../lib/quiz";
 import {
 	assertWholeAmount,
 	levelForXp,
+	MODULE_REWARD,
 	NO_REWARD,
+	type PassedLesson,
 	type Reward,
 	rewardForPassedLesson,
+	rewardForPassedOneOff,
 } from "../lib/rewards";
 import type { Track } from "../lib/tracks";
 
@@ -15,11 +19,22 @@ function addOnce(list: string[], id: string): void {
 	if (!list.includes(id)) list.push(id);
 }
 
+/**
+ * Where a lesson sits, which decides how passing it is rewarded. A core
+ * lesson names its module so the module bonus is paid when the last lesson is
+ * passed, and a one-off lesson names its price.
+ */
+export type LessonPlace =
+	| { kind: "module"; moduleId: string; lessonIds: readonly string[] }
+	| { kind: "oneOff"; price: number };
+
 export interface QuizOutcome {
 	score: QuizScore;
 	reward: Reward;
 	/** True the first time this lesson is passed. */
 	firstCompletion: boolean;
+	/** The bonus for finishing the whole module, when this pass finished it. */
+	moduleReward: Reward | null;
 }
 
 /** The part of the progress that is saved per user in db.json. */
@@ -38,6 +53,7 @@ export interface ProgressSnapshot {
 	lastActivity: string | null;
 	badges: string[];
 	unlockedContent: string[];
+	completedModules: string[];
 }
 
 export function emptyProgress(): ProgressSnapshot {
@@ -55,6 +71,7 @@ export function emptyProgress(): ProgressSnapshot {
 		lastActivity: null,
 		badges: [],
 		unlockedContent: [],
+		completedModules: [],
 	};
 }
 
@@ -75,6 +92,7 @@ export const useProgressStore = defineStore("progress", () => {
 	const lastActivity = ref<string | null>(null);
 	const badges = ref<string[]>([]);
 	const unlockedContent = ref<string[]>([]);
+	const completedModules = ref<string[]>([]);
 
 	// Derived from XP instead of stored, so the level can never drift out of sync.
 	const level = computed(() => levelForXp(xp.value));
@@ -105,9 +123,7 @@ export const useProgressStore = defineStore("progress", () => {
 	function spendStacks(amount: number): void {
 		assertWholeAmount(amount, "Stacks");
 		if (amount > stacks.value) {
-			throw new Error(
-				`You need ${amount} Stacks but only have ${stacks.value}.`,
-			);
+			throw new AppError("notEnoughStacks");
 		}
 		stacks.value -= amount;
 	}
@@ -138,21 +154,53 @@ export const useProgressStore = defineStore("progress", () => {
 		sectionsToReview.value = rest;
 	}
 
-	function passLesson(lessonId: string, score: QuizScore, attempt: number) {
+	function pay(reward: Reward): void {
+		addXp(reward.xp);
+		addStacks(reward.stacks);
+	}
+
+	/** Pays the module bonus the first time every lesson of it is done. */
+	function completeModule(
+		moduleId: string,
+		lessonIds: readonly string[],
+	): Reward | null {
+		if (completedModules.value.includes(moduleId)) return null;
+		if (!lessonIds.every((id) => completedLessons.value.includes(id))) {
+			return null;
+		}
+		completedModules.value.push(moduleId);
+		pay(MODULE_REWARD);
+		return MODULE_REWARD;
+	}
+
+	function rewardForPass(result: PassedLesson, place?: LessonPlace): Reward {
+		return place?.kind === "oneOff"
+			? rewardForPassedOneOff(result, place.price)
+			: rewardForPassedLesson(result);
+	}
+
+	function passLesson(
+		lessonId: string,
+		score: QuizScore,
+		attempt: number,
+		place?: LessonPlace,
+	) {
 		const firstCompletion = !completedLessons.value.includes(lessonId);
 		const afterReview = lessonsToReview.value.includes(lessonId);
 		completeLesson(lessonId);
 		clearReview(lessonId);
 		const reward = firstCompletion
-			? rewardForPassedLesson({
-					correctAnswers: score.correct,
-					attempt,
-					afterReview,
-				})
+			? rewardForPass(
+					{ correctAnswers: score.correct, attempt, afterReview },
+					place,
+				)
 			: NO_REWARD;
-		addXp(reward.xp);
-		addStacks(reward.stacks);
-		return { reward, firstCompletion };
+		pay(reward);
+		const moduleReward =
+			place?.kind === "module"
+				? completeModule(place.moduleId, place.lessonIds)
+				: null;
+		return { reward, firstCompletion, moduleReward };
 	}
 
 	// The theory always comes before the quiz (GDD 3.1): a quiz only opens
@@ -181,6 +229,7 @@ export const useProgressStore = defineStore("progress", () => {
 		lessonId: string,
 		questions: QuizQuestion[],
 		answers: QuizAnswers,
+		place?: LessonPlace,
 	): QuizOutcome {
 		registerAttempt(lessonId);
 		const attempt = quizAttempts.value[lessonId];
@@ -189,9 +238,16 @@ export const useProgressStore = defineStore("progress", () => {
 			...quizResults.value,
 			[lessonId]: Math.max(quizResults.value[lessonId] ?? 0, score.percent),
 		};
-		if (score.passed) return { score, ...passLesson(lessonId, score, attempt) };
+		if (score.passed) {
+			return { score, ...passLesson(lessonId, score, attempt, place) };
+		}
 		failLesson(lessonId, score);
-		return { score, reward: NO_REWARD, firstCompletion: false };
+		return {
+			score,
+			reward: NO_REWARD,
+			firstCompletion: false,
+			moduleReward: null,
+		};
 	}
 
 	function snapshot(): ProgressSnapshot {
@@ -209,6 +265,7 @@ export const useProgressStore = defineStore("progress", () => {
 			lastActivity: lastActivity.value,
 			badges: [...badges.value],
 			unlockedContent: [...unlockedContent.value],
+			completedModules: [...completedModules.value],
 		};
 	}
 
@@ -227,6 +284,7 @@ export const useProgressStore = defineStore("progress", () => {
 		lastActivity.value = value.lastActivity;
 		badges.value = [...value.badges];
 		unlockedContent.value = [...value.unlockedContent];
+		completedModules.value = [...value.completedModules];
 	}
 
 	function reset(): void {
@@ -256,6 +314,7 @@ export const useProgressStore = defineStore("progress", () => {
 		lastActivity,
 		badges,
 		unlockedContent,
+		completedModules,
 		setTrack,
 		completeOnboarding,
 		addXp,
