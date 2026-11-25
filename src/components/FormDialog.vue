@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, useId } from "vue";
 
-defineProps<{ title: string; subtitle?: string }>();
+defineProps<{
+	title: string;
+	subtitle?: string;
+	/** "small" fits a quick look, such as a theme preview, instead of a form. */
+	size?: "small";
+}>();
 const emit = defineEmits<{ close: [] }>();
 
 const titleId = useId();
@@ -57,7 +62,8 @@ onUnmounted(() => focusBeforeOpen?.focus());
 			role="dialog"
 			aria-modal="true"
 			:aria-labelledby="titleId"
-			class="popover relative flex w-full max-w-lg animate-reveal flex-col gap-5 rounded-panel p-6 motion-reduce:animate-none"
+			:data-small="size === 'small' || undefined"
+			class="popover relative flex w-full max-w-lg data-small:max-w-sm animate-reveal flex-col gap-5 rounded-panel p-6 motion-reduce:animate-none"
 			@keydown="handleKeydown"
 		>
 			<div>

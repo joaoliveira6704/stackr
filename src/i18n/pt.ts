@@ -286,7 +286,8 @@ export const pt = {
 	},
 	unlock: {
 		button: "Desbloquear por {price} Stacks",
-		buyButton: "Comprar por {price} Stacks",
+		buyButton: "Comprar · {price}",
+		buyLabel: "Comprar por {price} Stacks",
 		missing: "Faltam-te {amount} Stacks.",
 		moduleTitle: "Desbloquear este módulo?",
 		oneOffTitle: "Desbloquear esta aula?",
@@ -301,12 +302,12 @@ export const pt = {
 	},
 	shop: {
 		title: "Loja",
-		subtitle:
-			"Dá um toque teu à app. Compras uma vez com Stacks e trocas sempre que quiseres.",
 		themesTitle: "Temas de cor",
 		themesSubtitle:
 			"Mudam as cores que brilham por trás de cada ecrã. Os animados também as põem a mexer.",
 		animatedTag: "Animado",
+		preview: "Pré-visualizar {name}",
+		closePreview: "Fechar",
 		avatarsTitle: "Ícones de perfil",
 		avatarsSubtitle:
 			"Gerados a partir da tua conta, como no GitHub. O padrão é só teu, tu escolhes as cores.",

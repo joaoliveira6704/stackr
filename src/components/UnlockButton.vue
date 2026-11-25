@@ -6,7 +6,9 @@ import { useI18n } from "vue-i18n";
 import { useProgressStore } from "../stores/progress";
 import AppIcon from "./AppIcon.vue";
 
-// "buy" is for shop items, which are bought rather than unlocked.
+// "buy" is for shop items, which are bought rather than unlocked. Their cards
+// are narrow, so the button only says the price and the full sentence is its
+// accessible name.
 const props = withDefaults(
 	defineProps<{ price: number; verb?: "unlock" | "buy" }>(),
 	{ verb: "unlock" },
@@ -23,8 +25,9 @@ const missing = computed(() => Math.max(props.price - progress.stacks, 0));
 	<div class="flex flex-col items-start gap-1.5">
 		<button
 			type="button"
-			class="btn-primary btn-sm"
+			class="btn-primary btn-sm whitespace-nowrap"
 			:disabled="missing > 0"
+			:aria-label="verb === 'buy' ? t('unlock.buyLabel', { price: n(price) }) : undefined"
 			@click="$emit('unlock')"
 		>
 			<AppIcon name="stacks" :size="16" />

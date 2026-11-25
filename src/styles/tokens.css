@@ -98,6 +98,22 @@
 	--animate-orb-drift: orb-drift 40s ease-in-out infinite;
 	--animate-orb-shift: orb-shift 26s ease-in-out infinite;
 
+	/* The same drift, scaled down for the small theme previews in the shop. */
+	--animate-orb-drift-sm: orb-drift-sm 14s ease-in-out infinite;
+
+	@keyframes orb-drift-sm {
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		33% {
+			transform: translate(0.75rem, -0.5rem) scale(1.1);
+		}
+		66% {
+			transform: translate(-0.5rem, 0.5rem) scale(0.92);
+		}
+	}
+
 	@keyframes orb-drift {
 		0%,
 		100% {

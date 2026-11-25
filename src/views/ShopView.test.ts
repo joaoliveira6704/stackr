@@ -39,8 +39,22 @@ function buttonIn(wrapper: Wrapper, item: string, label: string) {
 	return button;
 }
 
+function buyButton(wrapper: Wrapper, item: string) {
+	return card(wrapper, item).get("button.btn-primary");
+}
+
+function eyeButton(wrapper: Wrapper, item: string) {
+	return card(wrapper, item).get("[data-preview-button]");
+}
+
+async function openPreview(wrapper: Wrapper, item: string) {
+	await eyeButton(wrapper, item).trigger("click");
+	await flushPromises();
+	return wrapper.get('[role="dialog"]');
+}
+
 async function startBuying(wrapper: Wrapper, item: string) {
-	await buttonIn(wrapper, item, "Buy for").trigger("click");
+	await buyButton(wrapper, item).trigger("click");
 	await flushPromises();
 }
 
@@ -50,12 +64,168 @@ describe("ShopView", () => {
 
 		expect(wrapper.text()).toContain("Colour themes");
 		expect(wrapper.text()).toContain("Profile icons");
-		expect(card(wrapper, "theme:sunset").text()).toContain(
+		expect(buyButton(wrapper, "theme:sunset").text()).toContain(
+			`Buy · ${SUNSET_PRICE}`,
+		);
+		expect(buyButton(wrapper, "theme:sunset").attributes("aria-label")).toBe(
 			`Buy for ${SUNSET_PRICE} Stacks`,
 		);
-		expect(card(wrapper, "avatar:prism").text()).toContain(
+		expect(buyButton(wrapper, "avatar:prism").attributes("aria-label")).toBe(
 			`Buy for ${PRISM_ICON_PRICE} Stacks`,
 		);
+	});
+
+	it("keeps the theme previews closed until an eye button is pressed", async () => {
+		const wrapper = await mountShop(0);
+
+		expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+		expect(eyeButton(wrapper, "theme:sunset").attributes("aria-label")).toBe(
+			"Preview Sunset",
+		);
+		expect(eyeButton(wrapper, "theme:sunset").attributes("aria-haspopup")).toBe(
+			"dialog",
+		);
+	});
+
+	it("opens a small dialog with a window sample of the theme", async () => {
+		const wrapper = await mountShop(0);
+
+		const dialog = await openPreview(wrapper, "theme:sunset");
+
+		expect(dialog.text()).toContain("Sunset");
+		expect(dialog.text()).toContain("Warm orange and yellow.");
+		const sample = dialog.get("[data-theme-preview]");
+		expect(sample.attributes("data-large")).toBe("true");
+		expect(sample.find(".bg-tangerine").exists()).toBe(true);
+		expect(sample.attributes("data-animated")).toBeUndefined();
+	});
+
+	it("shows an animated theme moving and tagged as animated in the dialog", async () => {
+		const wrapper = await mountShop(0);
+
+		const dialog = await openPreview(wrapper, "theme:prism");
+
+		expect(dialog.get("[data-theme-preview]").attributes("data-animated")).toBe(
+			"true",
+		);
+		expect(dialog.text()).toContain("Animated");
+	});
+
+	it("closes the dialog from its close button", async () => {
+		const wrapper = await mountShop(0);
+		const dialog = await openPreview(wrapper, "theme:sunset");
+
+		const close = dialog
+			.findAll("button")
+			.find((button) => button.text() === "Close");
+		await close?.trigger("click");
+
+		expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+	});
+
+	it("closes the dialog with Escape", async () => {
+		const wrapper = await mountShop(0);
+		const dialog = await openPreview(wrapper, "theme:sunset");
+
+		await dialog.trigger("keydown", { key: "Escape" });
+
+		expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+	});
+
+	it("offers to buy the theme from the preview dialog", async () => {
+		const wrapper = await mountShop(100);
+
+		const dialog = await openPreview(wrapper, "theme:sunset");
+
+		const buy = dialog.get("button.btn-primary");
+		expect(buy.text()).toContain(`Buy · ${SUNSET_PRICE}`);
+		expect(buy.attributes("disabled")).toBeUndefined();
+	});
+
+	it("closes the preview and asks before buying from it", async () => {
+		const wrapper = await mountShop(100);
+		const dialog = await openPreview(wrapper, "theme:sunset");
+
+		await dialog.get("button.btn-primary").trigger("click");
+		await flushPromises();
+
+		expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+		expect(wrapper.get('[role="alertdialog"]').text()).toContain(
+			"Buy this theme?",
+		);
+		expect(useProgressStore().stacks).toBe(100);
+	});
+
+	it("buys and applies the theme once the user confirms from the preview", async () => {
+		const wrapper = await mountShop(100);
+		const dialog = await openPreview(wrapper, "theme:sunset");
+
+		await dialog.get("button.btn-primary").trigger("click");
+		await flushPromises();
+		await answerConfirmDialog(wrapper, "confirm");
+
+		expect(useProgressStore().stacks).toBe(100 - SUNSET_PRICE);
+		expect(useProgressStore().equipped.colourTheme).toBe("sunset");
+	});
+
+	it("spends nothing when the user cancels a purchase started from the preview", async () => {
+		const wrapper = await mountShop(100);
+		const dialog = await openPreview(wrapper, "theme:sunset");
+
+		await dialog.get("button.btn-primary").trigger("click");
+		await flushPromises();
+		await answerConfirmDialog(wrapper, "cancel");
+
+		expect(useProgressStore().stacks).toBe(100);
+		expect(useProgressStore().equipped.colourTheme).toBeNull();
+	});
+
+	it("disables buying from the preview when Stacks are short", async () => {
+		const wrapper = await mountShop(10);
+
+		const dialog = await openPreview(wrapper, "theme:sunset");
+
+		expect(
+			dialog.get("button.btn-primary").attributes("disabled"),
+		).toBeDefined();
+		expect(dialog.text()).toContain(
+			`You need ${SUNSET_PRICE - 10} more Stacks.`,
+		);
+	});
+
+	it("applies a theme the user already owns from the preview, for free", async () => {
+		const wrapper = await mountShop(SUNSET_PRICE);
+		const progress = useProgressStore();
+		progress.unlockContent("theme:sunset", SUNSET_PRICE);
+		await flushPromises();
+		const dialog = await openPreview(wrapper, "theme:sunset");
+
+		const apply = dialog.get("button.btn-primary");
+		expect(apply.text()).toBe("Apply");
+		await apply.trigger("click");
+
+		expect(progress.equipped.colourTheme).toBe("sunset");
+		expect(progress.stacks).toBe(0);
+		expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+	});
+
+	it("says the theme is in use instead of offering to buy it", async () => {
+		const wrapper = await mountShop(0);
+
+		const dialog = await openPreview(wrapper, "theme:default");
+
+		expect(dialog.text()).toContain("In use");
+		expect(dialog.find("button.btn-primary").exists()).toBe(false);
+	});
+
+	it("previews a theme without spending or applying anything", async () => {
+		const wrapper = await mountShop(100);
+
+		await openPreview(wrapper, "theme:sunset");
+
+		expect(useProgressStore().stacks).toBe(100);
+		expect(useProgressStore().equipped.colourTheme).toBeNull();
+		expect(wrapper.find('[role="alertdialog"]').exists()).toBe(false);
 	});
 
 	it("tags only the animated themes as animated", async () => {
@@ -89,6 +259,13 @@ describe("ShopView", () => {
 		expect(themes.find('[data-item^="avatar:"]').exists()).toBe(false);
 	});
 
+	it("opens with the title and the balance, without a subtitle", async () => {
+		const wrapper = await mountShop(0);
+
+		expect(wrapper.get("h1").text()).toBe("Shop");
+		expect(wrapper.text()).not.toContain("Make the app your own");
+	});
+
 	it("shows the free default look as in use before anything is bought", async () => {
 		const wrapper = await mountShop(0);
 
@@ -100,7 +277,7 @@ describe("ShopView", () => {
 		const wrapper = await mountShop(50);
 
 		expect(
-			buttonIn(wrapper, "theme:sunset", "Buy for").attributes("disabled"),
+			buyButton(wrapper, "theme:sunset").attributes("disabled"),
 		).toBeDefined();
 		expect(card(wrapper, "theme:sunset").text()).toContain(
 			`You need ${SUNSET_PRICE - 50} more Stacks.`,
@@ -194,8 +371,11 @@ describe("ShopView", () => {
 		expect(card(wrapper, "theme:prism").text()).toContain("Animado");
 		expect(wrapper.text()).toContain("Ícones de perfil");
 		expect(card(wrapper, "avatar:default").text()).toContain("Clássico");
-		expect(card(wrapper, "theme:sunset").text()).toContain(
-			`Comprar por ${SUNSET_PRICE} Stacks`,
+		expect(buyButton(wrapper, "theme:sunset").text()).toContain(
+			`Comprar · ${SUNSET_PRICE}`,
+		);
+		expect(eyeButton(wrapper, "theme:sunset").attributes("aria-label")).toBe(
+			"Pré-visualizar Pôr do sol",
 		);
 	});
 });

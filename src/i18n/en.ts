@@ -283,7 +283,8 @@ export const en: MessageSchema = {
 	},
 	unlock: {
 		button: "Unlock for {price} Stacks",
-		buyButton: "Buy for {price} Stacks",
+		buyButton: "Buy · {price}",
+		buyLabel: "Buy for {price} Stacks",
 		missing: "You need {amount} more Stacks.",
 		moduleTitle: "Unlock this module?",
 		oneOffTitle: "Unlock this lesson?",
@@ -298,12 +299,12 @@ export const en: MessageSchema = {
 	},
 	shop: {
 		title: "Shop",
-		subtitle:
-			"Make the app your own. Buy once with Stacks and switch whenever you like.",
 		themesTitle: "Colour themes",
 		themesSubtitle:
 			"They change the colours glowing behind every screen. The animated ones also set them moving.",
 		animatedTag: "Animated",
+		preview: "Preview {name}",
+		closePreview: "Close",
 		avatarsTitle: "Profile icons",
 		avatarsSubtitle:
 			"Drawn from your account, like on GitHub. The pattern is yours alone, you pick the colours.",
