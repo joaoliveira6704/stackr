@@ -5,6 +5,7 @@ import type { IconName } from "../components/icons";
 import LevelCard from "../components/LevelCard.vue";
 import StatCard from "../components/StatCard.vue";
 import type { Tone } from "../components/tones";
+import UserAvatar from "../components/UserAvatar.vue";
 import { useAuth } from "../lib/use-auth";
 import { useProgressStore } from "../stores/progress";
 
@@ -36,11 +37,14 @@ const stats = computed<Stat[]>(() => [
 
 <template>
 	<div class="flex flex-col gap-8">
-		<div>
-			<h1 class="text-title sm:text-display">
-				{{ t("dashboard.greeting", { name: firstName }) }}
-			</h1>
-			<p class="mt-2 text-lead text-ink-muted">{{ t("dashboard.subtitle") }}</p>
+		<div class="flex items-center gap-5">
+			<UserAvatar :seed="user?.id ?? ''" size="large" />
+			<div class="min-w-0">
+				<h1 class="text-title sm:text-display">
+					{{ t("dashboard.greeting", { name: firstName }) }}
+				</h1>
+				<p class="mt-2 text-lead text-ink-muted">{{ t("dashboard.subtitle") }}</p>
+			</div>
 		</div>
 
 		<section class="card">

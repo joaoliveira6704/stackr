@@ -8,7 +8,7 @@ import ProfileView from "./ProfileView.vue";
 import ShopView from "./ShopView.vue";
 
 const SUNSET_PRICE = 80;
-const CROWN_PRICE = 120;
+const PRISM_ICON_PRICE = 150;
 
 afterEach(() => {
 	useAuth().signOut();
@@ -53,8 +53,8 @@ describe("ShopView", () => {
 		expect(card(wrapper, "theme:sunset").text()).toContain(
 			`Buy for ${SUNSET_PRICE} Stacks`,
 		);
-		expect(card(wrapper, "avatar:crown").text()).toContain(
-			`Buy for ${CROWN_PRICE} Stacks`,
+		expect(card(wrapper, "avatar:prism").text()).toContain(
+			`Buy for ${PRISM_ICON_PRICE} Stacks`,
 		);
 	});
 
@@ -93,7 +93,7 @@ describe("ShopView", () => {
 		const wrapper = await mountShop(0);
 
 		expect(card(wrapper, "theme:default").text()).toContain("In use");
-		expect(card(wrapper, "avatar:initials").text()).toContain("In use");
+		expect(card(wrapper, "avatar:default").text()).toContain("In use");
 	});
 
 	it("disables buying and says how many Stacks are missing", async () => {
@@ -160,6 +160,32 @@ describe("ShopView", () => {
 		expect(wrapper.find('[role="alertdialog"]').exists()).toBe(false);
 	});
 
+	it("tags only the animated profile styles as animated", async () => {
+		const wrapper = await mountShop(0);
+
+		for (const item of ["avatar:wave", "avatar:prism"]) {
+			expect(card(wrapper, item).get("[data-tag]").text()).toBe("Animated");
+		}
+		for (const item of ["avatar:default", "avatar:grape", "avatar:duo"]) {
+			expect(card(wrapper, item).find("[data-tag]").exists()).toBe(false);
+		}
+	});
+
+	it("moves the squares only in the animated profile styles", async () => {
+		const wrapper = await mountShop(0);
+		const movingCells = (item: string) =>
+			card(wrapper, item)
+				.findAll("[data-cell]")
+				.filter((cell) =>
+					cell.classes().some((name) => name.includes("animate-identicon")),
+				).length;
+
+		expect(movingCells("avatar:wave")).toBeGreaterThan(0);
+		expect(movingCells("avatar:prism")).toBeGreaterThan(0);
+		expect(movingCells("avatar:duo")).toBe(0);
+		expect(movingCells("avatar:default")).toBe(0);
+	});
+
 	it("shows the shop in Portuguese", async () => {
 		const wrapper = await mountShop(0, "pt-PT");
 
@@ -167,6 +193,7 @@ describe("ShopView", () => {
 		expect(wrapper.text()).toContain("Temas de cor");
 		expect(card(wrapper, "theme:prism").text()).toContain("Animado");
 		expect(wrapper.text()).toContain("Ícones de perfil");
+		expect(card(wrapper, "avatar:default").text()).toContain("Clássico");
 		expect(card(wrapper, "theme:sunset").text()).toContain(
 			`Comprar por ${SUNSET_PRICE} Stacks`,
 		);
@@ -182,25 +209,44 @@ describe("ProfileView avatar", () => {
 		return wrapper;
 	}
 
-	it("shows the initials when no icon is in use", async () => {
+	it("shows the free green pattern when no style is in use", async () => {
 		const wrapper = await mountProfile();
 
 		const avatar = wrapper.get("[data-avatar]");
-		expect(avatar.attributes("data-avatar")).toBe("initials");
-		expect(avatar.text()).toBe("JO");
+		expect(avatar.attributes("data-avatar")).toBe("default");
+		expect(avatar.findAll("[data-cell]").length).toBeGreaterThan(0);
+		for (const cell of avatar.findAll("[data-cell]")) {
+			expect(cell.classes()).toContain("bg-brand");
+		}
 	});
 
 	it("shows the icon the user bought and applied", async () => {
 		const wrapper = await mountProfile();
 		const progress = useProgressStore();
-		progress.addStacks(CROWN_PRICE);
-		progress.unlockContent("avatar:crown", CROWN_PRICE);
-		progress.equip("avatar", "crown");
+		progress.addStacks(PRISM_ICON_PRICE);
+		progress.unlockContent("avatar:prism", PRISM_ICON_PRICE);
+		progress.equip("avatar", "prism");
 		await flushPromises();
 
 		expect(wrapper.get("[data-avatar]").attributes("data-avatar")).toBe(
-			"crown",
+			"prism",
 		);
+	});
+
+	it("draws the same pattern on the profile as in the shop", async () => {
+		const profile = await mountProfile();
+		const profileCells = profile
+			.findAll("[data-avatar] > span > span")
+			.map((cell) => cell.attributes("data-cell") ?? "");
+		useAuth().signOut();
+
+		const shop = await mountShop(0);
+		const shopCells = card(shop, "avatar:default")
+			.findAll("[data-avatar] > span > span")
+			.map((cell) => cell.attributes("data-cell") ?? "");
+
+		expect(profileCells).toHaveLength(25);
+		expect(shopCells).toEqual(profileCells);
 	});
 
 	it("links to the shop to change the icon", async () => {

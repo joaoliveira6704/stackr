@@ -332,7 +332,7 @@
       "progress": {
         "xp": 330,
         "weeklyXp": 330,
-        "stacks": 30,
+        "stacks": 0,
         "completedLessons": [
           "strategist-growth-1",
           "strategist-growth-2",
@@ -365,13 +365,14 @@
           "avatar:leaf",
           "avatar:crown",
           "theme:berry",
-          "theme:ocean"
+          "theme:ocean",
+          "avatar:tangerine"
         ],
         "completedModules": [
           "strategist-growth"
         ],
         "equipped": {
-          "avatar": "crown",
+          "avatar": "tangerine",
           "colourTheme": null
         }
       }

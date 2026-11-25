@@ -5,7 +5,6 @@ import {
 	BookOpen,
 	CalendarDays,
 	Car,
-	Cat,
 	ChartLine,
 	ChartPie,
 	Check,
@@ -14,11 +13,9 @@ import {
 	ClipboardList,
 	Clock,
 	Coins,
-	Crown,
 	Eye,
 	EyeOff,
 	Flame,
-	Gem,
 	Gift,
 	Globe,
 	GraduationCap,
@@ -27,7 +24,6 @@ import {
 	Info,
 	Landmark,
 	LayoutDashboard,
-	Leaf,
 	Lightbulb,
 	Lock,
 	LogOut,
@@ -40,7 +36,6 @@ import {
 	Plane,
 	Plus,
 	Receipt,
-	Rocket,
 	Save,
 	Scale,
 	Search,
@@ -61,11 +56,9 @@ import {
 	Trophy,
 	User,
 	Wallet,
-	Zap,
 } from "lucide-vue-next";
 import type { BadgeId } from "../lib/badges";
 import type { BudgetGroup } from "../lib/budget";
-import type { AvatarId } from "../lib/shop";
 import type { Track } from "../lib/tracks";
 
 // Our own names for the Lucide icons the app uses. Components ask for an
@@ -75,12 +68,6 @@ export const ICONS = {
 	alert: TriangleAlert,
 	arrowLeft: ArrowLeft,
 	arrowRight: ArrowRight,
-	avatarCat: Cat,
-	avatarCrown: Crown,
-	avatarGem: Gem,
-	avatarLeaf: Leaf,
-	avatarRocket: Rocket,
-	avatarZap: Zap,
 	badge: Award,
 	book: BookOpen,
 	check: Check,
@@ -158,13 +145,4 @@ export const BADGE_ICONS: Record<BadgeId, IconName> = {
 	inflation: "inflation",
 	diversification: "simulator",
 	prudentInvestor: "trophy",
-};
-
-export const AVATAR_ICONS: Record<AvatarId, IconName> = {
-	leaf: "avatarLeaf",
-	rocket: "avatarRocket",
-	zap: "avatarZap",
-	cat: "avatarCat",
-	gem: "avatarGem",
-	crown: "avatarCrown",
 };

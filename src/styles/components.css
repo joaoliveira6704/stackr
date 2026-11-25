@@ -158,6 +158,12 @@
 	border-radius: 1.5rem;
 }
 
+/* The largest tile, for a profile picture next to a display heading. */
+@utility icon-tile-2xl {
+	--tile-size: 5.5rem;
+	border-radius: 1.75rem;
+}
+
 /* Buttons ----------------------------------------------------------------- */
 
 @utility btn {

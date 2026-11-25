@@ -111,6 +111,37 @@
 		}
 	}
 
+	/* Level 3 profile pictures. A wave of light runs across the squares, or
+	each square cycles through the four palette colours. */
+	--animate-identicon-wave: identicon-wave 2.4s ease-in-out infinite;
+	--animate-identicon-cycle: identicon-cycle 8s linear infinite;
+
+	@keyframes identicon-wave {
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.35;
+		}
+	}
+
+	@keyframes identicon-cycle {
+		0%,
+		100% {
+			background-color: var(--color-brand);
+		}
+		25% {
+			background-color: var(--color-grape);
+		}
+		50% {
+			background-color: var(--color-tangerine);
+		}
+		75% {
+			background-color: var(--color-sun);
+		}
+	}
+
 	@keyframes orb-shift {
 		0%,
 		100% {

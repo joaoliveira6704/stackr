@@ -32,16 +32,15 @@ interface ShopCard<Id> {
 	title: string;
 	detail: string;
 	price: number;
+	/** Level 3 items move, and their card says so. */
+	animated: boolean;
 }
 
 function owns(kind: CosmeticKind, id: string | null): boolean {
 	return id === null || progress.unlockedContent.includes(shopItemId(kind, id));
 }
 
-type ThemeCard = ShopCard<ColourThemeId> & {
-	swatches: PaletteColour[];
-	animated: boolean;
-};
+type ThemeCard = ShopCard<ColourThemeId> & { swatches: PaletteColour[] };
 
 // The free default comes first, then the static themes and the animated
 // ones, in the order of the catalogue.
@@ -64,18 +63,22 @@ const themeCards = computed<ThemeCard[]>(() => [
 	})),
 ]);
 
+// Every style is shown on the user's own pattern, so they see exactly what
+// their picture would look like.
 const avatarCards = computed<ShopCard<AvatarId>[]>(() => [
 	{
 		id: null,
-		title: t("shop.initials"),
-		detail: t("shop.initialsDetail"),
+		title: t("shop.defaultAvatar"),
+		detail: t("shop.defaultAvatarDetail"),
 		price: 0,
+		animated: false,
 	},
 	...AVATARS.map((avatar) => ({
 		id: avatar.id,
-		title: t(`shop.avatars.${avatar.id}`),
-		detail: t("shop.avatarDetail"),
+		title: t(`shop.avatars.${avatar.id}.name`),
+		detail: t(`shop.avatars.${avatar.id}.detail`),
 		price: avatar.price,
+		animated: avatar.level === 3,
 	})),
 ]);
 
@@ -150,18 +153,19 @@ async function buy<Kind extends CosmeticKind>(
 			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				<ShopItemCard
 					v-for="card in avatarCards"
-					:key="card.id ?? 'initials'"
-					:data-item="shopItemId('avatar', card.id ?? 'initials')"
+					:key="card.id ?? 'default'"
+					:data-item="shopItemId('avatar', card.id ?? 'default')"
 					:title="card.title"
 					:detail="card.detail"
 					:price="card.price"
+					:tag="card.animated ? t('shop.animatedTag') : undefined"
 					:owned="owns('avatar', card.id)"
 					:in-use="progress.equipped.avatar === card.id"
 					@buy="buy('avatar', card)"
 					@apply="progress.equip('avatar', card.id)"
 				>
 					<template #preview>
-						<UserAvatar :name="user?.name ?? ''" :avatar="card.id" />
+						<UserAvatar :seed="user?.id ?? ''" :avatar="card.id" />
 					</template>
 				</ShopItemCard>
 			</div>

@@ -102,7 +102,7 @@ The compound interest calculation is money logic, so it lives with the other mon
 
 ## Phase 5: the Stacks shop
 
-This is built. Extra learning is bought on the Learn page, so the shop at `/shop` only sells cosmetics: colour themes in three levels (the free default, static themes that recolour the backdrop orbs, and pricier animated themes that also make them drift and blend), and profile icons that replace the initials on the profile. Prices live in `src/lib/shop.ts`. Buying goes through `unlockContent`, with the same confirm as unlocking a module, and refuses the purchase with a clear message if the balance is too low. An item is bought once and then applied or taken off for free, and what is in use is saved with the progress under `equipped`. A short tip about spending with intention sits at the bottom of the page.
+This is built. Extra learning is bought on the Learn page, so the shop at `/shop` only sells cosmetics: colour themes in three levels (the free default, static themes that recolour the backdrop orbs, and pricier animated themes that also make them drift and blend), and profile pictures in the same three levels. Every profile picture is an identicon drawn from the user's id, like on GitHub, and the shop sells colour styles for it, from one colour or a mix of two to animated ones. Prices live in `src/lib/shop.ts`. Buying goes through `unlockContent`, with the same confirm as unlocking a module, and refuses the purchase with a clear message if the balance is too low. An item is bought once and then applied or taken off for free, and what is in use is saved with the progress under `equipped`. A short tip about spending with intention sits at the bottom of the page.
 
 ## Phase 6: weekly ranking
 

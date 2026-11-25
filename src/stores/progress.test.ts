@@ -476,14 +476,14 @@ describe("shop cosmetics", () => {
 	it("refuses to put on an item that was never bought and changes nothing", () => {
 		const progress = useProgressStore();
 
-		expect(() => progress.equip("avatar", "crown")).toThrow("itemNotOwned");
+		expect(() => progress.equip("avatar", "prism")).toThrow("itemNotOwned");
 		expect(progress.equipped.avatar).toBeNull();
 	});
 
 	it("does not count an avatar as a colour theme", () => {
 		const progress = useProgressStore();
 		progress.addStacks(100);
-		progress.unlockContent(shopItemId("avatar", "leaf"), 30);
+		progress.unlockContent(shopItemId("avatar", "grape"), 30);
 
 		expect(() => progress.equip("colourTheme", "grape")).toThrow(
 			"itemNotOwned",
@@ -493,8 +493,8 @@ describe("shop cosmetics", () => {
 	it("goes back to the default look when the item is taken off", () => {
 		const progress = useProgressStore();
 		progress.addStacks(100);
-		progress.unlockContent(shopItemId("avatar", "leaf"), 30);
-		progress.equip("avatar", "leaf");
+		progress.unlockContent(shopItemId("avatar", "grape"), 30);
+		progress.equip("avatar", "grape");
 
 		progress.equip("avatar", null);
 
@@ -504,15 +504,15 @@ describe("shop cosmetics", () => {
 	it("saves what is in use and loads it back", () => {
 		const progress = useProgressStore();
 		progress.addStacks(100);
-		progress.unlockContent(shopItemId("avatar", "rocket"), 40);
-		progress.equip("avatar", "rocket");
+		progress.unlockContent(shopItemId("avatar", "duo"), 40);
+		progress.equip("avatar", "duo");
 		const saved = progress.snapshot();
 
 		progress.reset();
 		progress.load(saved);
 
-		expect(progress.equipped.avatar).toBe("rocket");
-		expect(progress.unlockedContent).toContain("avatar:rocket");
+		expect(progress.equipped.avatar).toBe("duo");
+		expect(progress.unlockedContent).toContain("avatar:duo");
 	});
 
 	it("loads a record saved before the shop existed with the default look", () => {
@@ -544,9 +544,9 @@ describe("loading cosmetics that left the shop", () => {
 
 		progress.load({
 			...emptyProgress(),
-			equipped: { avatar: "crown", colourTheme: "aurora" },
+			equipped: { avatar: "prism", colourTheme: "aurora" },
 		});
 
-		expect(progress.equipped).toEqual({ avatar: "crown", colourTheme: "aurora" });
+		expect(progress.equipped).toEqual({ avatar: "prism", colourTheme: "aurora" });
 	});
 });

@@ -4,6 +4,7 @@ import {
 	AVATARS,
 	COLOUR_THEMES,
 	DEFAULT_ORBS,
+	findAvatar,
 	isAnimatedTheme,
 	PALETTE_COLOURS,
 	shopItemId,
@@ -95,5 +96,36 @@ describe("theme levels", () => {
 			);
 
 		expect(Math.min(...prices(3))).toBeGreaterThan(Math.max(...prices(2)));
+	});
+});
+
+describe("profile picture styles", () => {
+	it("moves only the level 3 styles", () => {
+		for (const avatar of AVATARS) {
+			expect(avatar.motion !== undefined, avatar.id).toBe(avatar.level === 3);
+		}
+	});
+
+	it("paints every style with brand palette colours only", () => {
+		for (const avatar of AVATARS) {
+			expect(avatar.colours.length, avatar.id).toBeGreaterThan(0);
+			for (const colour of avatar.colours) {
+				expect(PALETTE_COLOURS).toContain(colour);
+			}
+		}
+	});
+
+	it("prices every animated style above every static one", () => {
+		const prices = (level: number) =>
+			AVATARS.filter((avatar) => avatar.level === level).map(
+				(avatar) => avatar.price,
+			);
+
+		expect(Math.min(...prices(3))).toBeGreaterThan(Math.max(...prices(2)));
+	});
+
+	it("finds a style by its id and nothing for the free default", () => {
+		expect(findAvatar("duo")?.colours).toEqual(["brand", "grape"]);
+		expect(findAvatar(null)).toBeUndefined();
 	});
 });

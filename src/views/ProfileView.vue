@@ -27,7 +27,7 @@ const { t, n } = useI18n();
 
 		<section class="card flex flex-col gap-4">
 			<div class="flex items-center gap-4">
-				<UserAvatar :name="user?.name ?? ''" />
+				<UserAvatar :seed="user?.id ?? ''" />
 				<div class="min-w-0 flex-1">
 					<h2 class="text-heading truncate">{{ user?.name }}</h2>
 					<p class="truncate text-sm text-ink-muted">{{ user?.email }}</p>

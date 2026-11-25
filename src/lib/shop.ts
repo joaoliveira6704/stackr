@@ -19,30 +19,39 @@ export const COLOUR_THEME_IDS = [
 export type ColourThemeId = (typeof COLOUR_THEME_IDS)[number];
 
 export const AVATAR_IDS = [
-	"leaf",
-	"rocket",
-	"zap",
-	"cat",
-	"gem",
-	"crown",
+	"grape",
+	"tangerine",
+	"sun",
+	"duo",
+	"ember",
+	"wave",
+	"prism",
 ] as const;
 export type AvatarId = (typeof AVATAR_IDS)[number];
 
-// Themes come in three levels. Level 1 is the free default, level 2 themes
-// recolour the backdrop and level 3 themes also make it move.
-export type ThemeLevel = 2 | 3;
+// Everything in the shop comes in three levels. Level 1 is the free default,
+// level 2 items change colours and level 3 items also move.
+export type ShopLevel = 2 | 3;
 
 export interface ColourTheme {
 	id: ColourThemeId;
 	price: number;
-	level: ThemeLevel;
+	level: ShopLevel;
 	/** The colours of the four backdrop orbs, matching themes.css. */
 	orbs: readonly PaletteColour[];
 }
 
+/** How a level 3 profile picture moves. */
+export type AvatarMotion = "wave" | "cycle";
+
+/** A style for the identicon drawn from the user's id, see identicon.ts. */
 export interface Avatar {
 	id: AvatarId;
 	price: number;
+	level: ShopLevel;
+	/** The colours its squares are painted with, mixed when there are two. */
+	colours: readonly PaletteColour[];
+	motion?: AvatarMotion;
 }
 
 /** The free look everyone starts with, the same orbs as without a theme. */
@@ -103,14 +112,28 @@ export function isAnimatedTheme(id: ColourThemeId | null): boolean {
 	return COLOUR_THEMES.some((theme) => theme.id === id && theme.level === 3);
 }
 
+/** The free style everyone starts with, their pattern in brand green. */
+export const DEFAULT_AVATAR_COLOURS: readonly PaletteColour[] = ["brand"];
+
 export const AVATARS: readonly Avatar[] = [
-	{ id: "leaf", price: 30 },
-	{ id: "rocket", price: 40 },
-	{ id: "zap", price: 50 },
-	{ id: "cat", price: 60 },
-	{ id: "gem", price: 80 },
-	{ id: "crown", price: 120 },
+	{ id: "grape", price: 30, level: 2, colours: ["grape"] },
+	{ id: "tangerine", price: 30, level: 2, colours: ["tangerine"] },
+	{ id: "sun", price: 30, level: 2, colours: ["sun"] },
+	{ id: "duo", price: 50, level: 2, colours: ["brand", "grape"] },
+	{ id: "ember", price: 50, level: 2, colours: ["tangerine", "sun"] },
+	{ id: "wave", price: 100, level: 3, colours: ["brand"], motion: "wave" },
+	{
+		id: "prism",
+		price: 150,
+		level: 3,
+		colours: ["brand", "grape", "tangerine", "sun"],
+		motion: "cycle",
+	},
 ];
+
+export function findAvatar(id: AvatarId | null): Avatar | undefined {
+	return AVATARS.find((avatar) => avatar.id === id);
+}
 
 const ID_PREFIXES: Record<CosmeticKind, string> = {
 	avatar: "avatar",
