@@ -6,7 +6,11 @@ import { useI18n } from "vue-i18n";
 import { useProgressStore } from "../stores/progress";
 import AppIcon from "./AppIcon.vue";
 
-const props = defineProps<{ price: number }>();
+// "buy" is for shop items, which are bought rather than unlocked.
+const props = withDefaults(
+	defineProps<{ price: number; verb?: "unlock" | "buy" }>(),
+	{ verb: "unlock" },
+);
 defineEmits<{ unlock: [] }>();
 
 const progress = useProgressStore();
@@ -24,10 +28,10 @@ const missing = computed(() => Math.max(props.price - progress.stacks, 0));
 			@click="$emit('unlock')"
 		>
 			<AppIcon name="stacks" :size="16" />
-			<span class="tabular-nums">{{ t("learn.unlock.button", { price: n(price) }) }}</span>
+			<span class="tabular-nums">{{ t(verb === "buy" ? "unlock.buyButton" : "unlock.button", { price: n(price) }) }}</span>
 		</button>
 		<p v-if="missing > 0" class="text-sm text-ink-muted tabular-nums">
-			{{ t("learn.unlock.missing", { amount: n(missing) }) }}
+			{{ t("unlock.missing", { amount: n(missing) }) }}
 		</p>
 	</div>
 </template>

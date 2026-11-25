@@ -1,13 +1,18 @@
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
 import { MODULE_REWARD, ONE_OFF_STACKS_PROFIT } from "../lib/rewards";
+import { shopItemId } from "../lib/shop";
 import {
 	answersFor,
 	FUND_PRICE,
 	foundationTrack,
 	quizzes,
 } from "../test/content-fixtures";
-import { emptyProgress, useProgressStore } from "./progress";
+import {
+	emptyProgress,
+	type ProgressSnapshot,
+	useProgressStore,
+} from "./progress";
 
 beforeEach(() => {
 	setActivePinia(createPinia());
@@ -446,5 +451,102 @@ describe("reading the lesson before the quiz", () => {
 		progress.markLessonRead(quiz.lessonId);
 
 		expect(progress.snapshot().lessonsRead).toEqual([quiz.lessonId]);
+	});
+});
+
+describe("shop cosmetics", () => {
+	it("starts with the default look and nothing in use", () => {
+		expect(useProgressStore().equipped).toEqual({
+			avatar: null,
+			colourTheme: null,
+		});
+	});
+
+	it("puts on a colour theme the user bought", () => {
+		const progress = useProgressStore();
+		progress.addStacks(100);
+		progress.unlockContent(shopItemId("colourTheme", "sunset"), 80);
+
+		progress.equip("colourTheme", "sunset");
+
+		expect(progress.equipped.colourTheme).toBe("sunset");
+		expect(progress.stacks).toBe(20);
+	});
+
+	it("refuses to put on an item that was never bought and changes nothing", () => {
+		const progress = useProgressStore();
+
+		expect(() => progress.equip("avatar", "crown")).toThrow("itemNotOwned");
+		expect(progress.equipped.avatar).toBeNull();
+	});
+
+	it("does not count an avatar as a colour theme", () => {
+		const progress = useProgressStore();
+		progress.addStacks(100);
+		progress.unlockContent(shopItemId("avatar", "leaf"), 30);
+
+		expect(() => progress.equip("colourTheme", "grape")).toThrow(
+			"itemNotOwned",
+		);
+	});
+
+	it("goes back to the default look when the item is taken off", () => {
+		const progress = useProgressStore();
+		progress.addStacks(100);
+		progress.unlockContent(shopItemId("avatar", "leaf"), 30);
+		progress.equip("avatar", "leaf");
+
+		progress.equip("avatar", null);
+
+		expect(progress.equipped.avatar).toBeNull();
+	});
+
+	it("saves what is in use and loads it back", () => {
+		const progress = useProgressStore();
+		progress.addStacks(100);
+		progress.unlockContent(shopItemId("avatar", "rocket"), 40);
+		progress.equip("avatar", "rocket");
+		const saved = progress.snapshot();
+
+		progress.reset();
+		progress.load(saved);
+
+		expect(progress.equipped.avatar).toBe("rocket");
+		expect(progress.unlockedContent).toContain("avatar:rocket");
+	});
+
+	it("loads a record saved before the shop existed with the default look", () => {
+		const progress = useProgressStore();
+		const { equipped: _missing, ...older } = emptyProgress();
+
+		progress.load({ ...older, stacks: 12 } as ProgressSnapshot);
+
+		expect(progress.stacks).toBe(12);
+		expect(progress.equipped).toEqual({ avatar: null, colourTheme: null });
+	});
+});
+
+describe("loading cosmetics that left the shop", () => {
+	it("falls back to the default look for a theme or icon the shop no longer sells", () => {
+		const progress = useProgressStore();
+		const saved = emptyProgress();
+
+		progress.load({
+			...saved,
+			equipped: { avatar: "unicorn", colourTheme: "ocean" },
+		} as unknown as ProgressSnapshot);
+
+		expect(progress.equipped).toEqual({ avatar: null, colourTheme: null });
+	});
+
+	it("keeps a theme and icon the shop still sells", () => {
+		const progress = useProgressStore();
+
+		progress.load({
+			...emptyProgress(),
+			equipped: { avatar: "crown", colourTheme: "aurora" },
+		});
+
+		expect(progress.equipped).toEqual({ avatar: "crown", colourTheme: "aurora" });
 	});
 });

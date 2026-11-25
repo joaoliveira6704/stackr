@@ -1,5 +1,6 @@
 import type { BadgeId } from "../lib/badges";
 import type { BudgetGroup, SpendingProgress } from "../lib/budget";
+import type { AvatarId, PaletteColour } from "../lib/shop";
 import type { Track } from "../lib/tracks";
 
 // The tone-* utilities live in src/styles/components.css. Class names are
@@ -34,6 +35,24 @@ export const BADGE_TONES: Record<BadgeId, Tone> = {
 	inflation: "tangerine",
 	diversification: "brand",
 	prudentInvestor: "sun",
+};
+
+export const AVATAR_TONES: Record<AvatarId, Tone> = {
+	leaf: "brand",
+	rocket: "grape",
+	zap: "sun",
+	cat: "tangerine",
+	gem: "grape",
+	crown: "sun",
+};
+
+// The palette strip on each colour theme card in the shop. Class names are
+// written out in full so Tailwind can find them.
+export const SWATCH_CLASSES: Record<PaletteColour, string> = {
+	brand: "bg-brand",
+	grape: "bg-grape",
+	tangerine: "bg-tangerine",
+	sun: "bg-sun",
 };
 
 /** At this share of the plan the bar has turned from red to orange. */

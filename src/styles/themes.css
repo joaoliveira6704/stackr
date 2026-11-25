@@ -4,6 +4,11 @@
  */
 :root {
 	color-scheme: light;
+	/* Backdrop orbs. A colour theme from the shop swaps them, see below. */
+	--orb-1: var(--color-brand);
+	--orb-2: var(--color-grape);
+	--orb-3: var(--color-brand);
+	--orb-4: var(--color-tangerine);
 	--surface: #f6f8f7;
 	--surface-muted: #eef2f0;
 	--ink: #0b0f0d;
@@ -57,4 +62,60 @@
 	--chart-2: #b88a20;
 	--chart-3: #8a6cf7;
 	--chart-4: #e2602c;
+}
+
+/*
+ * Colour themes bought in the shop. They only recolour the backdrop orbs with
+ * other colours from the brand palette, so the brand green keeps every button
+ * and selected state, and the orb opacity above keeps them right in both light
+ * and dark. The colours must match COLOUR_THEMES in src/lib/shop.ts, which a
+ * test checks.
+ */
+[data-colour-theme="grape"] {
+	--orb-1: var(--color-grape);
+	--orb-2: var(--color-grape);
+	--orb-3: var(--color-brand);
+	--orb-4: var(--color-grape);
+}
+
+[data-colour-theme="sunset"] {
+	--orb-1: var(--color-tangerine);
+	--orb-2: var(--color-sun);
+	--orb-3: var(--color-tangerine);
+	--orb-4: var(--color-grape);
+}
+
+[data-colour-theme="citrus"] {
+	--orb-1: var(--color-sun);
+	--orb-2: var(--color-brand);
+	--orb-3: var(--color-sun);
+	--orb-4: var(--color-tangerine);
+}
+
+[data-colour-theme="aurora"] {
+	--orb-1: var(--color-grape);
+	--orb-2: var(--color-brand);
+	--orb-3: var(--color-tangerine);
+	--orb-4: var(--color-sun);
+}
+
+[data-colour-theme="neon"] {
+	--orb-1: var(--color-brand);
+	--orb-2: var(--color-grape);
+	--orb-3: var(--color-brand);
+	--orb-4: var(--color-grape);
+}
+
+[data-colour-theme="ember"] {
+	--orb-1: var(--color-tangerine);
+	--orb-2: var(--color-sun);
+	--orb-3: var(--color-tangerine);
+	--orb-4: var(--color-sun);
+}
+
+[data-colour-theme="prism"] {
+	--orb-1: var(--color-brand);
+	--orb-2: var(--color-grape);
+	--orb-3: var(--color-tangerine);
+	--orb-4: var(--color-sun);
 }

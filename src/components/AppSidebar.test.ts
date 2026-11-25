@@ -33,7 +33,7 @@ function buttonNamed(
 }
 
 describe("AppSidebar", () => {
-	it("links to the dashboard, the budget, the register, the simulator and the profile", async () => {
+	it("links to the dashboard, the budget, the register, the simulator, the shop and the profile", async () => {
 		const { wrapper } = await mountSidebar();
 
 		const links = wrapper.findAll("a").map((link) => link.attributes("href"));
@@ -41,6 +41,7 @@ describe("AppSidebar", () => {
 		expect(links).toContain("/budget");
 		expect(links).toContain("/register");
 		expect(links).toContain("/simulator");
+		expect(links).toContain("/shop");
 		expect(links).toContain("/profile");
 	});
 

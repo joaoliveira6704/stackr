@@ -13,6 +13,14 @@ import {
 	rewardForPassedLesson,
 	rewardForPassedOneOff,
 } from "../lib/rewards";
+import {
+	AVATAR_IDS,
+	type AvatarId,
+	COLOUR_THEME_IDS,
+	type ColourThemeId,
+	type CosmeticKind,
+	shopItemId,
+} from "../lib/shop";
 import type { Track } from "../lib/tracks";
 
 function addOnce(list: string[], id: string): void {
@@ -37,6 +45,14 @@ export interface QuizOutcome {
 	moduleReward: Reward | null;
 }
 
+/** The shop cosmetics in use, null for the free default look. */
+export interface EquippedCosmetics {
+	avatar: AvatarId | null;
+	colourTheme: ColourThemeId | null;
+}
+
+type EquippedId<Kind extends CosmeticKind> = EquippedCosmetics[Kind];
+
 /** The part of the progress that is saved per user in db.json. */
 export interface ProgressSnapshot {
 	xp: number;
@@ -54,6 +70,7 @@ export interface ProgressSnapshot {
 	badges: string[];
 	unlockedContent: string[];
 	completedModules: string[];
+	equipped: EquippedCosmetics;
 }
 
 export function emptyProgress(): ProgressSnapshot {
@@ -72,6 +89,22 @@ export function emptyProgress(): ProgressSnapshot {
 		badges: [],
 		unlockedContent: [],
 		completedModules: [],
+		equipped: { avatar: null, colourTheme: null },
+	};
+}
+
+function isOneOf<T extends string>(list: readonly T[], value: unknown): value is T {
+	return list.includes(value as T);
+}
+
+// Records saved before the shop existed have no equipped field at all, and an
+// item taken out of the shop must not leave the user with no look in use.
+function knownCosmetics(saved?: Partial<EquippedCosmetics>): EquippedCosmetics {
+	return {
+		avatar: isOneOf(AVATAR_IDS, saved?.avatar) ? saved.avatar : null,
+		colourTheme: isOneOf(COLOUR_THEME_IDS, saved?.colourTheme)
+			? saved.colourTheme
+			: null,
 	};
 }
 
@@ -93,6 +126,7 @@ export const useProgressStore = defineStore("progress", () => {
 	const badges = ref<string[]>([]);
 	const unlockedContent = ref<string[]>([]);
 	const completedModules = ref<string[]>([]);
+	const equipped = ref<EquippedCosmetics>(emptyProgress().equipped);
 
 	// Derived from XP instead of stored, so the level can never drift out of sync.
 	const level = computed(() => levelForXp(xp.value));
@@ -132,6 +166,18 @@ export const useProgressStore = defineStore("progress", () => {
 		if (unlockedContent.value.includes(contentId)) return;
 		spendStacks(cost);
 		unlockedContent.value.push(contentId);
+	}
+
+	// Buying goes through unlockContent, so only something bought can be put
+	// on. Taking it off, with null, is always allowed.
+	function equip<Kind extends CosmeticKind>(
+		kind: Kind,
+		id: EquippedId<Kind>,
+	): void {
+		if (id !== null && !unlockedContent.value.includes(shopItemId(kind, id))) {
+			throw new AppError("itemNotOwned");
+		}
+		equipped.value = { ...equipped.value, [kind]: id };
 	}
 
 	function completeLesson(lessonId: string): void {
@@ -266,6 +312,7 @@ export const useProgressStore = defineStore("progress", () => {
 			badges: [...badges.value],
 			unlockedContent: [...unlockedContent.value],
 			completedModules: [...completedModules.value],
+			equipped: { ...equipped.value },
 		};
 	}
 
@@ -285,6 +332,7 @@ export const useProgressStore = defineStore("progress", () => {
 		badges.value = [...value.badges];
 		unlockedContent.value = [...value.unlockedContent];
 		completedModules.value = [...value.completedModules];
+		equipped.value = knownCosmetics(saved.equipped);
 	}
 
 	function reset(): void {
@@ -315,6 +363,7 @@ export const useProgressStore = defineStore("progress", () => {
 		badges,
 		unlockedContent,
 		completedModules,
+		equipped,
 		setTrack,
 		completeOnboarding,
 		addXp,
@@ -322,6 +371,7 @@ export const useProgressStore = defineStore("progress", () => {
 		addStacks,
 		spendStacks,
 		unlockContent,
+		equip,
 		completeLesson,
 		registerAttempt,
 		requireReview,

@@ -74,11 +74,3 @@ export interface TrackContent {
 	id: Track;
 	modules: Module[];
 }
-
-/** A one-off lesson on an everyday topic, open to every track for a price. */
-export interface OneOff {
-	id: string;
-	lessonId: string;
-	/** Stacks needed to unlock the lesson. */
-	price: number;
-}

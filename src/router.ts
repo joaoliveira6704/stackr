@@ -16,8 +16,9 @@ import LoginView from "./views/LoginView.vue";
 import NotFoundView from "./views/NotFoundView.vue";
 import OnboardingView from "./views/OnboardingView.vue";
 import ProfileView from "./views/ProfileView.vue";
-import RegisterView from "./views/RegisterView.vue";
 import QuizView from "./views/QuizView.vue";
+import RegisterView from "./views/RegisterView.vue";
+import ShopView from "./views/ShopView.vue";
 import SignupView from "./views/SignupView.vue";
 import SimulatorView from "./views/SimulatorView.vue";
 
@@ -80,6 +81,11 @@ const routes: RouteRecordRaw[] = [
 	{
 		path: "/simulator",
 		component: SimulatorView,
+		meta: { requiresAuth: true, layout: "app" },
+	},
+	{
+		path: "/shop",
+		component: ShopView,
 		meta: { requiresAuth: true, layout: "app" },
 	},
 	{ path: "/:pathMatch(.*)*", component: NotFoundView },

@@ -102,7 +102,7 @@ The compound interest calculation is money logic, so it lives with the other mon
 
 ## Phase 5: the Stacks shop
 
-A `StackShop` page lists extra content with its price: 30 Stacks for a bonus quiz and 50 Stacks for an extra lesson. Buying goes through `unlockContent(contentId, cost)`, which uses `spendStacks(amount)` and refuses the purchase with a clear message if the balance is too low. After a purchase the balance updates, the item shows as unlocked on the module map, and a short tip about spending with intention appears. Bonus quizzes and extra lessons need their own content on top of the main path.
+This is built. Extra learning is bought on the Learn page, so the shop at `/shop` only sells cosmetics: colour themes in three levels (the free default, static themes that recolour the backdrop orbs, and pricier animated themes that also make them drift and blend), and profile icons that replace the initials on the profile. Prices live in `src/lib/shop.ts`. Buying goes through `unlockContent`, with the same confirm as unlocking a module, and refuses the purchase with a clear message if the balance is too low. An item is bought once and then applied or taken off for free, and what is in use is saved with the progress under `equipped`. A short tip about spending with intention sits at the bottom of the page.
 
 ## Phase 6: weekly ranking
 

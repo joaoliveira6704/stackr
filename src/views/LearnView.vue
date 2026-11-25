@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import AppIcon from "../components/AppIcon.vue";
 import HorizontalScroller from "../components/HorizontalScroller.vue";
 import LoadState from "../components/LoadState.vue";
 import ModuleCard from "../components/ModuleCard.vue";
 import OneOffCard from "../components/OneOffCard.vue";
+import StacksBalance from "../components/StacksBalance.vue";
 import type { Lesson, Module } from "../content/types";
 import { useLocalized } from "../content/use-localized";
 import {
@@ -22,7 +22,7 @@ import { useProgressStore } from "../stores/progress";
 
 const { user } = useAuth();
 const progress = useProgressStore();
-const { t, n } = useI18n();
+const { t } = useI18n();
 const localized = useLocalized();
 const { unlock, error: unlockError } = useUnlock();
 
@@ -106,10 +106,7 @@ function unlockOneOff(id: string, price: number, lesson: Lesson) {
 				<h1 class="text-title">{{ t("learn.title") }}</h1>
 				<p class="mt-2 text-lead text-ink-muted">{{ t("learn.subtitle") }}</p>
 			</div>
-			<p class="chip tone-sun tabular-nums" :aria-label="t('learn.balanceLabel')">
-				<AppIcon name="stacks" :size="16" />
-				{{ t("learn.balance", { amount: n(progress.stacks) }) }}
-			</p>
+			<StacksBalance />
 		</header>
 
 		<p v-if="unlockError" role="alert" class="card-tint tone-tangerine font-semibold">
