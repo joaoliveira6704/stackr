@@ -7,6 +7,7 @@ import AppFooter from "./components/AppFooter.vue";
 import AppSidebar from "./components/AppSidebar.vue";
 import ConfirmDialog from "./components/ConfirmDialog.vue";
 import PublicNavbar from "./components/PublicNavbar.vue";
+import { useColourTheme } from "./lib/use-colour-theme";
 import { useProgressSync } from "./lib/use-progress-sync";
 
 const route = useRoute();
@@ -16,6 +17,7 @@ const isAppLayout = computed(() => route.meta.layout === "app");
 const { syncError } = useProgressSync(() =>
 	router.replace({ path: "/login", query: { redirect: route.fullPath } }),
 );
+useColourTheme();
 </script>
 
 <template>

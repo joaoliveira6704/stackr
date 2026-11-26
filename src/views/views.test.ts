@@ -1,5 +1,6 @@
 import { flushPromises } from "@vue/test-utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { shopItemId } from "../lib/shop";
 import { useAuth } from "../lib/use-auth";
 import { useProgressStore } from "../stores/progress";
 import {
@@ -142,6 +143,29 @@ describe("DashboardView", () => {
 		const { wrapper } = await mountAt("/dashboard", DashboardView);
 
 		expect(wrapper.text()).toContain("Hi, João");
+	});
+
+	it("shows the user's profile picture next to the greeting", async () => {
+		await signInAsDemoUser();
+		const { wrapper } = await mountAt("/dashboard", DashboardView);
+
+		const avatar = wrapper.get("[data-avatar]");
+		expect(avatar.attributes("data-avatar")).toBe("default");
+		expect(avatar.findAll("[data-cell]").length).toBeGreaterThan(0);
+	});
+
+	it("shows the profile style the user applied in the shop", async () => {
+		await signInAsDemoUser();
+		const { wrapper } = await mountAt("/dashboard", DashboardView);
+		const progress = useProgressStore();
+		progress.addStacks(30);
+		progress.unlockContent(shopItemId("avatar", "grape"), 30);
+		progress.equip("avatar", "grape");
+		await flushPromises();
+
+		expect(wrapper.get("[data-avatar]").attributes("data-avatar")).toBe(
+			"grape",
+		);
 	});
 
 	it("shows the current level", async () => {

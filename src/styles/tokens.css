@@ -33,6 +33,12 @@
 	--color-glass-strong: var(--glass-strong);
 	--color-glass-border: var(--glass-border);
 
+	/* The four backdrop orbs, which a shop colour theme can recolour. */
+	--color-orb-1: var(--orb-1);
+	--color-orb-2: var(--orb-2);
+	--color-orb-3: var(--orb-3);
+	--color-orb-4: var(--orb-4);
+
 	/* Chart series, in this fixed order. Never cycle them, fold extra series
 	into "Outros" instead. */
 	--color-chart-1: var(--chart-1);
@@ -83,6 +89,82 @@
 		to {
 			opacity: 1;
 			transform: none;
+		}
+	}
+
+	/* Backdrop orbs wander along a slow loop and fade into a second colour.
+	Both move only transform and opacity, so the blurred orbs are painted once
+	and the browser just moves and fades them. */
+	--animate-orb-drift: orb-drift 40s ease-in-out infinite;
+	--animate-orb-shift: orb-shift 26s ease-in-out infinite;
+
+	/* The same drift, scaled down for the small theme previews in the shop. */
+	--animate-orb-drift-sm: orb-drift-sm 14s ease-in-out infinite;
+
+	@keyframes orb-drift-sm {
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		33% {
+			transform: translate(0.75rem, -0.5rem) scale(1.1);
+		}
+		66% {
+			transform: translate(-0.5rem, 0.5rem) scale(0.92);
+		}
+	}
+
+	@keyframes orb-drift {
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		33% {
+			transform: translate(4rem, -3rem) scale(1.08);
+		}
+		66% {
+			transform: translate(-3rem, 2.5rem) scale(0.94);
+		}
+	}
+
+	/* Level 3 profile pictures. A wave of light runs across the squares, or
+	each square cycles through the four palette colours. */
+	--animate-identicon-wave: identicon-wave 2.4s ease-in-out infinite;
+	--animate-identicon-cycle: identicon-cycle 8s linear infinite;
+
+	@keyframes identicon-wave {
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.35;
+		}
+	}
+
+	@keyframes identicon-cycle {
+		0%,
+		100% {
+			background-color: var(--color-brand);
+		}
+		25% {
+			background-color: var(--color-grape);
+		}
+		50% {
+			background-color: var(--color-tangerine);
+		}
+		75% {
+			background-color: var(--color-sun);
+		}
+	}
+
+	@keyframes orb-shift {
+		0%,
+		100% {
+			opacity: 0;
+		}
+		50% {
+			opacity: var(--orb-opacity);
 		}
 	}
 }

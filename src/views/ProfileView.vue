@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import AppIcon from "../components/AppIcon.vue";
 import { TRACK_ICONS } from "../components/icons";
 import LevelCard from "../components/LevelCard.vue";
 import StatRow from "../components/StatRow.vue";
 import { TONE_CLASSES, TRACK_TONES } from "../components/tones";
+import UserAvatar from "../components/UserAvatar.vue";
 import { ONBOARDING_PATH } from "../lib/onboarding";
 import { useAuth } from "../lib/use-auth";
 import { useLogout } from "../lib/use-logout";
@@ -15,15 +15,6 @@ const { user } = useAuth();
 const { logOut } = useLogout();
 const progress = useProgressStore();
 const { t, n } = useI18n();
-
-const initials = computed(() =>
-	(user.value?.name ?? "")
-		.split(" ")
-		.filter(Boolean)
-		.slice(0, 2)
-		.map((part) => part[0]?.toUpperCase())
-		.join(""),
-);
 
 </script>
 
@@ -36,13 +27,15 @@ const initials = computed(() =>
 
 		<section class="card flex flex-col gap-4">
 			<div class="flex items-center gap-4">
-				<span aria-hidden="true" class="icon-tile icon-tile-xl tone-brand text-heading">
-					{{ initials }}
-				</span>
-				<div class="min-w-0">
+				<UserAvatar :seed="user?.id ?? ''" />
+				<div class="min-w-0 flex-1">
 					<h2 class="text-heading truncate">{{ user?.name }}</h2>
 					<p class="truncate text-sm text-ink-muted">{{ user?.email }}</p>
 				</div>
+				<RouterLink to="/shop" class="btn-ghost btn-sm shrink-0">
+					<AppIcon name="shop" :size="16" />
+					{{ t("profile.changeAvatar") }}
+				</RouterLink>
 			</div>
 			<div class="divide-y divide-line border-t border-line">
 				<StatRow icon="user" :title="t('profile.name')" :value="user?.name ?? '—'" />

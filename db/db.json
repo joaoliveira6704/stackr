@@ -332,7 +332,7 @@
       "progress": {
         "xp": 330,
         "weeklyXp": 330,
-        "stacks": 15,
+        "stacks": 9950,
         "completedLessons": [
           "strategist-growth-1",
           "strategist-growth-2",
@@ -359,11 +359,23 @@
         "lastActivity": null,
         "badges": [],
         "unlockedContent": [
-          "strategist-etfs"
+          "strategist-etfs",
+          "theme:sunset",
+          "theme:aurora",
+          "avatar:leaf",
+          "avatar:crown",
+          "theme:berry",
+          "theme:ocean",
+          "avatar:tangerine",
+          "avatar:duo"
         ],
         "completedModules": [
           "strategist-growth"
-        ]
+        ],
+        "equipped": {
+          "avatar": "duo",
+          "colourTheme": "aurora"
+        }
       }
     }
   ],

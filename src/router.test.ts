@@ -21,6 +21,24 @@ describe("router", () => {
 		expect(router.currentRoute.value.query.redirect).toBe("/dashboard");
 	});
 
+	it("opens the shop as a page inside the app for a signed in user", async () => {
+		signInAsDemoUser();
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/shop");
+
+		expect(router.currentRoute.value.path).toBe("/shop");
+		expect(router.currentRoute.value.meta.layout).toBe("app");
+	});
+
+	it("sends a signed out visitor from the shop to login", async () => {
+		const router = createAppRouter(createMemoryHistory());
+
+		await router.push("/shop");
+
+		expect(router.currentRoute.value.path).toBe("/login");
+	});
+
 	it("lets a signed in user open the dashboard", async () => {
 		signInAsDemoUser();
 		const router = createAppRouter(createMemoryHistory());
